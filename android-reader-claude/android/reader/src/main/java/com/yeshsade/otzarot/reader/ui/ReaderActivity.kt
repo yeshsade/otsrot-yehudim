@@ -149,8 +149,8 @@ class ReaderActivity : AppCompatActivity() {
         ).forEach { (icon, label, active) ->
             val item = ui.column().apply {
                 gravity = Gravity.CENTER
-                setPadding(ui.dp(14), ui.dp(6), ui.dp(14), ui.dp(6))
-                minimumWidth = ui.dp(68)
+                setPadding(ui.dp(8), ui.dp(6), ui.dp(8), ui.dp(6))
+                minimumWidth = ui.dp(72)
                 if (active) background = ui.rounded(ui.colors.selection, 18f)
                 alpha = if (active) 1f else .4f
                 contentDescription = getString(label)
@@ -159,8 +159,11 @@ class ReaderActivity : AppCompatActivity() {
                 setImageResource(icon)
                 imageTintList = ColorStateList.valueOf(if (active) ui.colors.accent else ui.colors.muted)
             }, LinearLayout.LayoutParams(ui.dp(24), ui.dp(24)))
-            item.addView(ui.label(getString(label), 12f, if (active) ui.colors.accent else ui.colors.muted).apply { gravity = Gravity.CENTER })
-            bar.addView(item)
+            item.addView(ui.label(getString(label), 12f, if (active) ui.colors.accent else ui.colors.muted).apply {
+                gravity = Gravity.CENTER
+                maxLines = 1
+            }, LinearLayout.LayoutParams(-2, -2))
+            bar.addView(item, LinearLayout.LayoutParams(-2, -2))
         }
         return bar
     }
@@ -325,7 +328,13 @@ class ReaderActivity : AppCompatActivity() {
 
     private fun leave() {
         saveNow()
-        if (isTaskRoot) startActivity(Intent(this, LibraryActivity::class.java).putExtra(LibraryActivity.EXTRA_STAY, true))
+        if (isTaskRoot) {
+            // The list becomes the base of the app's task. Otherwise Android would treat opening the same
+            // file again from WhatsApp as "return to this task" and show the list instead of the document.
+            startActivity(Intent(this, LibraryActivity::class.java)
+                .putExtra(LibraryActivity.EXTRA_STAY, true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
+        }
         finish()
     }
 
