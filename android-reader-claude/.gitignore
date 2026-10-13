@@ -14,3 +14,9 @@
 *.jks
 *.keystore
 signing.properties
+# תוצרי בניית ספריות native — נבנים מחדש ב-build_dependencies.py
+android/PdfiumAndroid/src/main/libs/
+android/PdfiumAndroid/src/main/obj/
+android/PdfiumAndroid/src/main/jni/lib/
+android/build_dependencies/*_build/
+android/build_dependencies/*_src/

@@ -1,0 +1,192 @@
+{
+  "version": 4,
+  "status": "approved",
+  "source_entries_sha256": "78b1623c6c2a290ea39d97de535ec6f58926895b0881402d7d35de954619e577",
+  "entries": [
+    {
+      "id": "settings_title",
+      "he": "הגדרות",
+      "en": "Settings"
+    },
+    {
+      "id": "settings_back",
+      "he": "חזרה",
+      "en": "Back"
+    },
+    {
+      "id": "settings_close",
+      "he": "סגירה",
+      "en": "Close"
+    },
+    {
+      "id": "group_reading",
+      "he": "קריאה",
+      "en": "Reading"
+    },
+    {
+      "id": "group_display",
+      "he": "תצוגה",
+      "en": "Display"
+    },
+    {
+      "id": "group_app",
+      "he": "ממשק",
+      "en": "Interface"
+    },
+    {
+      "id": "scroll_label",
+      "he": "כיוון הדפדוף",
+      "en": "Page navigation"
+    },
+    {
+      "id": "scroll_desc",
+      "he": "דפדוף",
+      "en": "Page navigation"
+    },
+    {
+      "id": "scroll_vertical",
+      "he": "מלמעלה למטה",
+      "en": "Vertical"
+    },
+    {
+      "id": "scroll_horizontal",
+      "he": "ימינה ושמאלה",
+      "en": "Horizontal"
+    },
+    {
+      "id": "resume_label",
+      "he": "בפתיחה חוזרת",
+      "en": "When reopening a document"
+    },
+    {
+      "id": "resume_desc",
+      "he": "",
+      "en": ""
+    },
+    {
+      "id": "resume_last",
+      "he": "המשך מהמקום בו עצרתי",
+      "en": "Continue where I left off"
+    },
+    {
+      "id": "resume_start",
+      "he": "מתחילת המסמך",
+      "en": "From the beginning"
+    },
+    {
+      "id": "marks_label",
+      "he": "אחרי סימון במרקר או בעט",
+      "en": "After highlighting or drawing"
+    },
+    {
+      "id": "marks_desc",
+      "he": "לחזור לקריאה או להמשיך לסמן",
+      "en": "Return to reading or keep the tool active"
+    },
+    {
+      "id": "marks_once",
+      "he": "לחזור לקריאה",
+      "en": "Return to reading"
+    },
+    {
+      "id": "marks_repeat",
+      "he": "להמשיך לסמן",
+      "en": "Keep marking"
+    },
+    {
+      "id": "rotation_label",
+      "he": "סיבוב המסך",
+      "en": "Screen rotation"
+    },
+    {
+      "id": "rotation_desc",
+      "he": "השינוי חל רק בתוך האפליקציה",
+      "en": "This setting applies only to this app"
+    },
+    {
+      "id": "rotation_phone",
+      "he": "כמוגדר במערכת",
+      "en": "System default"
+    },
+    {
+      "id": "rotation_lock",
+      "he": "לנעול בכיוון הנוכחי",
+      "en": "Lock current orientation"
+    },
+    {
+      "id": "awake_label",
+      "he": "כיבוי המסך בזמן קריאה",
+      "en": "Screen timeout while reading"
+    },
+    {
+      "id": "awake_desc",
+      "he": "כמה זמן המסך יישאר דלוק, בזמן השימוש",
+      "en": "How long the screen stays on while using the app"
+    },
+    {
+      "id": "awake_more",
+      "he": "כמוגדר במערכת + 10 דקות",
+      "en": "System timeout + 10 minutes"
+    },
+    {
+      "id": "awake_always",
+      "he": "דולק עד יציאה מהאפליקציה",
+      "en": "Keep on until leaving the app"
+    },
+    {
+      "id": "awake_system",
+      "he": "כמוגדר במערכת",
+      "en": "System default"
+    },
+    {
+      "id": "theme_label",
+      "he": "מראה העמוד",
+      "en": "Page appearance"
+    },
+    {
+      "id": "theme_desc",
+      "he": "שינוי התצוגה אינו משנה את הקובץ",
+      "en": "Changing the appearance does not change the file"
+    },
+    {
+      "id": "theme_day",
+      "he": "מצב יום",
+      "en": "Day mode"
+    },
+    {
+      "id": "theme_dark",
+      "he": "מצב לילה",
+      "en": "Night mode"
+    },
+    {
+      "id": "theme_warm",
+      "he": "רקע חם",
+      "en": "Warm background"
+    },
+    {
+      "id": "language_label",
+      "he": "שפת האפליקציה",
+      "en": "App language"
+    },
+    {
+      "id": "language_desc",
+      "he": "",
+      "en": ""
+    },
+    {
+      "id": "language_he",
+      "he": "עברית",
+      "en": "Hebrew"
+    },
+    {
+      "id": "language_en",
+      "he": "אנגלית",
+      "en": "English"
+    },
+    {
+      "id": "settings_footer",
+      "he": "ההעדפות שלך נשמרות באפליקציה",
+      "en": "Your preferences are saved in the app"
+    }
+  ]
+}

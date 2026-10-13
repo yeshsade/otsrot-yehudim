@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Texts outside the settings screen. Draft wording unless marked approved; the owner approves all settings texts. -->
+<resources>
+    <string name="app_name">קורא PDF</string>
+    <string name="library_title">מסמכים</string>
+    <string name="library_sort">מהחדש לישן לפי קבלה</string>
+    <string name="library_open_pdf">פתיחת PDF</string>
+    <string name="library_today">היום</string>
+    <string name="library_yesterday">אתמול</string>
+    <string name="library_pages">%1$s · %2$d עמודים</string>
+    <string name="library_continue">להמשיך מעמוד %1$d</string>
+    <string name="library_unread">עדיין לא נקרא</string>
+    <string name="library_empty">אין עדיין מסמכים. אפשר לפתוח PDF מוואטסאפ או בכפתור למטה.</string>
+    <string name="library_remove">הסרה מהרשימה</string>
+    <string name="library_remove_confirm">להסיר את „%1$s” מהרשימה? הקובץ המקורי בוואטסאפ לא יימחק.</string>
+    <string name="library_settings">הגדרות</string>
+    <string name="library_night">מצב לילה</string>
+    <string name="library_day">מצב יום</string>
+    <string name="action_cancel">ביטול</string>
+    <string name="action_remove">הסרה</string>
+    <string name="wa_title">חוברות מוואטסאפ — אוטומטית</string>
+    <string name="wa_body">לחץ „בחירת התיקייה” ואז „אישור”, כדי שחוברות שמגיעות בוואטסאפ יופיעו כאן לבד, והסימונים יישמרו בקובץ עצמו בלי לתפוס מקום כפול.</string>
+    <string name="wa_choose">בחירת התיקייה</string>
+    <string name="wa_later">לא עכשיו</string>
+    <string name="wa_failed">לא הצלחנו לקבל גישה לתיקייה. אפשר להמשיך כרגיל — כל חוברת שתיפתח תישמר כאן.</string>
+    <string name="reader_page">עמוד %1$d מתוך %2$d</string>
+    <string name="reader_back">חזרה לרשימה</string>
+    <string name="reader_undo">ביטול הסימון האחרון</string>
+    <string name="tool_read">קריאה</string>
+    <string name="tool_marker">מרקר</string>
+    <string name="tool_pen">עט</string>
+    <string name="tool_bookmark">סימנייה</string>
+    <string name="open_failed">לא ניתן לפתוח את הקובץ.</string>
+    <string name="save_failed">הסימון לא נשמר בקובץ. הוא נשאר על המסך; ננסה שוב בסימון הבא.</string>
+</resources>

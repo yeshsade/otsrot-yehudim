@@ -1,0 +1,55 @@
+// Lean Otzarot reader app (Claude). Reuses the PDF engine modules of the MJ PDF fork. License: GPLv3.
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace = 'com.yeshsade.otzarot.reader'
+    compileSdkVersion 36
+
+    defaultConfig {
+        applicationId "com.yeshsade.otzarot.reader"
+        minSdkVersion 23
+        targetSdkVersion 36
+        versionCode 60
+        versionName "0.2.0-dev"
+        testInstrumentationRunner "com.yeshsade.otzarot.reader.LeanProbe"
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    packaging {
+        jniLibs { useLegacyPackaging = true }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources = true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:2.4.0"
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.core:core-ktx:1.18.0'
+    implementation 'androidx.documentfile:documentfile:1.1.0'
+    implementation 'com.google.android.material:material:1.14.0'
+    implementation project(':PdfiumAndroid')
+    implementation project(':AndroidPdfViewer:android-pdf-viewer')
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20240303'
+}
