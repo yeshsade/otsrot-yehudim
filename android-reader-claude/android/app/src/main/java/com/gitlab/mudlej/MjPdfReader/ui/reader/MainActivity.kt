@@ -258,43 +258,17 @@ class MainActivity : AppCompatActivity(), ReaderUi {
         }
     }
 
+    // Marks are saved automatically into the PDF. Leaving or switching documents never asks.
     override fun runAfterDirtyAnnotationPrompt(action: PostSaveAction, uri: Uri?) {
         if (!annotationController.hasUnsavedAnnotations) {
             performPostSaveAction(action, uri)
             return
         }
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.unsaved_highlights)
-            .setMessage(R.string.unsaved_highlights_prompt)
-            .setPositiveButton(R.string.save_highlights) { _, _ ->
-                annotationSaveController.saveHighlights(action, uri)
-            }
-            .setNegativeButton(R.string.discard) { _, _ ->
-                clearUnsavedAnnotationState()
-                performPostSaveAction(action, uri)
-            }
-            .setNeutralButton(R.string.cancel, null)
-            .show()
+        reader.flushAutoSave(action, uri)
     }
 
     internal fun runAfterAnnotationSaveGate(action: PostSaveAction, uri: Uri? = null) {
-        if (!annotationController.hasUnsavedAnnotations) {
-            performPostSaveAction(action, uri)
-            return
-        }
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.unsaved_highlights)
-            .setMessage(R.string.unsaved_highlights_prompt)
-            .setPositiveButton(R.string.save_highlights) { _, _ ->
-                annotationSaveController.saveHighlights(action, uri)
-            }
-            .setNegativeButton(R.string.discard) { _, _ ->
-                clearUnsavedAnnotationState()
-                reloadPdf()
-                performPostSaveAction(action, uri)
-            }
-            .setNeutralButton(R.string.cancel, null)
-            .show()
+        runAfterDirtyAnnotationPrompt(action, uri)
     }
 
     internal fun performPostSaveAction(action: PostSaveAction, uri: Uri?) {
@@ -414,13 +388,14 @@ class MainActivity : AppCompatActivity(), ReaderUi {
     override fun updateDirtyUi() {
         val visible = annotationController.hasUnsavedAnnotations
         val saving = annotationController.isSaving
-        binding.saveAnnotationsFab.visibility = if (visible) View.VISIBLE else View.GONE
-        binding.discardAnnotationsFab.visibility = if (visible) View.VISIBLE else View.GONE
+        // No save button: saving is automatic. Discard is replaced by undo in a later stage.
+        binding.saveAnnotationsFab.visibility = View.GONE
+        binding.discardAnnotationsFab.visibility = View.GONE
         binding.saveAnnotationsFab.isEnabled = visible && !saving
         binding.discardAnnotationsFab.isEnabled = visible && !saving
         binding.saveAnnotationsFab.alpha = if (saving) 0.5f else 1f
         binding.discardAnnotationsFab.alpha = if (saving) 0.5f else 1f
-        if (saving && !savingProgressVisible) {
+        if (saving && !savingProgressVisible && !vm.isSilentSave) {
             savingProgressVisible = true
             binding.progressBar.isIndeterminate = true
             binding.progressBar.visibility = View.VISIBLE
@@ -765,6 +740,9 @@ class MainActivity : AppCompatActivity(), ReaderUi {
     }
 
     override fun onStop() {
+        if (::reader.isInitialized && !isChangingConfigurations && annotationController.hasUnsavedAnnotations) {
+            reader.flushAutoSave()
+        }
         if (::reader.isInitialized) {
             reader.autoScrollManager.stop()
             reader.autoScrollSpeedStore.flushPendingSave()

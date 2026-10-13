@@ -45,6 +45,12 @@ class AnnotationController(
     }
 
     fun markDirty() {
+        vm.autoSaveState.onEdit()
+        vm.hasUnsavedAnnotations = true
+    }
+
+    /** Keeps the document marked unsaved without counting a new edit (used after a partial auto-save). */
+    fun markDirtyWithoutNewEdit() {
         vm.hasUnsavedAnnotations = true
     }
 
@@ -63,8 +69,13 @@ class AnnotationController(
             journal.append(uri, edit)
         }
         vm.sessionOwnedAnnotationKeys.add(SourceKey.of(uri))
+        vm.autoSaveState.onEdit()
         vm.hasUnsavedAnnotations = true
+        onEdited?.invoke()
     }
+
+    /** Called after every recorded edit; the reader schedules a quiet auto-save from here. */
+    var onEdited: (() -> Unit)? = null
 
     fun resetContentTags() {
         pageContentTags.clear()
@@ -117,7 +128,9 @@ class AnnotationController(
             edits.forEach(::applyEdit)
         }
         markSessionOwned(uri)
+        vm.autoSaveState.onEdit()
         vm.hasUnsavedAnnotations = true
+        onEdited?.invoke()
         return true
     }
 

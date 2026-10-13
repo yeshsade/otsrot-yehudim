@@ -29,6 +29,7 @@ import com.gitlab.mudlej.MjPdfReader.core.io.UriCanonicalizer
 import com.gitlab.mudlej.MjPdfReader.core.io.canWriteToDownloadFolder
 import com.gitlab.mudlej.MjPdfReader.core.io.computeHash
 import com.gitlab.mudlej.MjPdfReader.core.io.DocumentIdentity
+import com.gitlab.mudlej.MjPdfReader.core.io.DurableCopyStore
 import com.gitlab.mudlej.MjPdfReader.core.io.computeTailHash
 import com.gitlab.mudlej.MjPdfReader.core.io.getFileName
 import com.gitlab.mudlej.MjPdfReader.core.io.publicDownloadsCopy
@@ -110,6 +111,112 @@ class AnnotationSaveController(
         vm.pendingPostSaveAction = null
         vm.pendingPostSaveActionUri = null
         vm.pendingAnnotationDestinationIsCopy = false
+    }
+
+    /**
+     * Quiet save: no destination sheet, no "saved" message. The marks go into the PDF itself, at the
+     * destination chosen by [AutoSavePolicy]. A post action (leave, open another file) runs after a
+     * successful save. Returns false when nothing was started.
+     */
+    fun autoSave(postSaveAction: PostSaveAction? = null, actionUri: Uri? = null): Boolean {
+        if (!annotationController.hasUnsavedAnnotations) {
+            postSaveAction?.let { runPostSaveAction(it, actionUri) }
+            return false
+        }
+        if (annotationController.isSaving) {
+            if (postSaveAction != null) {
+                vm.pendingPostSaveAction = postSaveAction
+                vm.pendingPostSaveActionUri = actionUri
+            }
+            return false
+        }
+        if (binding.pdfView.hasPendingStampPlacement() && postSaveAction == null) {
+            return false
+        }
+        if (!beforeSave()) {
+            return false
+        }
+        val sourceUri = pdf.uri ?: return false
+        vm.pendingPostSaveAction = postSaveAction
+        vm.pendingPostSaveActionUri = actionUri
+        vm.isSilentSave = true
+        annotationController.setSaving(true)
+        updateDirtyUi()
+        val loadToken = vm.currentLoadToken
+        backgroundSaveScope.launch {
+            val choice = runCatching { resolveAutoDestination(sourceUri) }
+                .onFailure { if (it is CancellationException) throw it; Log.e(TAG, "resolveAutoDestination", it) }
+                .getOrNull()
+            withContext(Dispatchers.Main) {
+                if (choice == null || !vm.isCurrent(loadToken, sourceUri)) {
+                    annotationController.setSaving(false)
+                    val outcome = SaveOutcome.Failure(rescueFileName = null, unconfirmed = false)
+                    vm.onSaveComplete?.invoke(outcome)
+                    return@withContext
+                }
+                annotationController.setSaving(false)
+                saveHighlightsToUri(
+                    choice.first,
+                    sourceUri,
+                    saveDestinationDurably = true,
+                    moveRecord = choice.second != AutoSavePolicy.Kind.SOURCE,
+                )
+            }
+        }
+        return true
+    }
+
+    private suspend fun resolveAutoDestination(sourceUri: Uri): Pair<Uri, AutoSavePolicy.Kind>? =
+        withContext(Dispatchers.IO) {
+            val isRemote = sourceUri.scheme?.startsWith("http") == true
+            val current = annotationController.currentSaveDestinationUri
+            val remembered = (
+                pdfRepository.findAnnotationSaveDestinationBySourceKey(AnnotationController.sourceKey(sourceUri))
+                    ?: pdf.fileHash?.let {
+                        pdfRepository.findAnnotationSaveDestinationBySourceKey(AutoSavePolicy.originalIdentityKey(it))
+                    }
+                )?.destinationUri?.toUri()?.takeIf { it != sourceUri }
+            val directSource = if (isRemote) null else directWriteDestination(sourceUri)
+            val sourceWritable = !isRemote && (directSource != null || canWrite(sourceUri))
+            val libraryCopy = pdf.fileHash?.let { pdfRepository.findRecord(it)?.uri }
+                ?.takeIf { it != sourceUri && !(it.scheme?.startsWith("http") ?: false) }
+            val choice = AutoSavePolicy.choose(
+                AutoSavePolicy.Candidates(
+                    sourceUri = sourceUri.toString(),
+                    currentDestination = current?.toString(),
+                    currentDestinationWritable = current != null && canWrite(current),
+                    rememberedDestination = remembered?.toString(),
+                    rememberedDestinationWritable = remembered != null && canWrite(remembered),
+                    sourceWritable = sourceWritable,
+                    sourceIsRemote = isRemote,
+                    libraryCopy = libraryCopy?.toString(),
+                    libraryCopyWritable = libraryCopy != null && canWrite(libraryCopy),
+                )
+            )
+            when (choice.kind) {
+                AutoSavePolicy.Kind.SOURCE -> (directSource ?: sourceUri) to choice.kind
+                AutoSavePolicy.Kind.NEW_WORKING_COPY -> {
+                    val copySource = OnlineDocumentStore.fileFor(activity, sourceUri.toString())
+                        ?.let(Uri::fromFile) ?: sourceUri
+                    val name = pdf.name.ifBlank { getFileName(activity, sourceUri) }
+                    DurableCopyStore.saveCopy(activity, copySource, name, pdf.fileHash)?.uri?.let { it to choice.kind }
+                }
+                else -> choice.uri?.toUri()?.let { it to choice.kind }
+            }
+        }
+
+    /** True only when the app can really write this location; never assumed from a read grant. */
+    private fun canWrite(uri: Uri): Boolean {
+        return when (uri.scheme) {
+            "file" -> {
+                val file = uri.path?.let { File(it) } ?: return false
+                file.isFile && file.canWrite() && file.parentFile?.canWrite() == true
+            }
+            "content" -> runCatching {
+                activity.contentResolver.openFileDescriptor(uri, "rw")?.use { true } ?: false
+            }.getOrDefault(false)
+            else -> false
+        }
     }
 
     fun handleDestinationResult(intent: Intent?) {
@@ -311,13 +418,19 @@ class AnnotationSaveController(
         }
     }
 
-    private fun saveHighlightsToUri(destinationUri: Uri, sourceUri: Uri, saveDestinationDurably: Boolean = true) {
+    private fun saveHighlightsToUri(
+        destinationUri: Uri,
+        sourceUri: Uri,
+        saveDestinationDurably: Boolean = true,
+        moveRecord: Boolean = false,
+    ) {
         clearActiveSearchResultHighlight()
         annotationController.setSaving(true)
         updateDirtyUi()
         val loadToken = vm.currentLoadToken
         val oldHash = pdf.fileHash
         val overwritesSource = resolvesToSameDocument(destinationUri, sourceUri)
+        vm.autoSaveState.beginSave(force = true)
 
         backgroundSaveScope.launch {
             var outcome: SaveOutcome =
@@ -336,6 +449,7 @@ class AnnotationSaveController(
                                 sourceUri,
                                 destinationUri,
                                 destinationName.removeSuffix(".pdf"),
+                                moveRecord = moveRecord,
                             )
                         } else if (isCurrent) {
                             pdfRepository.saveRecordInBackground(
@@ -354,6 +468,17 @@ class AnnotationSaveController(
                                     lastSavedAt = LocalDateTime.now(),
                                 )
                             )
+                            if (oldHash != null && !overwritesSource) {
+                                // The same original arriving again (e.g. from WhatsApp) opens this working file.
+                                pdfRepository.saveAnnotationSaveDestination(
+                                    PdfAnnotationSaveDestination(
+                                        sourceKey = AutoSavePolicy.originalIdentityKey(oldHash),
+                                        destinationUri = destinationUri.toString(),
+                                        lastSavedHash = newHash,
+                                        lastSavedAt = LocalDateTime.now(),
+                                    )
+                                )
+                            }
                         }
                     }
                     annotationController.clearJournal(sourceUri, resetContentTags = false)
@@ -388,19 +513,40 @@ class AnnotationSaveController(
         }
     }
 
+    /** Asked to run another quiet save (an edit arrived while the previous one was writing). */
+    var onAutoSaveAgain: (() -> Unit)? = null
+
     fun deliverSaveOutcome(outcome: SaveOutcome) {
+        val silent = vm.isSilentSave
+        vm.isSilentSave = false
+        val after = vm.autoSaveState.finishSave(outcome is SaveOutcome.Success)
         updateDirtyUi()
         when (outcome) {
-            is SaveOutcome.Success -> onSaveSucceeded(outcome)
+            is SaveOutcome.Success -> {
+                if (after == AutoSaveState.After.SAVE_AGAIN) {
+                    annotationController.markDirtyWithoutNewEdit()
+                }
+                onSaveSucceeded(outcome, silent)
+                if (after == AutoSaveState.After.SAVE_AGAIN) {
+                    onAutoSaveAgain?.invoke()
+                }
+            }
             is SaveOutcome.Failure -> {
+                val postSaveAction = vm.pendingPostSaveAction
+                val postSaveActionUri = vm.pendingPostSaveActionUri
                 vm.pendingPostSaveAction = null
                 vm.pendingPostSaveActionUri = null
-                showSaveFailed(outcome)
+                if (!silent || vm.autoSaveState.shouldReportFailure()) {
+                    showSaveFailed(outcome)
+                } else if (postSaveAction != null) {
+                    // Already reported once; the marks stay in the recovery journal. Do not trap the reader.
+                    runPostSaveAction(postSaveAction, postSaveActionUri)
+                }
             }
         }
     }
 
-    private fun onSaveSucceeded(outcome: SaveOutcome.Success) {
+    private fun onSaveSucceeded(outcome: SaveOutcome.Success, silent: Boolean = false) {
         if (!outcome.isCurrent) {
             vm.pendingPostSaveAction = null
             vm.pendingPostSaveActionUri = null
@@ -422,7 +568,9 @@ class AnnotationSaveController(
         annotationController.setCurrentSaveDestination(outcome.destinationUri, durable = outcome.saveDestinationDurable)
         onDocumentSaved()
         activity.setTaskDescription(ActivityManager.TaskDescription(pdf.name))
-        AppSnackbar.make(binding.root, R.string.highlights_saved, Snackbar.LENGTH_SHORT).show()
+        if (!silent) {
+            AppSnackbar.make(binding.root, R.string.highlights_saved, Snackbar.LENGTH_SHORT).show()
+        }
         val postSaveAction = vm.pendingPostSaveAction
         val postSaveActionUri = vm.pendingPostSaveActionUri
         vm.pendingPostSaveAction = null

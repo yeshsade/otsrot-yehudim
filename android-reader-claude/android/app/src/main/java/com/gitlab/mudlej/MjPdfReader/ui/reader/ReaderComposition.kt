@@ -494,8 +494,34 @@ class ReaderComposition(
 
     private var historyNavState = false to false
 
+    private var autoSaveJob: kotlinx.coroutines.Job? = null
+
+    /** Debounced quiet save after the reader stops marking for a moment. */
+    fun scheduleAutoSave(delayMs: Long = AUTO_SAVE_DELAY_MS) {
+        autoSaveJob?.cancel()
+        autoSaveJob = scope.launch {
+            kotlinx.coroutines.delay(delayMs)
+            if (!activity.isFinishing) {
+                annotationSaveController.autoSave()
+            }
+        }
+    }
+
+    /** Save now (leaving the screen, app going to background). */
+    fun flushAutoSave(postSaveAction: PostSaveAction? = null, uri: android.net.Uri? = null): Boolean {
+        autoSaveJob?.cancel()
+        autoSaveJob = null
+        return annotationSaveController.autoSave(postSaveAction, uri)
+    }
+
     init {
-        inlineAnnotationActionController.configure { annotationSaveController.saveHighlights() }
+        annotationController.onEdited = { scheduleAutoSave() }
+        annotationSaveController.onAutoSaveAgain = { scheduleAutoSave(AUTO_SAVE_RETRY_MS) }
+        if (vm.hasUnsavedAnnotations && !vm.isSavingAnnotations) {
+            // Recreated (rotation) with marks the cancelled timer never saved.
+            scheduleAutoSave()
+        }
+        inlineAnnotationActionController.configure { flushAutoSave() }
         vm.onSaveComplete = { outcome ->
             if (!activity.isFinishing && !activity.isDestroyed) {
                 annotationSaveController.deliverSaveOutcome(outcome)
@@ -1047,5 +1073,7 @@ class ReaderComposition(
     companion object {
         private const val TAG = "ReaderComposition"
         private val backgroundSaveScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        private const val AUTO_SAVE_DELAY_MS = 1500L
+        private const val AUTO_SAVE_RETRY_MS = 300L
     }
 }

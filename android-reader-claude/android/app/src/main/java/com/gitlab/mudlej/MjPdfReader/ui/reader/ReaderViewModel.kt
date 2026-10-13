@@ -44,6 +44,8 @@ class ReaderViewModel(state: SavedStateHandle) : ViewModel() {
     var isSavingAnnotations = false
     val sessionOwnedAnnotationKeys = mutableSetOf<String>()
     var onSaveComplete: ((SaveOutcome) -> Unit)? = null
+    val autoSaveState = com.gitlab.mudlej.MjPdfReader.ui.reader.annotation.AutoSaveState()
+    var isSilentSave = false
 
     val bookmarkedPages = mutableSetOf<Int>()
     var bookmarksLoadedForHash: String? = null
@@ -127,6 +129,8 @@ class ReaderViewModel(state: SavedStateHandle) : ViewModel() {
         annotationSaveDestinationDurable = false
         hasUnsavedAnnotations = false
         isSavingAnnotations = false
+        isSilentSave = false
+        autoSaveState.reset()
     }
 
     fun captureViewStateForSave(captured: PDFView.ViewState?) {

@@ -220,8 +220,9 @@ class PdfRepository(private val database: AppDatabase) {
         sourceUri: android.net.Uri,
         destinationUri: android.net.Uri,
         fileName: String,
+        moveRecord: Boolean = false,
     ) {
-        val replacingSourceFile = sourceUri.toString() == destinationUri.toString()
+        val replacingSourceFile = moveRecord || sourceUri.toString() == destinationUri.toString()
         if (oldHash == newHash) {
             safeWrite {
                 database.pdfRecordDao()

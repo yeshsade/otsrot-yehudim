@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <!-- Debug builds only: lets the on-device test see its read-only "shared file" provider (Android 11+ package visibility). -->
+    <queries>
+        <package android:name="com.yeshsade.otzarot.reader.test" />
+    </queries>
     <application>
         <!-- Only debug builds expose the settings component to adb-driven UI verification. -->
         <activity android:name=".ui.settings.ReaderSettingsActivity" android:exported="true" tools:replace="android:exported" />

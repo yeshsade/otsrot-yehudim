@@ -28,9 +28,16 @@ class NativeSettingsProbe : Instrumentation() {
         sendStatus(0, Bundle().apply { putString("stream", "PASS: $message\n") })
     }
 
-    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); start() }
+    private var probe: String? = null
+
+    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); probe = arguments?.getString("probe"); start() }
 
     override fun onStart() {
+        if (probe == "autosave") {
+            val (code, bundle) = AutoSaveProbe(this).run()
+            finish(code, bundle)
+            return
+        }
         val result = Bundle()
         try {
             val storage = PreferenceManager.getDefaultSharedPreferences(targetContext)

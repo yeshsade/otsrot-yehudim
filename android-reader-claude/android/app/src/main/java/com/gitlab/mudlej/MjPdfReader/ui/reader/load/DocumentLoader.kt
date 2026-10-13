@@ -174,6 +174,19 @@ class DocumentLoader(
                 doc.fileHash = hash
             }
 
+            val workingCopy = findWorkingCopyFor(documentUri, hash)
+            if (!vm.isCurrent(loadToken, documentUri)) {
+                return@launch
+            }
+            if (workingCopy != null) {
+                withContext(Dispatchers.Main) {
+                    if (vm.isCurrent(loadToken, documentUri)) {
+                        displayFromUri(workingCopy, savePassword)
+                    }
+                }
+                return@launch
+            }
+
             resolveAnnotationDestination(documentUri)
             if (!vm.isCurrent(loadToken, documentUri)) {
                 return@launch
@@ -284,6 +297,31 @@ class DocumentLoader(
                 }.getOrDefault(false)
             }
         }
+    }
+
+    /**
+     * The same original file (same content identity) that was already marked and saved to a working
+     * file opens that working file, so the reader sees the marks and no further copy is made.
+     * A changed edition has a different identity and opens as its own document.
+     */
+    private suspend fun findWorkingCopyFor(documentUri: Uri?, hash: String?): Uri? {
+        if (documentUri == null || hash == null) {
+            return null
+        }
+        val mapping = pdfRepository.findAnnotationSaveDestinationBySourceKey(
+            com.gitlab.mudlej.MjPdfReader.ui.reader.annotation.AutoSavePolicy.originalIdentityKey(hash)
+        ) ?: return null
+        val destination = mapping.destinationUri.toUri()
+        if (destination == documentUri) {
+            return null
+        }
+        val hasPendingJournal = withContext(Dispatchers.IO) {
+            com.gitlab.mudlej.MjPdfReader.data.annotation.AnnotationJournal(context).hasRecords(documentUri)
+        }
+        if (hasPendingJournal || !isUriReadable(destination)) {
+            return null
+        }
+        return destination
     }
 
     private suspend fun resolveAnnotationDestination(documentUri: Uri?) {

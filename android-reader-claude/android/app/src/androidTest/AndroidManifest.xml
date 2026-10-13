@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Simulates a messaging app that shares a PDF with read access only (like WhatsApp). -->
+        <provider
+            android:name="com.gitlab.mudlej.MjPdfReader.ReadOnlyPdfProvider"
+            android:authorities="com.yeshsade.otzarot.reader.test.readonly"
+            android:exported="true" />
+    </application>
+</manifest>
