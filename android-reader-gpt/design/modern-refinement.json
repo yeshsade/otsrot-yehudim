@@ -1,0 +1,43 @@
+{
+  "title": "עיצוב 3, הכתב של 1 — שתי הצעות לשדרוג",
+  "intro": "בחרת בכיוון הצבעוני של 3 ובכתב של 1. כאן מופיע השילוב הזה, ולצדו שתי הצעות למראה חדשני יותר. אפשר להשוות גם במסך הקריאה ולבחור את מה שהכי קרוב.",
+  "scope": "כל הדוגמאות משתמשות באותו כתב פשוט ובאותם מסמכי המחשה. ההצעות א ו־ב עדיין לבדיקה; מילות ההגדרות עדיין טיוטה. בחירה בתרגיל הזה אינה מבטלת אוטומטית את הכיוון שכבר בחרת.",
+  "feedback_hint": "אם רוצים — למשל „הכותרת של א והכפתורים של ב”",
+  "output_name": "choose-refinement.html",
+  "fonts": ["NotoSansHebrew", "NotoSerifHebrew"],
+  "css_file": "modern-refinement.css",
+  "directions": [
+    {
+      "id": "base",
+      "className": "bold chosen-sans baseline",
+      "icons": "filled",
+      "label": "הבסיס · 3 עם הכתב של 1",
+      "name": "הבסיס שבחרת",
+      "description": "המראה הצבעוני הקודם עם הכתב הפשוט שבחרת. נקודת ההשוואה לשדרוגים.",
+      "choiceLabel": "הבסיס הכי מתאים"
+    },
+    {
+      "id": "a",
+      "className": "bold chosen-sans modern-light",
+      "icons": "filled",
+      "label": "א · בהיר וקל",
+      "name": "א — בהיר וקל",
+      "description": "כותרת בהירה, צבע ממוקד וכרטיסים עדינים. מקום הקריאה מסומן בתווית שקטה.",
+      "choiceLabel": "א הכי מתאים"
+    },
+    {
+      "id": "b",
+      "className": "bold chosen-sans modern-color",
+      "icons": "filled",
+      "label": "ב · צבע ותחושה חדשה",
+      "name": "ב — צבע ותחושה חדשה",
+      "description": "פס עליון עם קצוות מעוגלים, כפתור מודגש וסרגל קריאה שנראה נפרד מהדף.",
+      "choiceLabel": "ב הכי מתאים"
+    }
+  ],
+  "preference": {
+    "scope": "visual-refinement-three-sans",
+    "revision": "2026-10-12",
+    "storageKey": "pdf-reader-refinement-three-sans-2026-10-12"
+  }
+}

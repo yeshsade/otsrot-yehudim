@@ -1,0 +1,4 @@
+<resources>
+    <!-- Temporary proper name identifies a development build; product naming remains open. -->
+    <string name="otzr_development_app_name" translatable="false">PDF Reader Dev</string>
+</resources>

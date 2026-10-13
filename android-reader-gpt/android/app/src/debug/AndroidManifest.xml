@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <application>
+        <!-- Only debug builds expose the settings component to adb-driven UI verification. -->
+        <activity android:name=".ui.settings.ReaderSettingsActivity" android:exported="true" tools:replace="android:exported" />
+    </application>
+</manifest>

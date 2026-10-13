@@ -1,0 +1,29 @@
+[
+  {
+    "family": "NotoSansHebrew",
+    "filename": "NotoSansHebrew.ttf",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanshebrew/NotoSansHebrew%5Bwdth%2Cwght%5D.ttf",
+    "license": "SIL Open Font License 1.1",
+    "license_file": "NotoSansHebrew-OFL.txt",
+    "sha256": "7ef36a2c3593758cdb622e1bdef4f84523e92fbc3ccc667438dd80ff54c2de88",
+    "bytes": 112640
+  },
+  {
+    "family": "NotoSerifHebrew",
+    "filename": "NotoSerifHebrew.ttf",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/notoserifhebrew/NotoSerifHebrew%5Bwdth%2Cwght%5D.ttf",
+    "license": "SIL Open Font License 1.1",
+    "license_file": "NotoSerifHebrew-OFL.txt",
+    "sha256": "93caef921360788dc3b0e32136bb26f16bc57717ec482d48fc7fd43820617165",
+    "bytes": 183600
+  },
+  {
+    "family": "Rubik",
+    "filename": "Rubik.ttf",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/rubik/Rubik%5Bwght%5D.ttf",
+    "license": "SIL Open Font License 1.1",
+    "license_file": "Rubik-OFL.txt",
+    "sha256": "1b3a7437ba2af80e465e773ed60c5036d1ba6ace492d89046dbcf18fb31e4e88",
+    "bytes": 359804
+  }
+]

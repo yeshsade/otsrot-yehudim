@@ -1,0 +1,228 @@
+{
+  "version": 4,
+  "status": "draft",
+  "entries": [
+    {
+      "id": "settings_title",
+      "he": "הגדרות",
+      "en": "Settings",
+      "meaning": "כותרת מסך ההגדרות"
+    },
+    {
+      "id": "settings_back",
+      "he": "חזרה",
+      "en": "Back",
+      "meaning": "כפתור חזרה ממסך ההגדרות"
+    },
+    {
+      "id": "settings_close",
+      "he": "סגירה",
+      "en": "Close",
+      "meaning": "סגירת חלון בחירת האפשרות בלי לבחור ערך חדש"
+    },
+    {
+      "id": "group_reading",
+      "he": "קריאה",
+      "en": "Reading",
+      "meaning": "כותרת קבוצת העדפות הקריאה"
+    },
+    {
+      "id": "group_display",
+      "he": "תצוגה",
+      "en": "Display",
+      "meaning": "כותרת קבוצת העדפות התצוגה"
+    },
+    {
+      "id": "group_app",
+      "he": "ממשק",
+      "en": "Interface",
+      "meaning": "כותרת קבוצת העדפות הממשק"
+    },
+    {
+      "id": "scroll_label",
+      "he": "כיוון הדפדוף",
+      "en": "Page navigation",
+      "meaning": "בחירת דפדוף אנכי או אופקי"
+    },
+    {
+      "id": "scroll_desc",
+      "he": "דפדוף",
+      "en": "Page navigation",
+      "meaning": "הסבר להעדפת הדפדוף; אין קשר לסיבוב המסך"
+    },
+    {
+      "id": "scroll_vertical",
+      "he": "מלמעלה למטה",
+      "en": "Vertical",
+      "meaning": "ברירת המחדל שנבחרה: דפדוף אנכי"
+    },
+    {
+      "id": "scroll_horizontal",
+      "he": "ימינה ושמאלה",
+      "en": "Horizontal",
+      "meaning": "אפשרות לדפדוף אופקי; כיוון ההתקדמות הסופי טרם נקבע"
+    },
+    {
+      "id": "resume_label",
+      "he": "בפתיחה חוזרת",
+      "en": "When reopening a document",
+      "meaning": "מאיזה מקום לפתוח מסמך שכבר נקרא"
+    },
+    {
+      "id": "resume_desc",
+      "he": "",
+      "en": "",
+      "meaning": "הסבר להעדפת מקום הפתיחה החוזרת"
+    },
+    {
+      "id": "resume_last",
+      "he": "המשך מהמקום בו עצרתי",
+      "en": "Continue where I left off",
+      "meaning": "ברירת המחדל שנבחרה: חזרה למקום הקריאה"
+    },
+    {
+      "id": "resume_start",
+      "he": "מתחילת המסמך",
+      "en": "From the beginning",
+      "meaning": "אפשרות לפתוח את המסמך מהעמוד הראשון"
+    },
+    {
+      "id": "marks_label",
+      "he": "אחרי סימון במרקר או בעט",
+      "en": "After highlighting or drawing",
+      "meaning": "ההתנהגות לאחר פעולה במרקר או בעט; אינה מגבילה נגיעות בתיבות וי"
+    },
+    {
+      "id": "marks_desc",
+      "he": "לחזור לקריאה או להמשיך לסמן",
+      "en": "Return to reading or keep the tool active",
+      "meaning": "הסבר לבחירה בין פעולה אחת לסימון רצוף"
+    },
+    {
+      "id": "marks_once",
+      "he": "לחזור לקריאה",
+      "en": "Return to reading",
+      "meaning": "ברירת המחדל שנבחרה: הכלי מתבטל לאחר סימון אחד"
+    },
+    {
+      "id": "marks_repeat",
+      "he": "להמשיך לסמן",
+      "en": "Keep marking",
+      "meaning": "אפשרות להשאיר את הכלי פעיל לפעולות רצופות"
+    },
+    {
+      "id": "rotation_label",
+      "he": "סיבוב המסך",
+      "en": "Screen rotation",
+      "meaning": "העדפת סיבוב בתוך האפליקציה בלבד"
+    },
+    {
+      "id": "rotation_desc",
+      "he": "השינוי חל רק בתוך האפליקציה",
+      "en": "This setting applies only to this app",
+      "meaning": "אין שינוי בהגדרת הסיבוב הכללית של הטלפון"
+    },
+    {
+      "id": "rotation_phone",
+      "he": "כמוגדר במערכת",
+      "en": "System default",
+      "meaning": "ברירת המחדל לסיבוב בהפעלה הראשונה"
+    },
+    {
+      "id": "rotation_lock",
+      "he": "לנעול בכיוון הנוכחי",
+      "en": "Lock current orientation",
+      "meaning": "הצעת מימוש לנעילה בכיוון הקריאה הנוכחי; פרטי הנעילה דורשים בדיקת מכשיר"
+    },
+    {
+      "id": "awake_label",
+      "he": "כיבוי המסך בזמן קריאה",
+      "en": "Screen timeout while reading",
+      "meaning": "כמה זמן המסך נשאר דלוק בתוך הקריאה"
+    },
+    {
+      "id": "awake_desc",
+      "he": "כמה זמן המסך יישאר דלוק, בזמן השימוש",
+      "en": "How long the screen stays on while using the app",
+      "meaning": "הסבר לזמן מסך ארוך יותר; אין שינוי בזמן הכיבוי הכללי של הטלפון"
+    },
+    {
+      "id": "awake_more",
+      "he": "כמוגדר במערכת + 10 דקות",
+      "en": "System timeout + 10 minutes",
+      "meaning": "פירוש הבקשה שנמסר למשתמש; פרטי חוסר הפעילות ותאימות Android דורשים בדיקה"
+    },
+    {
+      "id": "awake_always",
+      "he": "דולק עד יציאה מהאפליקציה",
+      "en": "Keep on until leaving the app",
+      "meaning": "נשאר דולק בכל מסכי האפליקציה כל עוד היא מוצגת על המסך, לפי הבהרת המשתמש; חוזר לזמן המערכת במעבר לרקע או ביציאה. ההתנהגות טרם מומשה ב־Android."
+    },
+    {
+      "id": "awake_system",
+      "he": "כמוגדר במערכת",
+      "en": "System default",
+      "meaning": "אפשרות להשתמש בזמן הרגיל של המכשיר"
+    },
+    {
+      "id": "theme_label",
+      "he": "מראה העמוד",
+      "en": "Page appearance",
+      "meaning": "מצב תצוגה למסמך עצמו, ולא רק לתפריטים"
+    },
+    {
+      "id": "theme_desc",
+      "he": "שינוי התצוגה אינו משנה את הקובץ",
+      "en": "Changing the appearance does not change the file",
+      "meaning": "צבעי הקובץ שנשמר או נשלח נשארים מקוריים"
+    },
+    {
+      "id": "theme_day",
+      "he": "מצב יום",
+      "en": "Day mode",
+      "meaning": "תצוגה בהירה וחזרה לצבעי העמוד הרגילים; גם ממשק האפליקציה מוצג במצב יום"
+    },
+    {
+      "id": "theme_dark",
+      "he": "מצב לילה",
+      "en": "Night mode",
+      "meaning": "תצוגה כהה לממשק ולעמוד עצמו, עם כתב בהיר; שינוי תצוגה בלבד שאינו משנה את צבעי הקובץ"
+    },
+    {
+      "id": "theme_warm",
+      "he": "רקע חם",
+      "en": "Warm background",
+      "meaning": "הצעה למצב נוסף; מספר המצבים וצבעיהם עדיין אינם מאושרים"
+    },
+    {
+      "id": "language_label",
+      "he": "שפת האפליקציה",
+      "en": "App language",
+      "meaning": "שפת הממשק; אינה משנה את שפת המסמך"
+    },
+    {
+      "id": "language_desc",
+      "he": "",
+      "en": "",
+      "meaning": "הסבר להעדפת שפה; ברירת המחדל למוצר עדיין לא נבחרה"
+    },
+    {
+      "id": "language_he",
+      "he": "עברית",
+      "en": "Hebrew",
+      "meaning": "אפשרות ממשק עברי מימין לשמאל"
+    },
+    {
+      "id": "language_en",
+      "he": "אנגלית",
+      "en": "English",
+      "meaning": "אפשרות ממשק אנגלי משמאל לימין"
+    },
+    {
+      "id": "settings_footer",
+      "he": "ההעדפות שלך נשמרות באפליקציה",
+      "en": "Your preferences are saved in the app",
+      "meaning": "העדפות נשמרות; בהדגמה זו נשמרות בדפדפן בלבד"
+    }
+  ]
+}

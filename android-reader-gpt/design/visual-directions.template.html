@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__REVIEW_TITLE__</title>
+<style>
+__FONT_CSS__
+:root{font-family:"Reader Sans",sans-serif;background:#eeeef0;color:#23242a;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}button,input,textarea{font:inherit}button{cursor:pointer}
+main{max-width:1300px;margin:auto;padding:24px 28px}h1{font-size:25px;line-height:1.4;margin:0 0 10px;font-weight:650}
+.intro{font-size:16px;line-height:1.8;max-width:880px;margin:0 0 6px}.scope{font-size:14px;line-height:1.8;color:#5e6068;margin:0 0 18px}
+.views{display:flex;gap:8px;margin:16px 0 22px}.view-button{min-height:48px;padding:8px 20px;font-size:15px;background:white;border:1px solid #aaa;color:#25252c}
+.view-button[aria-pressed=true]{background:#25252c;color:white;border-color:#25252c}
+.comparison{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:start}
+.candidate{min-width:0}.candidate>h2{font-size:19px;margin:0 0 5px;font-weight:650}.candidate>.description{font-size:13px;line-height:1.65;margin:0 0 12px;min-height:43px;color:#53545c}
+.app{height:772px;display:flex;flex-direction:column;overflow:hidden;position:relative;border:1px solid var(--edge);background:var(--canvas);color:var(--ink);font-family:var(--font)}
+.status-bar{height:26px;flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:0 16px;font:11px/1 "Reader Sans",sans-serif;background:var(--header);color:var(--header-ink);direction:ltr}
+.system-icons{display:flex;align-items:center;gap:5px}.system-icons svg{width:14px;height:12px;fill:currentColor;stroke:none}.battery{width:17px;height:8px;border:1px solid currentColor;position:relative;border-radius:1px}.battery:after{content:"";position:absolute;width:11px;inset:1px;background:currentColor}
+.app-view{display:flex;flex-direction:column;flex:1;min-height:0}.app-view[hidden]{display:none}
+.toolbar{height:72px;display:flex;align-items:center;gap:4px;padding:0 12px;background:var(--header);color:var(--header-ink);flex-shrink:0;border-bottom:var(--header-line)}
+.heading{flex:1;min-width:0;padding-inline:4px}.heading strong{display:block;font-size:26px;line-height:1.45;font-weight:var(--heading-weight)}.heading small{font:12px/1.6 "Reader Sans",sans-serif;display:block;opacity:.8}
+.icon{height:48px;width:48px;border:0;background:transparent;color:inherit;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:var(--icon-radius)}
+.symbol{width:24px;height:24px;display:block;fill:none;stroke:currentColor;stroke-width:var(--stroke);stroke-linecap:var(--cap);stroke-linejoin:var(--join)}
+.app .icon:hover{background:var(--icon-hover)}.sort{height:49px;flex-shrink:0;display:flex;align-items:center;gap:7px;padding:0 20px;font:13px/1.4 "Reader Sans",sans-serif;color:var(--muted);border-bottom:var(--sort-line)}
+.sort .symbol{width:16px;height:16px;flex-shrink:0}.files{padding:8px 12px;min-height:0;flex:1;overflow:auto;overscroll-behavior:contain}
+.file{height:124px;display:grid;grid-template-columns:53px minmax(0,1fr) 48px;align-items:center;column-gap:12px;padding:12px 9px;margin-bottom:8px;background:var(--row);border:var(--row-border);border-bottom:var(--row-bottom);border-radius:var(--row-radius);box-shadow:var(--row-shadow)}
+.details{min-width:0}.doc-title{font-size:18px;font-weight:var(--title-weight);line-height:1.35;height:49px;margin:0;display:flex;align-items:center;overflow-wrap:anywhere;color:var(--ink)}
+.metadata{font:12px/1.5 "Reader Sans",sans-serif;color:var(--muted);margin:3px 0}.position{font:12px/1.5 "Reader Sans",sans-serif;color:var(--accent);margin:0}
+.file>.icon{color:var(--more-ink)}
+.cover{width:53px;height:77px;position:relative;flex-shrink:0;background:var(--book-color);color:var(--book-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px 5px;border-radius:var(--cover-radius);border:1px solid #0002;box-shadow:var(--cover-shadow);font:11px/1.4 "Reader Serif",serif;overflow:hidden}
+.cover:before{content:"";position:absolute;inset:5px;border:1px solid var(--book-rule);pointer-events:none}.cover:after{content:"";position:absolute;width:2px;right:0;top:0;bottom:0;background:#ffffff22}
+.cover-label{font:6px/1.3 "Reader Sans",sans-serif;letter-spacing:.25px;margin-bottom:7px;padding-bottom:3px;border-bottom:1px solid var(--book-rule)}.cover-title{max-width:100%;overflow-wrap:anywhere}
+.cover-footer{font:5px/1.2 "Reader Sans",sans-serif;margin-top:7px}
+.dock{flex-shrink:0;height:82px;display:flex;align-items:center;padding:12px 18px;background:var(--dock);border-top:var(--dock-line)}
+.primary{width:100%;min-height:52px;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--button-bg);color:var(--button-ink);border:var(--button-border);border-radius:var(--button-radius);font-size:16px;font-weight:var(--button-weight);box-shadow:var(--button-shadow)}
+.primary .symbol{width:22px;height:22px}.primary:hover{filter:brightness(.96)}
+.clean{--canvas:#fff;--row:#fff;--header:#fff;--header-ink:#1d2734;--ink:#202934;--muted:#606b78;--accent:#255f9f;--edge:#cbd3df;--header-line:1px solid #e1e6eb;--row-border:0;--row-bottom:1px solid #e2e7ec;--row-radius:0;--row-shadow:none;--sort-line:0;--dock:#fff;--dock-line:1px solid #dce2e9;--font:"Reader Sans",sans-serif;--heading-weight:600;--title-weight:550;--stroke:1.8;--cap:round;--join:round;--icon-radius:6px;--icon-hover:#ecf1f7;--more-ink:#626e7b;--cover-radius:1px;--cover-shadow:0 1px 2px #172b4020;--button-bg:#255f9f;--button-ink:#fff;--button-border:0;--button-radius:6px;--button-shadow:none;--button-weight:550}
+.classic{--canvas:#f7f2e8;--row:transparent;--header:#f7f2e8;--header-ink:#442e3b;--ink:#3e2e36;--muted:#70616a;--accent:#74334f;--edge:#c7b9b3;--header-line:1px solid #a69198;--row-border:0;--row-bottom:1px solid #d1c4bc;--row-radius:0;--row-shadow:none;--sort-line:1px solid #d1c4bc;--dock:#f7f2e8;--dock-line:1px solid #b4a2a7;--font:"Reader Serif",serif;--heading-weight:600;--title-weight:550;--stroke:1.3;--cap:square;--join:miter;--icon-radius:0;--icon-hover:#e9ded7;--more-ink:#775663;--cover-radius:0;--cover-shadow:2px 2px 0 #b9a58e60;--button-bg:transparent;--button-ink:#74334f;--button-border:1px solid #74334f;--button-radius:0;--button-shadow:none;--button-weight:600}
+.classic .heading strong{font-size:27px}.classic .doc-title{font-size:19px}.classic .primary{font-family:"Reader Serif",serif}
+.bold{--canvas:#eef1fb;--row:#fff;--header:#343b83;--header-ink:#fff;--ink:#272d4e;--muted:#5a6381;--accent:#343b83;--edge:#c3c9df;--header-line:0;--row-border:1px solid #e2e6f1;--row-bottom:1px solid #e2e6f1;--row-radius:12px;--row-shadow:0 1px 1px #32396708;--sort-line:0;--dock:#eef1fb;--dock-line:0;--font:"Reader Rubik",sans-serif;--heading-weight:550;--title-weight:500;--stroke:2.3;--cap:round;--join:round;--icon-radius:50%;--icon-hover:#ffffff20;--more-ink:#677092;--cover-radius:4px;--cover-shadow:0 2px 3px #242c4830;--button-bg:#343b83;--button-ink:#fff;--button-border:0;--button-radius:14px;--button-shadow:0 2px 3px #282d6118;--button-weight:500}
+.bold .toolbar .icon{background:#ffffff12}.bold .sort{color:#4e5877}.bold .filled{fill:currentColor;stroke:none}.bold .primary .filled{fill:currentColor;stroke:none}
+.reader .heading strong{font-size:18px;line-height:1.35}.reading-surface{flex:1;min-height:0;overflow:auto;padding:16px 12px;background:var(--canvas)}
+.paper{background:white;color:#1f1b18;box-shadow:0 1px 5px #00000018;min-height:665px;padding:24px 17px;font-family:"Reader Serif",serif}
+.paper-head{text-align:center;font-size:11px;color:#666;padding-bottom:12px;border-bottom:1px solid #bcb9b6}.paper h3{text-align:center;font-size:23px;font-weight:600;margin:20px 0 5px}.paper-subtitle{text-align:center;font:11px/1.5 "Reader Sans",sans-serif;color:#777;margin:0 0 24px}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:18px}.columns>div+div{border-inline-start:1px solid #d8d4d0;padding-inline-start:14px}.passage{font-size:13px;line-height:1.9;margin:0 0 20px;text-align:justify}.passage label{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;margin:0 0 8px}.passage input{appearance:none;width:23px;height:23px;border:1px solid #9b9792;flex-shrink:0;position:relative;background:white;cursor:pointer;margin:0}.passage input:checked:after{content:"✓";position:absolute;inset:-6px 0 0;line-height:28px;text-align:center;font-size:26px;color:#355d4b;font-family:"Reader Sans",sans-serif}
+.reading-tools{height:82px;flex-shrink:0;display:flex;align-items:center;justify-content:space-evenly;background:var(--dock);border-top:var(--dock-line);padding:8px}
+.tool{min-width:54px;height:60px;border:0;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;border-radius:var(--button-radius);font:11px/1.2 "Reader Sans",sans-serif}.tool.active{background:var(--button-bg);color:var(--button-ink);border:var(--button-border)}.classic .tool.active{color:var(--accent);background:#efe5dd}.bold .tool.active{background:#343b83;color:white}
+.choose{margin-top:12px;background:white;border:1px solid #9d9ea8;color:#292a33;width:100%;min-height:48px;font-size:16px;font-weight:550}.choose[aria-pressed=true],.answer[aria-pressed=true]{background:#25252c;color:white}
+.feedback-area{margin-top:26px;border-top:1px solid #bfc0c6;padding-top:20px}.feedback-area h2{font-size:18px;margin:0 0 12px}.answers{display:flex;gap:8px;flex-wrap:wrap}.answer,.download{min-height:48px;padding:8px 18px;border:1px solid #999;background:#fff;color:#25252c}.feedback-area label{display:block;font-size:14px;margin:18px 0 8px}
+textarea{font-family:"Reader Sans",sans-serif;background:#fff;border:1px solid #999;font-size:15px;line-height:1.65;width:100%;max-width:850px;min-height:75px;padding:12px;resize:vertical;display:block}.download{margin-top:12px}.download:disabled{opacity:.45;cursor:default}
+#feedback{font-size:14px;line-height:1.8;min-height:26px;margin:12px 0 0}.copyright{font-size:12px;color:#686970;line-height:1.8;margin-top:12px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #1677cb;outline-offset:2px}
+dialog{max-width:430px;border:1px solid #aaa;padding:22px;font-size:15px;line-height:1.8}dialog::backdrop{background:#0004}dialog button{min-height:48px;padding:8px 18px;background:#fff;border:1px solid #999}
+@media(max-width:1050px){.comparison{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:690px){main{padding:18px 12px}.comparison{grid-template-columns:1fr;gap:28px}.app{height:754px}.candidate>.description{min-height:auto}.views{position:sticky;top:0;z-index:2;background:#eeeef0;padding:8px 0;margin:12px 0}.views button{flex:1;padding-inline:12px}h1{font-size:22px}.file{column-gap:10px;padding-inline:8px}.files{padding-inline:10px}.doc-title{font-size:17px}.classic .doc-title{font-size:18px}.bold .doc-title{font-size:18px}}
+__EXTRA_CSS__
+</style>
+<main>
+ <h1>__REVIEW_TITLE__</h1>
+ <p class="intro">__REVIEW_INTRO__</p>
+ <p class="scope">__REVIEW_SCOPE__</p>
+ <div class="views" role="group" aria-label="בחירת מסך להדגמה"><button class="view-button" data-view="library" aria-pressed="true">רשימת המסמכים</button><button class="view-button" data-view="reader" aria-pressed="false">מסך הקריאה</button>__SETTINGS_NAV__</div>
+ __THEME_CONTROLS__
+ <div class="comparison" id="comparison"></div>
+ <section class="feedback-area" __REVIEW_SECTION_ATTRS__>
+  <h2>אפשר לבחור גם חלקים מכמה עיצובים</h2>
+  <div class="answers"><button class="answer" data-choice="none" aria-pressed="false">אף אחד לא מתאים</button><button class="answer" data-choice="uncertain" aria-pressed="false">קשה לי לבחור</button></div>
+  <label for="comment">__FEEDBACK_HINT__</label><textarea id="comment" placeholder="אפשר גם להשאיר ריק"></textarea>
+  <button class="download" id="download" disabled>הורדת הבחירה לשיתוף</button><p id="feedback" aria-live="polite"></p>
+  <p class="copyright">אפשר לכתוב את הבחירה ישירות בשיחה. אלה הצעות לבדיקת המראה. בחירה אינה אישור אוטומטי לכל הפרטים או לנוסחי ההגדרות. הגופנים בדוגמה מופצים לפי SIL Open Font License 1.1.</p>
+ </section>
+ __COPY_EDITOR__
+</main>
+<dialog id="scope-dialog"><p>זו דוגמת עיצוב. הפעולות כאן אינן פותחות או שומרות קובץ PDF אמיתי. אפשר לעבור בין הרשימה לקריאה בכפתורים שמעל הדוגמאות.</p><form method="dialog"><button>סגירה</button></form></dialog>
+<script>
+'use strict';
+const directions=__DIRECTIONS_JSON__;
+const preferenceConfig=__PREFERENCE_JSON__;
+const copyCatalog=__COPY_CATALOG_JSON__;
+let interfaceLanguage='he';
+const documents=[
+ {id:'a',title:'אוצרות יהודים — וירא',cover:'וירא',label:'חוברת לימוד',received:'היום',pages:84,position:'להמשיך מעמוד 12',color:'#233a53',ink:'#f8edce',rule:'#c5b68180'},
+ {id:'b',title:'סיכומי השיעור השבועי',cover:'סיכומי שיעור',label:'דפי לימוד',received:'היום',pages:18,position:'עדיין לא נקרא',color:'#a67058',ink:'#fff3e6',rule:'#fff3e670'},
+ {id:'c',title:'אוצרות יהודים — לך לך',cover:'לך לך',label:'חוברת לימוד',received:'אתמול',pages:80,position:'להמשיך מעמוד 38',color:'#41564d',ink:'#eee8cc',rule:'#d5d0a680'},
+ {id:'d',title:'מדריך לעבודה',cover:'מדריך לעבודה',label:'מדריכים',received:'אתמול',pages:24,position:'להמשיך מעמוד 4',color:'#dde4ed',ink:'#263951',rule:'#26395150'},
+ {id:'e',title:'חוברת לימוד',cover:'לימוד',label:'חוברת',received:'לפני יומיים',pages:36,position:'עדיין לא נקרא',color:'#795868',ink:'#fff0ef',rule:'#fff0ef70'},
+ {id:'f',title:'רשימת משימות',cover:'משימות',label:'מסמך',received:'לפני יומיים',pages:3,position:'להמשיך מעמוד 1',color:'#e6ddcb',ink:'#56482e',rule:'#56482e50'}
+];
+const paths={
+ settings:'<path d="m9.5 3-.7 2.2-2 .9-2.1-.5-2 3.5 1.5 1.7v2.4l-1.5 1.7 2 3.5 2.1-.5 2 .9.7 2.2h5l.7-2.2 2-.9 2.1.5 2-3.5-1.5-1.7v-2.4l1.5-1.7-2-3.5-2.1.5-2-.9-.7-2.2Z"/><circle cx="12" cy="12" r="3"/>',
+ open:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6M12 12v6m-3-3h6"/>',
+ sort:'<path d="M6 4v16m-3-3 3 3 3-3M12 5h8m-8 5h6m-6 5h4"/>',
+ more:'<circle cx="12" cy="5" r=".7"/><circle cx="12" cy="12" r=".7"/><circle cx="12" cy="19" r=".7"/>',
+ back:'<path d="M4 12h16m-6-6 6 6-6 6"/>',
+ book:'<path d="M3 4h6a3 3 0 0 1 3 3v14a4 4 0 0 0-4-2H3Zm18 0h-6a3 3 0 0 0-3 3v14a4 4 0 0 1 4-2h5Z"/>',
+ pen:'<path d="m15 4 5 5L9 20l-6 1 1-6ZM13 6l5 5"/>',
+ highlight:'<path d="m13 3 8 8-8 8-8-8ZM5 12l-3 6 4 4 6-3M1 23h14"/>',
+ bookmark:'<path d="M6 3h12v18l-6-4-6 4Z"/>',
+ undo:'<path d="m7 4-4 5 4 5M3 9h10a6 6 0 0 1 0 12h-3"/>'
+};
+paths.sun='<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>';
+paths.moon='<path d="M20.5 15.3A9 9 0 0 1 8.7 3.5 9 9 0 1 0 20.5 15.3Z"/>';
+const filled={
+ settings:'<path fill-rule="evenodd" d="m9.5 3-.7 2.2-2 .9-2.1-.5-2 3.5 1.5 1.7v2.4l-1.5 1.7 2 3.5 2.1-.5 2 .9.7 2.2h5l.7-2.2 2-.9 2.1.5 2-3.5-1.5-1.7v-2.4l1.5-1.7-2-3.5-2.1.5-2-.9-.7-2.2ZM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/>',
+ open:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8h-6Zm2 0v4h4Z"/><path d="M11 11h2v3h3v2h-3v3h-2v-3H8v-2h3Z" fill="var(--button-bg)"/>',
+ book:'<path d="M3 3h6c1.2 0 2 .4 3 1.2C13 3.4 13.8 3 15 3h6v17h-6c-1.1 0-2.1.4-3 1.2-.9-.8-1.9-1.2-3-1.2H3Z"/>',
+ pen:'<path d="m16 2 6 6-3 3-6-6ZM12 6l6 6L8 22H2v-6Z"/>',
+ highlight:'<path d="m13 2 9 9-9 9-9-9ZM4 13l-3 6 4 4 6-3ZM1 23h14v1H1Z"/>',
+ bookmark:'<path d="M5 2h14v21l-7-5-7 5Z"/>',
+ more:'<circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/>'
+};
+function icon(name,id){const isFilled=directions.find(d=>d.id===id)?.icons==='filled'&&filled[name];return '<svg class="symbol'+(isFilled?' filled':'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(isFilled||paths[name])+'</svg>';}
+function node(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;}
+function iconButton(name,id,label){const b=node('button','icon demo-action');b.setAttribute('aria-label',label);b.innerHTML=icon(name,id);if(name==='settings')b.dataset.appAction='settings';if(name==='back')b.dataset.appAction='back-library';return b;}
+function statusBar(){const bar=node('div','status-bar');bar.setAttribute('aria-hidden','true');bar.innerHTML='<span>9:41</span><span class="system-icons"><svg viewBox="0 0 16 12"><path d="M0 0h16L8 12Z"/></svg><span class="battery"></span></span>';return bar;}
+function makeCover(doc){const cover=node('div','cover');cover.dir='rtl';cover.setAttribute('aria-hidden','true');cover.style.setProperty('--book-color',doc.color);cover.style.setProperty('--book-ink',doc.ink);cover.style.setProperty('--book-rule',doc.rule);cover.append(node('span','cover-label',doc.label),node('span','cover-title',doc.cover),node('span','cover-footer','PDF'));return cover;}
+function toolbar(id,reader){const bar=node('header','toolbar');const heading=node('div','heading');heading.append(node('strong','',reader?'אוצרות יהודים — וירא':'מסמכים'));if(reader)heading.append(node('small','','עמוד 12 מתוך 84'));bar.append(heading);if(reader)bar.append(iconButton('undo',id,'ביטול'));if(preferenceConfig.dayNight){const toggle=node('button','icon theme-toggle');toggle.setAttribute('aria-label',preferenceConfig.themeNames.night);toggle.title=preferenceConfig.themeNames.night;toggle.innerHTML=icon('moon',id);bar.append(toggle);}bar.append(iconButton(reader?'back':'settings',id,reader?'חזרה לרשימה':'הגדרות'));return bar;}
+function library(id){
+ const screen=node('div','app-view library');screen.dataset.screen='library';screen.append(toolbar(id,false));
+ const sort=node('div','sort');sort.innerHTML=icon('sort',id);sort.append(node('span','','מהחדש לישן לפי קבלה'));screen.append(sort);
+ const list=node('div','files');
+ for(const doc of documents){const row=node('article','file');row.dataset.doc=doc.id;const details=node('div','details');details.append(node('h3','doc-title',doc.title),node('p','metadata',doc.received+' · '+doc.pages+' עמודים'),node('p','position',doc.position));row.append(makeCover(doc),details,iconButton('more',id,'אפשרויות מסמך'));list.append(row);}
+ const dock=node('footer','dock'),open=node('button','primary demo-action');open.innerHTML=icon('open',id);open.append(node('span','','פתיחת PDF'));dock.append(open);screen.append(list,dock);return screen;
+}
+function reader(id){
+ const screen=node('div','app-view reader');screen.dataset.screen='reader';screen.hidden=true;screen.append(toolbar(id,true));
+ const surface=node('div','reading-surface'),paper=node('article','paper');paper.dir='rtl';paper.append(node('div','paper-head','חוברת לדוגמה · קריאה וסימון'),node('h3','','לימוד בנחת'),node('p','paper-subtitle','טקסט וכריכה להמחשה בלבד'));
+ const columns=node('div','columns');
+ for(let col=0;col<2;col++){const column=node('div','');for(let p=0;p<3;p++){const number=col*3+p+1,passage=node('div','passage'),label=node('label','','קטע '+number),box=document.createElement('input');box.type='checkbox';box.checked=number===1;box.setAttribute('aria-label','סימון קטע '+number);label.append(box);passage.append(label,node('div','','לכל לימוד יש התחלה והמשך. אפשר לקרוא בשקט, לעצור במקום המתאים ולחזור אליו כשממשיכים. סימון קטן מזכיר היכן עצרנו ומאפשר להתקדם בקצב שלנו.'));column.append(passage);}columns.append(column);}
+ paper.append(columns);surface.append(paper);screen.append(surface);const tools=node('footer','reading-tools');
+ for(const item of [['book','קריאה'],['highlight','מרקר'],['pen','עט'],['bookmark','סימנייה']]){const button=node('button','tool demo-action'+(item[0]==='book'?' active':''));button.innerHTML=icon(item[0],id);button.append(node('span','',item[1]));tools.append(button);}
+ screen.append(tools);return screen;
+}
+__SETTINGS_SCRIPT__
+for(const d of directions){const candidate=node('section','candidate');candidate.append(node('h2','',d.label||d.id+' · '+d.name),node('p','description',d.description));const app=node('div','app '+d.className);app.dataset.variant=d.id;app.append(statusBar(),library(d.id),reader(d.id));if(preferenceConfig.settings)app.append(settingsScreen(d.id));candidate.append(app);if(!preferenceConfig.selectedDesign){const choose=node('button','choose',d.choiceLabel||d.id+' הכי קרוב');choose.dataset.choice=d.id;choose.setAttribute('aria-pressed','false');candidate.append(choose);}document.getElementById('comparison').append(candidate);}
+let currentView='library',settingsReturnView='library';
+function showView(view){if(view==='settings'&&currentView!=='settings')settingsReturnView=currentView;currentView=view;document.querySelectorAll('[data-screen]').forEach(el=>el.hidden=el.dataset.screen!==view);document.querySelectorAll('[data-view]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.view===view)));}
+document.querySelectorAll('[data-view]').forEach(el=>el.addEventListener('click',()=>showView(el.dataset.view)));
+document.querySelectorAll('.demo-action').forEach(el=>el.addEventListener('click',()=>{if(el.dataset.appAction==='back-library')showView('library');else if(preferenceConfig.settings&&el.dataset.appAction==='settings')showView('settings');else document.getElementById('scope-dialog').showModal();}));
+document.querySelectorAll('.passage input').forEach(el=>el.addEventListener('change',()=>{const index=Array.from(el.closest('.columns').querySelectorAll('input')).indexOf(el);document.querySelectorAll('.columns').forEach(columns=>columns.querySelectorAll('input')[index].checked=el.checked);}));
+const state={choice:preferenceConfig.selectedDesign||null,comment:'',theme:'day',preferences:preferenceConfig.settings?defaultSettingsPreferences():{}},storageKey=preferenceConfig.storageKey;
+try{const saved=JSON.parse(localStorage.getItem(storageKey)||'null');if(saved){if(!preferenceConfig.selectedDesign&&[...directions.map(d=>d.id),'none','uncertain'].includes(saved.choice)){state.choice=saved.choice;state.comment=typeof saved.comment==='string'?saved.comment:'';}if(preferenceConfig.dayNight&&['day','night'].includes(saved.theme))state.theme=saved.theme;if(preferenceConfig.settings)restoreSettingsPreferences(saved.preferences);}}catch{}
+__SETTINGS_INIT__
+function update(){document.querySelectorAll('[data-choice]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.choice===state.choice)));document.getElementById('download').disabled=!state.choice;const name=directions.find(d=>d.id===state.choice)?.name||({none:'אף אחד לא מתאים',uncertain:'קשה לי לבחור'}[state.choice]);document.getElementById('feedback').textContent=state.choice?'הבחירה: '+name+'. אפשר לשנות בכל רגע.':'';try{localStorage.setItem(storageKey,JSON.stringify(state));}catch{}}
+document.querySelectorAll('[data-choice]').forEach(el=>el.addEventListener('click',()=>{state.choice=el.dataset.choice;update();}));
+document.getElementById('comment').value=state.comment;document.getElementById('comment').addEventListener('input',el=>{state.comment=el.target.value;update();});
+document.getElementById('download').addEventListener('click',()=>{if(!state.choice)return;const payload={scope:preferenceConfig.scope,revision:preferenceConfig.revision,status:'preference-for-further-review',settings_copy_approved:false,choice:state.choice,comment:state.comment,view_at_export:currentView,exported_at:new Date().toISOString()};const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='visual-design-preference.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);});
+function setTheme(theme){if(!preferenceConfig.dayNight||!['day','night'].includes(theme))return;state.theme=theme;document.querySelectorAll('.app').forEach(app=>app.dataset.theme=theme);document.querySelectorAll('[data-theme-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.themeChoice===theme)));document.querySelectorAll('.theme-toggle').forEach(button=>{const night=theme==='night',label=preferenceConfig.settings?settingsText(night?'theme_day':'theme_dark'):preferenceConfig.themeNames[night?'day':'night'];button.setAttribute('aria-label',label);button.title=label;button.innerHTML=icon(night?'sun':'moon',button.closest('.app').dataset.variant);});if(preferenceConfig.settings)refreshSettingsValues();update();}
+document.querySelectorAll('[data-theme-choice]').forEach(button=>button.addEventListener('click',()=>setTheme(button.dataset.themeChoice)));
+document.querySelectorAll('.theme-toggle').forEach(button=>button.addEventListener('click',()=>setTheme(state.theme==='day'?'night':'day')));
+update();
+if(preferenceConfig.dayNight)setTheme(state.theme);
+if(preferenceConfig.initialView)showView(preferenceConfig.initialView);
+</script>
+</html>

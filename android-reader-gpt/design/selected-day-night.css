@@ -1,0 +1,15 @@
+.comparison{display:block;max-width:420px;margin-inline:auto}
+.theme-controls{display:flex;justify-content:center;gap:8px;margin:0 0 24px}
+.theme-controls .view-button[aria-pressed=true]{background:#342c69;border-color:#342c69;color:white}
+.selected .paper-subtitle{color:#737373}
+.selected[data-theme=night]{--canvas:#171720;--row:#24232f;--header:#252047;--header-ink:#f5f1ff;--ink:#f2eff9;--muted:#c1bbd0;--accent:#c5b8ff;--edge:#3a344f;--row-border:1px solid #3e394c;--row-bottom:1px solid #3e394c;--row-shadow:0 2px 4px #0002;--dock:#171720;--button-bg:#baacff;--button-ink:#251e49;--button-shadow:0 3px 5px #0003;--icon-hover:#ffffff1a;--more-ink:#c2b8db}
+.selected[data-theme=night] .sort{color:var(--muted)}
+.selected[data-theme=night] .primary .symbol{background:#251e4912}
+.selected[data-theme=night] .reading-tools{background:#252330;border-color:#3b364e;box-shadow:0 3px 8px #0003}
+.selected[data-theme=night] .tool.active{background:#443c64;color:#ede8ff}
+.selected[data-theme=night] .paper{background:#242128;color:#f5f0df;box-shadow:0 1px 5px #0003}
+.selected[data-theme=night] .paper-head{color:#c0b8ac;border-color:#716c67}
+.selected[data-theme=night] .paper-subtitle{color:#beb9ad}
+.selected[data-theme=night] .columns>div+div{border-color:#615956}
+.selected[data-theme=night] .passage input{background:#242128;border-color:#aba59c}
+.selected[data-theme=night] .passage input:checked:after{color:#b8e1c9}

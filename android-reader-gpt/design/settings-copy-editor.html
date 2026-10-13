@@ -1,0 +1,23 @@
+<section class="copy-review" id="copy-review">
+ <h2>תיקון מילות ההגדרות</h2>
+ <p>כל הנוסחים כאן עדיין טיוטה. אפשר לתקן בעברית ובאנגלית ולראות את השינוי מיד במסך. לצד כל נוסח מופיע הסבר למשמעותו בעברית.</p>
+ <p>תיקון אינו אישור אוטומטי. לאחר התיקונים אפשר להעתיק אותם לשיחה או להוריד קובץ ולצרף אותו. נוסח של אפשרות עתידית אינו מוסיף אותה לאפליקציה.</p>
+ <div class="copy-filters" role="group" aria-label="קבוצת נוסחים לתיקון">
+  <button class="copy-filter" data-copy-filter="general" aria-pressed="true">כותרות וחזרה</button>
+  <button class="copy-filter" data-copy-filter="reading" aria-pressed="false">קריאה</button>
+  <button class="copy-filter" data-copy-filter="display" aria-pressed="false">תצוגה</button>
+  <button class="copy-filter" data-copy-filter="interface" aria-pressed="false">שפה</button>
+ </div>
+ <div id="copy-rows"></div>
+ <div class="copy-actions">
+  <button class="copy-export" id="copy-to-chat">העתקת התיקונים לשיחה</button>
+  <button class="copy-export" id="export-copy">הורדת הנוסחים המתוקנים</button>
+ </div>
+ <div id="copy-transfer" hidden>
+  <p>אפשר להעתיק את הטקסט שבתיבה ולהדביק אותו בשיחה כאן. אין צורך למצוא קובץ שהורד.</p>
+  <label for="copy-transfer-text">הנוסחים להעברה — עדיין טיוטה</label>
+  <textarea id="copy-transfer-text" readonly dir="ltr" spellcheck="false"></textarea>
+  <button class="copy-export" id="select-copy-text">בחירת כל הטקסט להעתקה</button>
+ </div>
+ <p id="copy-progress" aria-live="polite">הנוסחים מוצגים לבדיקה. לא אושר עדיין אף נוסח.</p>
+</section>

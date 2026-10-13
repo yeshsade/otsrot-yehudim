@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>בחירת סידור המסך — סבב ראשון</title>
+<style>
+:root{font-family:"Noto Sans Hebrew",sans-serif;color:#202124;background:#f5f5f5;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}button,textarea{font:inherit}button{cursor:pointer}
+main{max-width:1240px;margin:auto;padding:24px}h1{font-size:25px;margin:0 0 12px;line-height:1.5}
+.intro{max-width:850px;font-size:16px;line-height:1.8;margin:0 0 8px}.note{font-size:14px;color:#595959;line-height:1.7;margin:0 0 24px}
+.comparison{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:start}
+.candidate{min-width:0;background:white;border:1px solid #c9c9c9}.candidate h2{font-size:18px;line-height:1.6;margin:0;padding:12px 14px;background:#f0f0f0;border-bottom:1px solid #c9c9c9}
+.app{height:720px;display:flex;flex-direction:column;background:white;position:relative;overflow:hidden}
+.toolbar{display:flex;align-items:center;min-height:64px;padding:0 8px;border-bottom:1px solid #dedede;gap:2px;background:white;flex-shrink:0}
+.toolbar strong{font-size:20px;font-weight:600;padding-inline:8px;flex:1}.icon{width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;color:#373737;flex-shrink:0}
+svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sort{font-size:13px;color:#5d5d5d;padding:13px 16px 10px;border-bottom:1px solid #eee;flex-shrink:0}
+.files{overflow:auto;flex:1;min-height:0;overscroll-behavior:contain}.file{display:flex;gap:14px;margin:0 16px;padding:15px 0;border-bottom:1px solid #e5e5e5;min-width:0}
+.cover{width:47px;height:64px;flex-shrink:0;border:1px solid #c6c6c6;background:#f2f2f2;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#555;padding:3px;text-align:center;font-size:9px;line-height:1.7}
+.cover:before{content:"PDF";font-size:8px;display:block;letter-spacing:.6px;border-bottom:1px solid #ccc;width:80%;margin-bottom:5px;padding-bottom:3px}
+.details{flex:1;min-width:0}.title{font-size:16px;font-weight:600;line-height:1.55;margin:0 0 6px;overflow-wrap:anywhere}
+.meta,.position{font-size:12px;line-height:1.65;color:#666}.position{color:#424242;margin-top:3px}.file .more{width:48px;min-height:48px;height:auto;align-self:center;margin-inline-end:-8px}
+.candidate .description{font-size:13px;line-height:1.8;padding:12px 14px;margin:0;border-top:1px solid #c9c9c9;min-height:72px;background:#fafafa}
+.select{margin:0;width:100%;min-height:48px;background:#fff;border:0;border-top:1px solid #c9c9c9;color:#222;font-weight:600}
+.select[aria-pressed=true],.answer[aria-pressed=true]{background:#202124;color:white}.select:hover,.answer:hover{background:#e7e7e7;color:#202124}
+.select[aria-pressed=true]:hover,.answer[aria-pressed=true]:hover{background:#202124;color:white}
+.group-title{margin:0;padding:14px 17px 6px;font-size:13px;font-weight:600;color:#606060}.grouped .file{margin:0 16px;padding:13px 0;gap:14px}.grouped .cover{width:47px;height:64px}
+.grouped .meta{margin-top:5px}.dock{padding:12px 16px;background:white;border-top:1px solid #d5d5d5;flex-shrink:0}
+.open-wide{min-height:48px;width:100%;background:#f0f0f0;border:1px solid #c6c6c6;display:flex;justify-content:center;align-items:center;gap:10px;font-size:15px;font-weight:600;color:#202124}
+.name-first .file{display:block;padding:15px 0}.name-first .title{margin:0 0 10px;display:flex;align-items:flex-start;gap:8px}.name-first .title span{flex:1}.name-first .more{min-height:48px;height:48px;margin-top:-8px}
+.summary{display:flex;align-items:center;gap:12px}.name-first .cover{width:38px;height:52px;font-size:8px}.name-first .cover:before{font-size:7px;padding-bottom:2px;margin-bottom:2px}
+.name-first .meta{font-size:12px}.name-first .files{padding-bottom:80px}.floating{position:absolute;bottom:18px;left:18px;width:56px;height:56px;border:1px solid #c6c6c6;border-radius:50%;background:#ededed;color:#222;display:flex;align-items:center;justify-content:center}
+.review{margin-top:28px;padding-top:22px;border-top:1px solid #c8c8c8}.review h2{font-size:19px;margin:0 0 12px}.answers{display:flex;gap:10px;flex-wrap:wrap}.answer,.download{min-height:48px;border:1px solid #aaa;background:#fff;color:#222;padding:10px 16px}.review label{display:block;margin:20px 0 8px;font-size:15px}
+textarea{display:block;width:100%;max-width:760px;min-height:84px;border:1px solid #aaa;background:white;padding:12px;resize:vertical;font-size:15px;line-height:1.6}.download{margin-top:16px;font-weight:600}.download:disabled{opacity:.45;cursor:default}
+#feedback{line-height:1.8;font-size:14px;min-height:26px;margin:14px 0 0}.selected-caption{font-size:13px;color:#444;line-height:1.8;margin-top:8px}
+button:focus-visible,textarea:focus-visible{outline:3px solid #175cd3;outline-offset:2px}
+dialog{max-width:460px;border:1px solid #bbb;padding:24px;font-size:16px;line-height:1.8}dialog::backdrop{background:#0005}dialog button{min-height:48px;padding:8px 20px;background:white;border:1px solid #888}
+@media(max-width:1000px){.comparison{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:660px){main{padding:18px 16px}.comparison{grid-template-columns:1fr;gap:24px}h1{font-size:22px}.app{height:680px}.candidate .description{min-height:auto}}
+</style>
+<main>
+ <h1>איזה סידור מסך הכי קרוב למה שאתה רוצה?</h1>
+ <p class="intro">שלוש אפשרויות לאותה רשימת מסמכים. אפשר לענות רק במספר, לבחור חלקים מכמה גרסאות או לומר שאף אחת לא מתאימה. ההסבר הוא באחריותי.</p>
+ <p class="note">זה תרגיל ראשון לבחירת סידור המידע והכפתורים. הצבעים ניטרליים לצורך ההשוואה; המראה הסופי עוד פתוח. מסמכי דוגמה בלבד. הכיוון נעזר בבקשתך לממשק מסודר, ואינו העתק של ReadEra.</p>
+ <div class="comparison">
+  <section class="candidate">
+   <h2>1 · רשימה וכל הפעולות למעלה</h2>
+   <div class="app regular" data-variant="1">
+    <header class="toolbar"><strong>מסמכים</strong><button class="icon demo-action" aria-label="פתיחת PDF" data-icon="open"></button><button class="icon demo-action" aria-label="הגדרות" data-icon="settings"></button></header>
+    <div class="sort">מהחדש לישן לפי קבלה</div><div class="files" id="list-1"></div>
+   </div>
+   <p class="description">כל מסמך בשורה עם כריכה, שם ומועד קבלה. פתיחת קובץ והגדרות נמצאות בפס העליון.</p>
+   <button class="select" data-choice="1" aria-pressed="false">1 הכי קרוב</button>
+  </section>
+  <section class="candidate">
+   <h2>2 · לפי מועד קבלה, פתיחה למטה</h2>
+   <div class="app grouped" data-variant="2">
+    <header class="toolbar"><strong>מסמכים</strong><button class="icon demo-action" aria-label="הגדרות" data-icon="settings"></button></header>
+    <div class="sort">מהחדש לישן לפי קבלה</div><div class="files" id="list-2"></div>
+    <footer class="dock"><button class="open-wide demo-action"><span data-icon="open"></span>פתיחת PDF</button></footer>
+   </div>
+   <p class="description">מועד הקבלה מופיע מעל קבוצת מסמכים. כפתור פתיחת הקובץ קבוע בתחתית.</p>
+   <button class="select" data-choice="2" aria-pressed="false">2 הכי קרוב</button>
+  </section>
+  <section class="candidate">
+   <h2>3 · השם קודם, כפתור פתיחה בפינה</h2>
+   <div class="app name-first" data-variant="3">
+    <header class="toolbar"><strong>מסמכים</strong><button class="icon demo-action" aria-label="הגדרות" data-icon="settings"></button></header>
+    <div class="sort">מהחדש לישן לפי קבלה</div><div class="files" id="list-3"></div>
+    <button class="floating demo-action" aria-label="פתיחת PDF" data-icon="open"></button>
+   </div>
+   <p class="description">שם המסמך מופיע בשורה משלו. הכריכה והפרטים מתחתיו; פתיחת קובץ זמינה בפינה.</p>
+   <button class="select" data-choice="3" aria-pressed="false">3 הכי קרוב</button>
+  </section>
+ </div>
+ <section class="review">
+  <h2>גם אלה תשובות מועילות</h2>
+  <div class="answers"><button class="answer" data-choice="none" aria-pressed="false">אף אחת לא מתאימה</button><button class="answer" data-choice="uncertain" aria-pressed="false">קשה לי לבחור</button></div>
+  <label for="comment">אפשר להוסיף משהו, אם רוצים — למשל „הרשימה של 1 והכפתור של 2”</label>
+  <textarea id="comment" placeholder="אפשר גם להשאיר ריק"></textarea>
+  <button class="download" id="download" disabled>הורדת הבחירה לשיתוף</button>
+  <p id="feedback" aria-live="polite"></p>
+  <p class="selected-caption">אפשר לכתוב את הבחירה ישירות בשיחה. בחירה כאן היא כיוון להמשך הבירור; נוסחי ההגדרות עדיין צריכים תיקון ואישור בנפרד.</p>
+ </section>
+</main>
+<dialog id="demo-dialog"><p>זהו מסך להשוואת סידור הכפתורים. פתיחת PDF והגדרות המכשיר אינן פועלות בתרגיל הזה.</p><form method="dialog"><button>סגירה</button></form></dialog>
+<script>
+'use strict';
+const ICONS={
+ open:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6M12 12v6m-3-3h6"/></svg>',
+ settings:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 3-.7 2.2-2 .9-2.1-.5-2 3.5 1.5 1.7v2.4l-1.5 1.7 2 3.5 2.1-.5 2 .9.7 2.2h5l.7-2.2 2-.9 2.1.5 2-3.5-1.5-1.7v-2.4l1.5-1.7-2-3.5-2.1.5-2-.9-.7-2.2Z"/><circle cx="12" cy="12" r="3"/></svg>',
+ more:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>'
+};
+const documents=[
+ {id:'a',title:'אוצרות יהודים — וירא',cover:'וירא',received:'היום',meta:'84 עמודים',position:'להמשיך מעמוד 12'},
+ {id:'b',title:'סיכומי השיעור השבועי',cover:'שיעור',received:'היום',meta:'18 עמודים',position:'עדיין לא נקרא'},
+ {id:'c',title:'אוצרות יהודים — לך לך',cover:'לך לך',received:'אתמול',meta:'80 עמודים',position:'להמשיך מעמוד 38'},
+ {id:'d',title:'מדריך לעבודה',cover:'מדריך',received:'אתמול',meta:'24 עמודים',position:'להמשיך מעמוד 4'},
+ {id:'e',title:'חוברת לימוד',cover:'לימוד',received:'לפני יומיים',meta:'36 עמודים',position:'עדיין לא נקרא'},
+ {id:'f',title:'רשימת משימות',cover:'משימות',received:'לפני יומיים',meta:'3 עמודים',position:'להמשיך מעמוד 1'}
+];
+function moreButton(){const button=document.createElement('button');button.className='icon more demo-action';button.setAttribute('aria-label','אפשרויות מסמך');button.innerHTML=ICONS.more;return button;}
+function cover(doc){const node=document.createElement('div');node.className='cover';node.setAttribute('aria-hidden','true');node.textContent=doc.cover;return node;}
+function textNode(className,value){const node=document.createElement('div');node.className=className;node.textContent=value;return node;}
+for(let variant=1;variant<=3;variant++){
+ const list=document.getElementById('list-'+variant);let group='';
+ for(const doc of documents){
+  if(variant===2&&group!==doc.received){group=doc.received;const heading=document.createElement('h3');heading.className='group-title';heading.textContent=group;list.append(heading);}
+  const row=document.createElement('article');row.className='file';row.dataset.doc=doc.id;
+  const title=textNode('title',doc.title),details=textNode('details','');
+  const receivedText=variant===2?doc.meta:doc.received+' · '+doc.meta;
+  details.append(textNode('meta',receivedText),textNode('position',doc.position));
+  if(variant===3){const span=document.createElement('span');span.textContent=doc.title;title.replaceChildren(span,moreButton());const summary=textNode('summary','');summary.append(cover(doc),details);row.append(title,summary);}
+  else{details.prepend(title);row.append(cover(doc),details,moreButton());}
+  list.append(row);
+ }
+}
+document.querySelectorAll('[data-icon]').forEach(el=>el.innerHTML=ICONS[el.dataset.icon]);
+document.querySelectorAll('.demo-action').forEach(el=>el.addEventListener('click',()=>document.getElementById('demo-dialog').showModal()));
+const state={choice:null,comment:''},storageKey='pdf-reader-design-preference-round-1';
+try{const previous=JSON.parse(localStorage.getItem(storageKey)||'null');if(previous&&['1','2','3','none','uncertain'].includes(previous.choice)){state.choice=previous.choice;state.comment=typeof previous.comment==='string'?previous.comment:'';}}catch{}
+function update(){
+ document.querySelectorAll('[data-choice]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.choice===state.choice)));
+ document.getElementById('download').disabled=!state.choice;
+ const labels={'1':'1 הכי קרוב','2':'2 הכי קרוב','3':'3 הכי קרוב',none:'אף אחת לא מתאימה',uncertain:'קשה לי לבחור'};
+ document.getElementById('feedback').textContent=state.choice?'הבחירה: '+labels[state.choice]+'. אפשר לשנות אותה בכל רגע.':'';
+ try{localStorage.setItem(storageKey,JSON.stringify(state));}catch{}
+}
+document.querySelectorAll('[data-choice]').forEach(el=>el.addEventListener('click',()=>{state.choice=el.dataset.choice;update();}));
+document.getElementById('comment').value=state.comment;
+document.getElementById('comment').addEventListener('input',el=>{state.comment=el.target.value;update();});
+document.getElementById('download').addEventListener('click',()=>{
+ if(!state.choice)return;
+ const payload={round:1,scope:'library-layout-comparison',status:'preference-for-further-review',settings_copy_approved:false,choice:state.choice,comment:state.comment,exported_at:new Date().toISOString()};
+ const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'}));
+ const link=document.createElement('a');link.href=url;link.download='design-preference-round-1.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+});
+update();
+</script>
+</html>

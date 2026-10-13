@@ -1,0 +1,24 @@
+{
+  "source": "design/assets/fonts/NotoSansHebrew.ttf",
+  "source_sha256": "7ef36a2c3593758cdb622e1bdef4f84523e92fbc3ccc667438dd80ff54c2de88",
+  "fonttools_version": "4.61.1",
+  "width": 100,
+  "weights": {
+    "Regular": {
+      "weight": 400,
+      "filename": "NotoSansHebrew-Regular.ttf",
+      "sha256": "3e3a016199941006e66233326444aa0b7aaf647efe280e507777d6d97901b01c"
+    },
+    "Medium": {
+      "weight": 550,
+      "filename": "NotoSansHebrew-Medium.ttf",
+      "sha256": "1a5611003352bcefdf1fc00dc5f96591f8449756ce7e03b6308aa9fe45340f3f"
+    },
+    "SemiBold": {
+      "weight": 600,
+      "filename": "NotoSansHebrew-SemiBold.ttf",
+      "sha256": "526e254b2aa698d08c7bb8241475296f7f748d99779aeb2fe808fe0cf36629e0"
+    }
+  },
+  "license": "SIL Open Font License 1.1; kept in APK assets"
+}

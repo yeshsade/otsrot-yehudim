@@ -1,0 +1,19 @@
+# קבצי בנייה ומטמון — לא נכנסים למאגר
+**/build/
+**/.gradle/
+**/.gradle-home/
+**/.android-home/
+**/.cxx/
+**/.externalNativeBuild/
+**/local.properties
+**/*.apk
+**/*.aab
+# ספריות native מקומפלות ומקורות שהורדו בזמן בנייה
+**/PdfiumAndroid/src/main/jni/lib/
+**/PdfiumAndroid/libs/
+**/build_dependencies/downloads/
+**/build_dependencies/work/
+# מפתחות וסודות
+**/*.jks
+**/*.keystore
+**/keystore.properties
