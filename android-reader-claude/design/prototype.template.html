@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>קורא PDF — דוגמת מסכים ראשונה</title>
+<style>
+:root{--ink:#172b29;--muted:#647471;--green:#226e5d;--border:#dce5df;--canvas:#f4f5ef}*{box-sizing:border-box}body{margin:0;background:var(--canvas);color:var(--ink);font:16px/1.6 Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.38}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #c89332;outline-offset:3px}button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.review{max-width:1060px;margin:auto;padding:34px 24px}.eyebrow{font-size:13px;font-weight:bold;color:var(--green);letter-spacing:.5px}h1{font-size:clamp(26px,4vw,37px);letter-spacing:-.7px;margin:8px 0}header p{color:var(--muted);margin:0 0 18px}.preview-layout{display:grid;grid-template-columns:420px minmax(0,1fr);gap:44px;align-items:start}.tabs{display:flex;gap:6px;margin:22px 0 24px;flex-wrap:wrap}.tabs button,.review-button{border:1px solid var(--border);border-radius:10px;background:white;color:var(--ink);padding:11px 17px;min-height:46px}.tabs button.active{background:var(--green);border-color:var(--green);color:white}.phone{border:7px solid #d6ded8;border-radius:31px;background:#f8faf7;box-shadow:0 25px 65px #17392b13;overflow:hidden;width:420px;height:820px;max-width:100%;position:relative}.phone-status{height:30px;padding:5px 20px;font-size:12px;display:flex;justify-content:space-between;background:#fff;color:#152623;direction:ltr}.phone-body{height:776px;display:flex;flex-direction:column;--app:#f8faf7;--surface:#fff;--text:#21342f;--sub:#6d7d76;--line:#e2e9e4;--paper:#fff;--paper-text:#26312a;background:var(--app);color:var(--text)}.phone-body.dark{--app:#182321;--surface:#22322e;--text:#ecf3ee;--sub:#a8b9af;--line:#3c4d44;--paper:#202c29;--paper-text:#f0f4e8}.phone-body.warm{--paper:#fff3d7;--paper-text:#4c3c23}.app-header{display:flex;align-items:center;gap:12px;background:var(--surface);padding:16px 18px;border-bottom:1px solid var(--line);min-height:78px}.app-header h2{font-size:23px;margin:0;line-height:1.35}.app-header .title{min-width:0;flex:1}.app-header .title small{display:block;font-size:12px;color:var(--sub);margin-top:3px}.reader-header h2{font-size:18px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.icon-button{width:44px;height:44px;flex-shrink:0;border:0;background:transparent;border-radius:12px;color:var(--text);display:grid;place-items:center}.icon-button:hover{background:#226e5d12}.app-content{overflow-y:auto;flex:1;padding:22px 18px;min-height:0}.app-intro{font-size:13px;color:var(--sub);margin:0 0 18px}.list-label{display:flex;justify-content:space-between;margin-bottom:12px;align-items:center;font-size:14px;font-weight:bold}.list-label small{font-size:12px;font-weight:normal;color:var(--sub)}.doc-card{display:flex;gap:14px;align-items:center;width:100%;padding:15px 12px;margin:0 0 11px;border:1px solid var(--line);border-radius:15px;background:var(--surface);text-align:start;color:var(--text);min-height:114px}.doc-card:hover{border-color:#84b6a1}.cover{width:64px;height:83px;flex-shrink:0;background:var(--cover,#e8eee8);border-radius:4px;box-shadow:1px 3px 5px #00000012;padding:10px 5px;color:#344d41;text-align:center;font-size:9px;display:flex;flex-direction:column;justify-content:space-between;border-inline-start:3px solid #ffffff80}.cover strong{font-size:11px;border-top:1px solid #344d4140;border-bottom:1px solid #344d4140;padding:7px 0}.doc-details{flex:1;min-width:0}.doc-details strong{font-size:17px;display:block}.doc-details small{display:block;font-size:12px;color:var(--sub);margin-top:5px}.doc-details .last{font-size:11px;color:#2c8065;margin-top:9px}.doc-arrow{color:#84958b;width:17px}.new-pill{font-size:10px;border:1px solid #d4e7dd;border-radius:5px;padding:1px 5px;margin-inline-start:6px;color:#2b7b5b}.app-footer{padding:16px 18px;background:var(--surface);border-top:1px solid var(--line)}.primary{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;min-height:51px;border:0;border-radius:12px;background:var(--green);color:white;font-weight:bold}.helper{font-size:11px;color:var(--sub);text-align:center;margin:10px 0 0}.reader-viewport{overflow:auto;flex:1;padding:20px 12px;background:#dfe7df;position:relative;min-height:0}.dark .reader-viewport{background:#111b18}.paper{background:var(--paper);color:var(--paper-text);width:100%;min-height:670px;padding:27px 17px 22px;position:relative;box-shadow:0 3px 13px #1a33231a;transform-origin:top center;touch-action:pan-y}.paper.full{width:74%;margin:0 auto;min-height:530px;padding:20px 10px}.paper.full .paper-columns{font-size:10px}.paper.full .paper-title{font-size:17px}.paper.full .study-row{min-height:125px}.paper-caption{font-size:9px;letter-spacing:.7px;text-align:center;border-bottom:1px solid currentColor;opacity:.6;padding-bottom:9px}.paper-title{text-align:center;font-size:23px;margin:18px 0 8px;font-family:Georgia,Arial,serif}.paper-subtitle{text-align:center;font-size:10px;margin:0 0 23px;opacity:.7}.paper-columns{display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:12px;line-height:1.85;direction:rtl}.paper-column+.paper-column{border-inline-start:1px solid #8b988440;padding-inline-start:12px}.study-row{margin-bottom:13px;min-height:156px}.study-row h4{display:flex;gap:8px;align-items:center;font-size:12px;margin:0 0 7px;font-weight:bold}.study-row p{margin:0;text-align:justify}.vcheck{width:25px;height:25px;flex:0 0 25px;border:1.5px solid #879581;border-radius:3px;background:var(--paper);color:var(--green);padding:0;display:grid;place-items:center;font-size:18px;font-weight:bold;position:relative;z-index:2}.vcheck[aria-pressed=true]{background:#e4f0e1;border-color:#629b6a}.paper-bottom{margin-top:20px;border-top:1px solid #8b988450;padding-top:10px;text-align:center;font-size:10px;opacity:.7}.annotation-layer{position:absolute;inset:0;pointer-events:none;width:100%;height:100%;overflow:visible}.bookmark{position:absolute;width:31px;height:42px;padding:0;border:0;background:transparent;cursor:grab;touch-action:none;z-index:5;color:#3b826b;transform:translate(-50%,-15%);filter:drop-shadow(0 2px 2px #142d2820)}.bookmark svg{width:31px;height:42px;fill:currentColor;stroke:white;stroke-width:1.2}.note-dot{position:absolute;display:grid;place-items:center;width:26px;height:26px;border-radius:7px;background:#f3d568;color:#57461c;border:1px solid #bda442;font-size:15px;transform:translate(-50%,-50%)}.page-nav{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-top:1px solid var(--line);padding:3px 13px;min-height:49px;font-size:12px}.tool-strip{display:flex;justify-content:space-around;padding:8px 6px 12px;background:var(--surface);border-top:1px solid var(--line)}.tool-button{border:0;background:transparent;border-radius:10px;color:var(--sub);min-width:53px;min-height:55px;font-size:10px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px}.tool-button.active{color:#226e5d;background:#e5f0e7}.dark .tool-button.active{background:#375445;color:#e0f3e4}.tool-button svg{width:22px;height:22px}.settings-content{padding:18px 15px}.setting-group{font-size:12px;color:#52836a;font-weight:bold;margin:5px 5px 10px}.settings-card{border:1px solid var(--line);background:var(--surface);border-radius:14px;overflow:hidden;margin-bottom:20px}.setting{padding:15px;border-bottom:1px solid var(--line)}.setting:last-child{border:0}.setting label{display:block;font-weight:bold;font-size:14px;margin-bottom:4px}.setting p{font-size:11px;color:var(--sub);margin:0 0 10px}.setting select{width:100%;background:var(--app);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px 11px;min-height:42px;font-size:13px}.review-panel{padding-top:4px}.review-card{background:#fff;border:1px solid var(--border);border-radius:15px;padding:22px;margin-bottom:17px}.review-card h2{font-size:20px;margin:0 0 10px}.review-card p,.review-card li{font-size:14px;color:var(--muted);line-height:1.85}.review-card ul{padding-inline-start:20px;margin:10px 0 0}.review-card .small{font-size:12px}.draft-tag{display:inline-block;color:#8c6220;background:#fff4d7;border:1px solid #ecd8a8;border-radius:5px;padding:2px 7px;font-size:11px;margin-bottom:10px}.review-choice{display:flex;gap:6px;margin-top:14px}.review-choice button{flex:1;border:1px solid var(--border);border-radius:9px;padding:10px 7px;background:#f7f9f5;font-size:13px;min-height:44px}.review-choice .selected{background:#e6f0e8;border-color:#9bbfa7;color:#226e5d}.copy-row{border-top:1px solid var(--border);padding:16px 0}.copy-row strong{display:block;font-size:13px}.copy-row p{font-size:12px;margin:5px 0 9px}.copy-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px}.copy-inputs label{font-size:11px;color:var(--muted)}.copy-inputs textarea{width:100%;height:65px;resize:vertical;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:13px;line-height:1.5}.copy-list{max-height:480px;overflow:auto}.review-button{font-size:13px;margin-top:12px;background:#fff}.notice{font-size:12px;color:var(--muted);margin-top:20px}.toast{position:absolute;bottom:101px;left:17px;right:17px;background:#263f35;color:#fff;border-radius:9px;padding:10px 14px;font-size:12px;z-index:20;text-align:center;box-shadow:0 4px 10px #0002}.zoom-choice{font-size:11px;display:flex;gap:5px;justify-content:center;margin-top:10px}.zoom-choice button{font-size:11px;padding:6px 10px;border:1px solid var(--border);border-radius:7px;background:white;min-height:34px}.phone-body[dir=ltr] .back-arrow{transform:rotate(180deg)}.pen-active{touch-action:none;cursor:crosshair}
+@media(max-width:920px){.preview-layout{grid-template-columns:1fr;gap:24px}.phone{margin:0 auto}.review-panel{max-width:600px;width:100%;margin:auto}.review{padding:24px 16px}.tabs{justify-content:center}}@media(max-width:450px){.phone{width:100%;height:785px;border-width:5px;border-radius:25px}.phone-body{height:745px}.doc-card{padding:12px 10px;gap:10px}.app-header{padding:14px}.app-content{padding:20px 13px}.doc-details strong{font-size:16px}.tool-button{min-width:45px}.copy-inputs{grid-template-columns:1fr}.paper-columns{font-size:11px}.cover{width:58px}.review{padding:20px 12px}.preview-layout{gap:20px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+.icon-button{width:48px;height:48px}.tool-button{font-size:12px;min-width:56px;min-height:62px}.setting label{font-size:15px}.setting p{font-size:12px}.setting select{font-size:14px;min-height:46px}.phone-body[dir=ltr] .doc-arrow,.phone-body[dir=ltr] .page-nav svg{transform:rotate(180deg)}
+</style></head>
+<body><main class="review">
+<header><div class="eyebrow">דוגמת עיצוב 01 · לבדיקה ולתיקון</div><h1>פותחים, קוראים, מסמנים.</h1><p>שלושה מסכים לקורא PDF פשוט. נתוני דוגמה; הפעולות כאן נשמרות בדפדפן, ולא בקובץ PDF אמיתי.</p></header>
+<nav class="tabs" aria-label="מסך לדוגמה"><button data-view="library" class="active">המסמכים</button><button data-view="reader">קריאה וסימון</button><button data-view="settings">הגדרות</button></nav>
+<div class="preview-layout"><section aria-label="הדגמת האפליקציה"><div class="phone"><div class="phone-status"><span>9:41</span><span>▰ &nbsp; Wi-Fi</span></div><div id="app" class="phone-body"></div><div id="toast" class="toast" role="status" hidden></div></div>
+<div class="zoom-choice" aria-label="השוואת גודל עמוד"><button data-fit="width">להמחשה: רוחב המסך</button><button data-fit="full">להמחשה: עמוד שלם</button></div></section>
+<aside class="review-panel"><section class="review-card"><span class="draft-tag">כיוון מוצע · טרם אושר</span><h2>מה אפשר לנסות?</h2><ul><li>לפתוח מסמך מהרשימה ולסמן תיבות וי.</li><li>לבטל סימון, לבחור מרקר או עט ולהוסיף הערה.</li><li>להוסיף כמה סימניות ולגרור אותן על הדף.</li><li>לנסות מצב לילה, רקע חם וממשק באנגלית.</li></ul><p class="small">״פתיחת PDF״ מדגימה קבלת מסמך נוסף. סיבוב וזמן מסך מוצגים כהעדפות; ההדגמה אינה משנה את הגדרות המכשיר.</p></section>
+<section class="review-card"><h2>לפי מה עוצב?</h2><p>סימון מתוך הקריאה כפי שתיארת באקסודו, פעולות מוכרות באנדרואיד, כתב ברור ושטחי נגיעה נוחים. המסמך תופס את מרכז המסך; הכלים זמינים לידו.</p><p class="small">הצבעים, מיקום הכלים ורקע חם הם הצעות. רשימת המסמכים נשארת מהחדש לישן לפי קבלה, גם כשפותחים מסמך ישן.</p></section>
+<section class="review-card"><h2>איזה גודל עמוד נוח לך?</h2><p>״רוחב המסך״ מציג כתב גדול יותר ודורש גלילה. ״עמוד שלם״ מציג יותר מהעמוד עם כתב קטן יותר. זאת השוואה להצעה שטרם הוכרעה.</p><div class="review-choice"><button data-fit="width" class="selected">רוחב המסך</button><button data-fit="full">עמוד שלם</button></div></section>
+<section class="review-card"><span class="draft-tag">כל הנוסחים טיוטה</span><h2>המילים בהגדרות — בידיים שלך</h2><p>אפשר לתקן עברית ואנגלית ולראות את השינוי במסך. מתחת לכל נוסח מוסברת המשמעות בעברית. עריכה אינה אישור; נשמור את האישור המפורש בנפרד.</p><details><summary>פתיחת רשימת הנוסחים לתיקון</summary><div id="copy-list" class="copy-list"></div></details><button class="review-button" id="download-copy">שמירת הנוסחים המתוקנים כקובץ</button></section>
+<p class="notice">בדיקת שמירת PDF אמיתית נערכת בנפרד. עיצוב זה אינו APK, והנוסחים עדיין לא שולבו באפליקציית Android.</p></aside></div>
+</main>
+<script id="draft-copy" type="application/json">__COPY_JSON__</script>
+<script>
+const catalog=JSON.parse(document.getElementById('draft-copy').textContent);
+const entries=new Map(catalog.entries.map(e=>[e.id,e]));
+const svg=(body,extra='')=>'<svg viewBox="0 0 24 24" aria-hidden="true" '+extra+'>'+body+'</svg>';
+const icons={
+ back:svg('<path d="m10 6 6 6-6 6M16 12H4"/>','class="back-arrow"'),
+ settings:svg('<path d="m10 3 4 0 .8 2.3 2 .8 2.2-1 2 3.5-1.8 1.6.2 2.3 1.9 1.5-2 3.5-2.3-.8-2 .9-.7 2.4h-4l-.7-2.4-2-.9-2.3.8-2-3.5 1.9-1.5.2-2.3-1.8-1.6 2-3.5 2.2 1 2-.8z"/><circle cx="12" cy="12" r="3"/>'),
+ file:svg('<path d="M7 3h7l4 4v14H7zM14 3v5h4M10 12h5M10 16h5"/>'),
+ undo:svg('<path d="m7 5-4 4 4 4M3 9h10a6 6 0 0 1 0 12"/>'),
+ highlight:svg('<path d="m14 3 7 7-10 10-7-7zM3 20h7M10 7l7 7"/>'),
+ pen:svg('<path d="m15 3 6 6-12 12H3v-6zM12 6l6 6"/>'),
+ note:svg('<path d="M4 3h16v13l-5 5H4zM15 16h5M8 8h8M8 12h6"/>'),
+ bookmark:svg('<path d="M6 3h12v18l-6-4-6 4z"/>'),
+ left:svg('<path d="m15 5-7 7 7 7"/>'),
+ right:svg('<path d="m9 5 7 7-7 7"/>'),
+ read:svg('<path d="M3 4h7l2 2 2-2h7v15h-7l-2 2-2-2H3zM12 6v15"/>')
+};
+const ui={
+ he:{library:'המסמכים שלי',intro:'כל המסמכים במקום אחד, גם בלי וואטסאפ.',recent:'מהחדש לישן',received:'לפי מועד הקבלה',open:'פתיחת PDF',offline:'אפשר לקרוא ולסמן גם בלי אינטרנט',new:'חדש',pages:'עמודים',resume:'להמשיך מעמוד',page:'עמוד',of:'מתוך',read:'קריאה',highlight:'מרקר',pen:'עט',note:'הערה',bookmark:'סימנייה',undo:'ביטול',next:'עמוד הבא',previous:'עמוד קודם',added:'נוספה סימנייה — אפשר לגרור אותה',undone:'הסימון האחרון בוטל',marked:'הסימון עודכן',notePrompt:'מה תרצה לכתוב בהערה?',noteDefault:'הערה אישית',save:'עודכן בהדגמה',tick:'סימון תיבה',back:'חזרה למסמכים'},
+ en:{library:'My documents',intro:'Your documents in one place, without opening WhatsApp.',recent:'Newest first',received:'By received date',open:'Open PDF',offline:'Read and mark without an internet connection',new:'New',pages:'pages',resume:'Continue on page',page:'Page',of:'of',read:'Read',highlight:'Highlight',pen:'Pen',note:'Note',bookmark:'Bookmark',undo:'Undo',next:'Next page',previous:'Previous page',added:'Bookmark added — drag to move it',undone:'Last mark undone',marked:'Mark updated',notePrompt:'What would you like to write?',noteDefault:'Personal note',save:'Updated in this demo',tick:'Toggle checkbox',back:'Back to documents'}
+};
+const initial={prefs:{language:'he',theme:'day',scroll:'vertical',resume:'last',marks:'once',rotation:'phone',awake:'more'},documents:[
+ {id:'study',title:'חוברת לימוד',subtitle:'אוצרות יהודים · דוגמה',received:3,date:'היום',pages:3,lastPage:1,color:'#e8e7d5',marks:{},annotations:[],bookmarks:[]},
+ {id:'work',title:'מדריך עבודה',subtitle:'מסמך PDF',received:2,date:'אתמול',pages:3,lastPage:0,color:'#dee8ee',marks:{},annotations:[],bookmarks:[]},
+ {id:'lesson',title:'סיכומי שיעור',subtitle:'חומר לימוד',received:1,date:'לפני יומיים',pages:3,lastPage:0,color:'#e9e1ee',marks:{},annotations:[],bookmarks:[]}
+],copy:{}};
+const clone=o=>JSON.parse(JSON.stringify(o));
+let state;try{state=JSON.parse(localStorage.getItem('reader-design-v1'));}catch(_){}
+if(!state||!state.prefs||!Array.isArray(state.documents))state=clone(initial);
+let screen='library',current='study',pageIndex=1,tool='read',fit='width',undo=[],drag=null,stroke=null,swipe=null;
+const app=document.getElementById('app');
+const doc=()=>state.documents.find(d=>d.id===current);
+const lang=()=>state.prefs.language;
+const label=id=>(state.copy[id]&&state.copy[id][lang()]!==undefined)?state.copy[id][lang()]:entries.get(id)[lang()];
+const word=id=>ui[lang()][id];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function persist(){try{localStorage.setItem('reader-design-v1',JSON.stringify(state));}catch(_){}}
+function toast(message){const el=document.getElementById('toast');el.textContent=message;el.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.hidden=true,2300);}
+function snapshot(){const d=doc();return clone({marks:d.marks,annotations:d.annotations,bookmarks:d.bookmarks});}
+function remember(){undo.push(snapshot());}
+function go(view){screen=view;tool='read';render();}
+function openDoc(id){current=id;const d=doc();pageIndex=state.prefs.resume==='last'?d.lastPage:0;undo=[];go('reader');}
+function iconButton(action,icon,title,extra=''){return '<button class="icon-button" data-action="'+action+'" aria-label="'+esc(title)+'" title="'+esc(title)+'" '+extra+'>'+icons[icon]+'</button>';}
+function render(){
+ const scroll=app.querySelector('.reader-viewport');const offset=scroll?scroll.scrollTop:0;
+ app.className='phone-body '+(state.prefs.theme==='dark'?'dark':state.prefs.theme==='warm'?'warm':'');
+ app.dir=lang()==='he'?'rtl':'ltr';app.lang=lang();
+ app.innerHTML=screen==='library'?library():screen==='reader'?reader():settings();
+ document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===screen));
+ document.querySelectorAll('[data-fit]').forEach(b=>b.classList.toggle('selected',b.dataset.fit===fit));
+ if(screen==='reader')layoutPaper();
+ if(screen==='reader')app.querySelector('.reader-viewport').scrollTop=offset;
+}
+function layoutPaper(){
+ const paper=app.querySelector('#paper'),viewport=app.querySelector('.reader-viewport');if(!paper||!viewport)return;
+ paper.style.width='367px';paper.style.transform='none';
+ const width=367,height=paper.offsetHeight,availableWidth=Math.max(100,viewport.clientWidth-24),availableHeight=Math.max(100,viewport.clientHeight-40);
+ const scale=fit==='full'?Math.min(availableWidth/width,availableHeight/height):availableWidth/width;
+ paper.style.transform='scale('+scale+')';paper.parentElement.style.width=(width*scale)+'px';paper.parentElement.style.height=(height*scale)+'px';paper.parentElement.style.margin='0 auto';paper.parentElement.style.direction='ltr';paper.style.transformOrigin='top left';
+}
+window.addEventListener('resize',()=>{if(screen==='reader')layoutPaper();});
+function library(){
+ const cards=state.documents.slice().sort((a,b)=>b.received-a.received).map(d=>
+ '<button class="doc-card" data-action="open" data-id="'+d.id+'"><span class="cover" style="--cover:'+d.color+'"><span>PDF</span><strong>'+esc(d.title)+'</strong><span>'+d.pages+' '+word('pages')+'</span></span><span class="doc-details"><strong>'+esc(d.title)+(d.received===3?'<span class="new-pill">'+word('new')+'</span>':'')+'</strong><small>'+esc(d.subtitle)+'</small><small>'+esc(d.date)+' · '+d.pages+' '+word('pages')+'</small>'+(d.lastPage?'<span class="last">'+word('resume')+' '+(d.lastPage+1)+'</span>':'')+'</span><span class="doc-arrow">'+icons.left+'</span></button>').join('');
+ return '<header class="app-header"><div class="title"><h2>'+word('library')+'</h2></div>'+iconButton('settings','settings',label('settings_title'))+'</header><section class="app-content"><p class="app-intro">'+word('intro')+'</p><div class="list-label"><span>'+word('recent')+'</span><small>'+word('received')+'</small></div>'+cards+'</section><footer class="app-footer"><button class="primary" data-action="import">'+icons.file+word('open')+'</button><p class="helper">'+word('offline')+'</p></footer>';
+}
+const passages=[
+ 'לכל לימוד יש התחלה והמשך. נקדיש זמן לקריאה מסודרת, נעצור בנקודה המתאימה ונחזור אליה בפעם הבאה. הסימון לצד הקטע עוזר לזכור היכן הגענו.',
+ 'קריאה בנחת מאפשרת לשים לב לפרטים. אפשר לקרוא שוב, להוסיף הערה קטנה ולסמן קטע שנרצה לזכור. כל קורא מתקדם בקצב שמתאים לו.',
+ 'לפעמים לומדים מתוך דף מודפס ולפעמים מתוך המסך. חזרה אל המקום שסומן מקלה על ההמשך, בלי לחפש מחדש את השורה האחרונה.'
+];
+function paper(){
+ const d=doc(),rows=[0,1].map(column=>'<div class="paper-column">'+[0,1,2].map(n=>{const i=column*3+n,key='p'+pageIndex+'-'+i;return '<section class="study-row"><h4><button class="vcheck" data-action="check" data-key="'+key+'" aria-label="'+word('tick')+' '+(i+1)+'" aria-pressed="'+Boolean(d.marks[key])+'">'+(d.marks[key]?'✓':'')+'</button><span>קטע '+(i+1)+'</span></h4><p>'+passages[n]+'</p></section>';}).join('')+'</div>').join('');
+ const annotations=d.annotations.filter(a=>a.page===pageIndex).map(a=>a.type==='note'?'<span class="note-dot" title="'+esc(a.text)+'" style="left:'+a.x+'%;top:'+a.y+'%">✎</span>':'').join('');
+ const strokes=d.annotations.filter(a=>a.page===pageIndex&&a.type!=='note').map(a=>'<polyline points="'+a.points+'" fill="none" stroke="'+(a.type==='highlight'?'#edcd4b':'#3b6eab')+'" stroke-width="'+(a.type==='highlight'?22:4)+'" opacity="'+(a.type==='highlight'?.48:1)+'" stroke-linecap="round" stroke-linejoin="round"/>').join('');
+ const bookmarks=d.bookmarks.filter(b=>b.page===pageIndex).map(b=>'<button class="bookmark" data-bookmark="'+b.id+'" aria-label="'+word('bookmark')+'" style="left:'+b.x+'%;top:'+b.y+'%">'+svg('<path d="M3 1h18v22l-9-5-9 5z"/>')+'</button>').join('');
+ return '<div class="paper-holder"><article dir="rtl" class="paper '+(tool==='pen'?'pen-active':'')+'" id="paper"><div class="paper-caption">מסמך לימוד לדוגמה · קריאה וסימון</div><h3 class="paper-title">לימוד בנחת</h3><p class="paper-subtitle">פרק '+(pageIndex+1)+' · תוכן להמחשה</p><div class="paper-columns">'+rows+'</div><div class="paper-bottom">'+(pageIndex+1)+' · '+esc(d.title)+'</div><svg class="annotation-layer" viewBox="0 0 1000 1400" preserveAspectRatio="none">'+strokes+'</svg>'+annotations+bookmarks+'</article></div>';
+}
+function reader(){
+ const d=doc(),tools=['read','highlight','pen','note','bookmark'].map(key=>'<button class="tool-button '+(key===tool?'active':'')+'" data-action="'+(key==='bookmark'?'bookmark':'tool')+'" data-tool="'+key+'" aria-pressed="'+(key===tool)+'">'+icons[key]+'<span>'+word(key)+'</span></button>').join('');
+ return '<header class="app-header reader-header">'+iconButton('library','back',word('back'))+'<div class="title"><h2>'+esc(d.title)+'</h2><small>'+word('page')+' '+(pageIndex+1)+' '+word('of')+' '+d.pages+'</small></div>'+iconButton('undo','undo',word('undo'),undo.length?'':'disabled')+iconButton('settings','settings',label('settings_title'))+'</header><section class="reader-viewport" id="viewport">'+paper()+'</section><div class="page-nav">'+iconButton('previous','right',word('previous'),pageIndex?'':'disabled')+'<span>'+word('page')+' '+(pageIndex+1)+' '+word('of')+' '+d.pages+'</span>'+iconButton('next','left',word('next'),pageIndex===d.pages-1?'disabled':'')+'</div><nav class="tool-strip" aria-label="Reading tools">'+tools+'</nav>';
+}
+const preferenceRows=[
+ {group:'group_reading',rows:[['scroll',['vertical','horizontal'],['scroll_vertical','scroll_horizontal']],['resume',['last','start'],['resume_last','resume_start']],['marks',['once','repeat'],['marks_once','marks_repeat']],['awake',['more','always','system'],['awake_more','awake_always','awake_system']]]},
+ {group:'group_display',rows:[['theme',['day','dark','warm'],['theme_day','theme_dark','theme_warm']],['rotation',['phone','lock'],['rotation_phone','rotation_lock']]]},
+ {group:'group_app',rows:[['language',['he','en'],['language_he','language_en']]]}
+];
+function settings(){
+ const groups=preferenceRows.map(g=>'<h3 class="setting-group">'+esc(label(g.group))+'</h3><section class="settings-card">'+g.rows.map(([id,values,ids])=>'<div class="setting"><label for="pref-'+id+'">'+esc(label(id+'_label'))+'</label><p>'+esc(label(id+'_desc'))+'</p><select id="pref-'+id+'" data-pref="'+id+'">'+values.map((value,i)=>'<option value="'+value+'" '+(state.prefs[id]===value?'selected':'')+'>'+esc(label(ids[i]))+'</option>').join('')+'</select></div>').join('')+'</section>').join('');
+ return '<header class="app-header">'+iconButton('library','back',label('settings_back'))+'<div class="title"><h2>'+esc(label('settings_title'))+'</h2></div></header><section class="app-content settings-content">'+groups+'<p class="helper">'+esc(label('settings_footer'))+'</p></section>';
+}
+function markDone(){persist();if(state.prefs.marks==='once'&&tool!=='note')tool='read';render();}
+document.addEventListener('click',event=>{
+ const view=event.target.closest('[data-view]');if(view){if(view.dataset.view==='reader')openDoc(current);else go(view.dataset.view);return;}
+ const sizing=event.target.closest('[data-fit]');if(sizing){fit=sizing.dataset.fit;if(screen!=='reader')openDoc(current);else render();return;}
+ const button=event.target.closest('[data-action]');if(!button||button.disabled)return;
+ const action=button.dataset.action;
+ if(action==='library'||action==='settings'){go(action);return;}
+ if(action==='open'){openDoc(button.dataset.id);return;}
+ if(action==='import'){let d=state.documents.find(d=>d.id==='tasks');if(!d){d={id:'tasks',title:'טופס משימות',subtitle:'מסמך PDF',received:4,date:'עכשיו',pages:3,lastPage:0,color:'#e4eddc',marks:{},annotations:[],bookmarks:[]};state.documents.push(d);persist();}openDoc(d.id);return;}
+ if(action==='check'){remember();doc().marks[button.dataset.key]=!doc().marks[button.dataset.key];persist();render();return;}
+ if(action==='undo'){const before=undo.pop();if(before){Object.assign(doc(),before);persist();render();toast(word('undone'));}return;}
+ if(action==='tool'){tool=button.dataset.tool;render();return;}
+ if(action==='next'||action==='previous'){pageIndex+=action==='next'?1:-1;doc().lastPage=pageIndex;tool='read';persist();render();app.querySelector('.reader-viewport').scrollTop=0;return;}
+ if(action==='bookmark'){remember();const count=doc().bookmarks.filter(b=>b.page===pageIndex).length;doc().bookmarks.push({id:'b'+Date.now()+Math.random(),page:pageIndex,x:91-(count%3)*10,y:13+(count%4)*6});persist();render();toast(word('added'));return;}
+});
+document.addEventListener('change',event=>{if(event.target.dataset.pref){state.prefs[event.target.dataset.pref]=event.target.value;persist();render();}});
+function point(event,paper){const r=paper.getBoundingClientRect();return {x:Math.max(2,Math.min(98,(event.clientX-r.left)/r.width*100)),y:Math.max(2,Math.min(96,(event.clientY-r.top)/r.height*100))};}
+app.addEventListener('pointerdown',event=>{
+ const paper=event.target.closest('#paper');if(!paper)return;
+ const bookmark=event.target.closest('[data-bookmark]');
+ if(bookmark){event.preventDefault();drag={id:bookmark.dataset.bookmark,before:snapshot(),moved:false};bookmark.setPointerCapture(event.pointerId);return;}
+ if(event.target.closest('button'))return;
+ const p=point(event,paper);
+ if(tool==='read'&&state.prefs.scroll==='horizontal'){swipe={x:event.clientX,y:event.clientY,lastX:event.clientX,lastY:event.clientY};paper.setPointerCapture(event.pointerId);}
+ if(tool==='pen'){event.preventDefault();stroke={before:snapshot(),points:[p],pointer:event.pointerId};paper.setPointerCapture(event.pointerId);const path=document.createElementNS('http://www.w3.org/2000/svg','polyline');path.id='live-stroke';path.setAttribute('fill','none');path.setAttribute('stroke','#3b6eab');path.setAttribute('stroke-width','4');path.setAttribute('stroke-linecap','round');paper.querySelector('svg.annotation-layer').append(path);}
+ if(tool==='highlight'){remember();doc().annotations.push({page:pageIndex,type:'highlight',points:(p.x*10)+','+(p.y*14)+' '+Math.min(970,p.x*10+180)+','+(p.y*14)});markDone();}
+ if(tool==='note'){const text=window.prompt(word('notePrompt'),word('noteDefault'));if(text&&text.trim()){remember();doc().annotations.push({page:pageIndex,type:'note',x:p.x,y:p.y,text:text.trim()});persist();tool='read';render();}}
+});
+app.addEventListener('pointermove',event=>{
+ const paper=app.querySelector('#paper');if(!paper)return;
+ if(swipe){swipe.lastX=event.clientX;swipe.lastY=event.clientY;}
+ if(drag){const p=point(event,paper);const b=doc().bookmarks.find(b=>b.id===drag.id);b.x=p.x;b.y=p.y;drag.moved=true;const el=app.querySelector('[data-bookmark="'+drag.id+'"]');el.style.left=p.x+'%';el.style.top=p.y+'%';}
+ if(stroke){const p=point(event,paper);stroke.points.push(p);app.querySelector('#live-stroke').setAttribute('points',stroke.points.map(p=>(p.x*10)+','+(p.y*14)).join(' '));}
+});
+function finishGesture(cancel=false){
+ if(swipe){const dx=swipe.lastX-swipe.x,dy=swipe.lastY-swipe.y;swipe=null;if(!cancel&&Math.abs(dx)>60&&Math.abs(dy)<45){const next=lang()==='he'?dx>0:dx<0;pageIndex=Math.max(0,Math.min(doc().pages-1,pageIndex+(next?1:-1)));doc().lastPage=pageIndex;persist();render();}}
+ if(drag){if(cancel)Object.assign(doc(),drag.before);else if(drag.moved)undo.push(drag.before);drag=null;persist();render();}
+ if(stroke){if(!cancel&&stroke.points.length>1){undo.push(stroke.before);doc().annotations.push({page:pageIndex,type:'pen',points:stroke.points.map(p=>(p.x*10)+','+(p.y*14)).join(' ')});}stroke=null;markDone();}
+}
+app.addEventListener('pointerup',()=>finishGesture());
+app.addEventListener('pointercancel',()=>finishGesture(true));
+const copyList=document.getElementById('copy-list');
+copyList.innerHTML=catalog.entries.map(entry=>'<section class="copy-row"><strong>'+esc(entry.id)+'</strong><p>'+esc(entry.meaning)+'</p><div class="copy-inputs">'+['he','en'].map(language=>'<label>'+(language==='he'?'עברית':'English')+'<textarea data-copy-id="'+entry.id+'" data-copy-language="'+language+'" dir="'+(language==='he'?'rtl':'ltr')+'">'+esc(state.copy[entry.id]?.[language]??entry[language])+'</textarea></label>').join('')+'</div></section>').join('');
+copyList.addEventListener('input',event=>{const id=event.target.dataset.copyId;if(!id)return;state.copy[id]=state.copy[id]||{};state.copy[id][event.target.dataset.copyLanguage]=event.target.value;persist();render();});
+document.getElementById('download-copy').addEventListener('click',()=>{
+ const data={version:catalog.version,status:'draft',entries:catalog.entries.map(entry=>({...entry,...state.copy[entry.id],status:'draft'}))};
+ const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'}));
+ const a=document.createElement('a');a.href=url;a.download='settings-copy-edited-draft.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+render();
+</script></body></html>

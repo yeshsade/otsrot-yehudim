@@ -1,0 +1,36 @@
+.settings-list{overflow:auto;flex:1;min-height:0;padding:10px 14px 22px;overscroll-behavior:contain}
+.settings-group-title{font-size:13px;font-weight:550;line-height:1.6;color:var(--accent);margin:16px 9px 9px}
+.settings-group{background:var(--row);border:var(--row-border);border-radius:18px;overflow:hidden}
+.setting-row{width:100%;min-height:90px;padding:15px 16px;background:transparent;border:0;border-bottom:1px solid #e5e1ef;color:var(--ink);text-align:start;display:flex;align-items:center;gap:12px}
+.setting-row:last-child{border-bottom:0}.setting-row:hover{background:#57479f08}.setting-text{flex:1;min-width:0}.setting-label{display:block;font-size:16px;font-weight:550;line-height:1.5;margin-bottom:5px}.setting-value{display:block;font-size:13px;line-height:1.55;color:var(--accent)}
+.settings-chevron{width:18px;height:18px;fill:none;stroke:var(--muted);stroke-width:1.7;flex-shrink:0}
+.app[dir=ltr] .settings-chevron{transform:scaleX(-1)}
+.app[dir=ltr] .settings-back .symbol,.app[dir=ltr] [data-app-action=back-library] .symbol{transform:scaleX(-1)}
+.settings-footer{font-size:12px;color:var(--muted);line-height:1.7;margin:18px 9px 0}
+.settings-shade{position:absolute;inset:26px 0 0;z-index:5;background:#0005;display:flex;align-items:flex-end}
+.settings-shade[hidden]{display:none}
+.options-sheet{background:var(--row);color:var(--ink);border:var(--row-border);border-radius:24px 24px 0 0;width:100%;padding:20px 12px 18px}
+.sheet-header{display:flex;align-items:center;gap:8px;padding-inline:6px}.sheet-title{font-size:18px;font-weight:600;line-height:1.5;margin:0;flex:1}
+.sheet-desc{font-size:13px;line-height:1.8;color:var(--muted);margin:5px 9px 14px}.sheet-options{display:flex;flex-direction:column}
+.sheet-option{min-height:58px;border:0;background:transparent;color:var(--ink);padding:12px 13px;display:flex;align-items:center;text-align:start;gap:12px;border-radius:12px;font-size:15px;line-height:1.5}
+.sheet-option[aria-checked=true]{background:#eeeaf9;color:#57479f}.sheet-radio{width:20px;height:20px;border:1.5px solid currentColor;border-radius:50%;display:inline-block;flex-shrink:0}
+.sheet-option[aria-checked=true] .sheet-radio{box-shadow:inset 0 0 0 4px #eeeaf9;background:currentColor}
+.selected[data-theme=night] .setting-row{border-bottom-color:#3e394c}
+.selected[data-theme=night] .setting-row:hover{background:#baacff0c}
+.selected[data-theme=night] .sheet-option[aria-checked=true]{background:#443c64;color:#ede8ff}
+.selected[data-theme=night] .sheet-option[aria-checked=true] .sheet-radio{box-shadow:inset 0 0 0 4px #443c64}
+.selected[data-theme=night] button:focus-visible{outline-color:#b7cfff}
+.copy-review{border-top:1px solid #b8b8c4;margin-top:26px;padding-top:20px}
+.copy-review h2{font-size:21px;margin:0 0 10px}.copy-review>p{max-width:860px;font-size:15px;line-height:1.8;margin:0 0 12px}
+.copy-filters{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.copy-filter,.copy-export{min-height:48px;padding:8px 16px;border:1px solid #aaa;background:white;color:#25252c}
+.copy-filter[aria-pressed=true]{background:#342c69;border-color:#342c69;color:white}
+.copy-row{margin:0 0 12px;background:#fff;border:1px solid #d7d7df;padding:15px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.3fr);gap:14px}
+.copy-row[hidden]{display:none}.copy-row label{font-size:12px;color:#575761;display:block;margin:0 0 6px}.copy-row input{width:100%;min-height:44px;background:#fff;color:#25252c;border:1px solid #aaa;padding:8px;font:15px/1.5 "Reader Sans",sans-serif}
+.copy-meaning{font-size:13px;line-height:1.8;color:#51515c;margin:0}.copy-note{display:block;font-size:12px;color:#685125;margin-top:5px}
+#copy-progress{font-size:14px;line-height:1.8;min-height:26px;margin-top:12px}
+.copy-actions{display:flex;flex-wrap:wrap;gap:10px}
+#copy-transfer{margin-top:16px}#copy-transfer[hidden]{display:none}
+#copy-transfer p,#copy-transfer label{font-size:14px;line-height:1.8}
+#copy-transfer label{display:block;margin-bottom:6px}
+#copy-transfer-text{display:block;width:100%;min-height:170px;max-height:320px;resize:vertical;margin-bottom:10px;padding:12px;background:white;color:#25252c;border:1px solid #aaa;font:13px/1.6 monospace}
+@media(max-width:690px){.copy-row{grid-template-columns:1fr}.views{flex-wrap:wrap}.views button{font-size:13px;padding-inline:8px}.setting-label{font-size:16px}}

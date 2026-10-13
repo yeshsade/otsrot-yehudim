@@ -1,0 +1,120 @@
+{
+  "received_from": "User pasted JSON attachment",
+  "attachment_sha256": "098bcc48f5984b2b203ea8695f1756ae12b256e6926990372364052b353ea0ae",
+  "user_exported_at": "2026-10-12T15:50:11.156Z",
+  "received_version": 3,
+  "current_version": 4,
+  "status": "draft",
+  "approval": "not requested or received yet; edits are not final approval",
+  "hebrew_preserved_exactly": true,
+  "changed_hebrew_entries": 10,
+  "english_proposals": {
+    "scroll_desc": "Page navigation",
+    "resume_label": "When reopening a document",
+    "resume_last": "Continue where I left off",
+    "rotation_phone": "System default",
+    "awake_desc": "How long the screen stays on while using the app",
+    "awake_more": "System timeout + 10 minutes",
+    "awake_always": "Keep on until leaving the app",
+    "awake_system": "System default"
+  },
+  "changes": [
+    {
+      "id": "scroll_desc",
+      "before_he": "איך לעבור בין העמודים בזמן הקריאה",
+      "user_he": "דפדוף",
+      "before_en": "Choose how to move between pages",
+      "user_en": "Choose how to move between pages",
+      "proposed_en": "Page navigation",
+      "meaning": "הסבר להעדפת הדפדוף; אין קשר לסיבוב המסך"
+    },
+    {
+      "id": "resume_label",
+      "before_he": "פתיחה חוזרת של מסמך",
+      "user_he": "בפתיחה חוזרת",
+      "before_en": "Reopening a document",
+      "user_en": "Reopening a document",
+      "proposed_en": "When reopening a document",
+      "meaning": "מאיזה מקום לפתוח מסמך שכבר נקרא"
+    },
+    {
+      "id": "resume_desc",
+      "before_he": "בחר מאיפה להמשיך כשפותחים שוב",
+      "user_he": "",
+      "before_en": "Choose where to start when reopening",
+      "user_en": "",
+      "proposed_en": "",
+      "meaning": "הסבר להעדפת מקום הפתיחה החוזרת"
+    },
+    {
+      "id": "resume_last",
+      "before_he": "מהמקום שבו עצרתי",
+      "user_he": "המשך מהמקום בו עצרתי",
+      "before_en": "Where I left off",
+      "user_en": "Where I left off",
+      "proposed_en": "Continue where I left off",
+      "meaning": "ברירת המחדל שנבחרה: חזרה למקום הקריאה"
+    },
+    {
+      "id": "rotation_phone",
+      "before_he": "לפי הגדרת הטלפון",
+      "user_he": "כמוגדר במערכת",
+      "before_en": "Follow phone settings",
+      "user_en": "Follow phone settings",
+      "proposed_en": "System default",
+      "meaning": "ברירת המחדל לסיבוב בהפעלה הראשונה"
+    },
+    {
+      "id": "awake_desc",
+      "before_he": "אפשר לתת יותר זמן לקריאה בלי לגעת במסך",
+      "user_he": "כמה זמן המסך יישאר דלוק, בזמן השימוש",
+      "before_en": "Allow more reading time without touching the screen",
+      "user_en": "Allow more reading time without touching the screen",
+      "proposed_en": "How long the screen stays on while using the app",
+      "meaning": "הסבר לזמן מסך ארוך יותר; אין שינוי בזמן הכיבוי הכללי של הטלפון"
+    },
+    {
+      "id": "awake_more",
+      "before_he": "זמן הטלפון ועוד 10 דקות",
+      "user_he": "כמוגדר במערכת + 10 דקות",
+      "before_en": "Phone timeout plus 10 minutes",
+      "user_en": "Phone timeout plus 10 minutes",
+      "proposed_en": "System timeout + 10 minutes",
+      "meaning": "פירוש הבקשה שנמסר למשתמש; פרטי חוסר הפעילות ותאימות Android דורשים בדיקה"
+    },
+    {
+      "id": "awake_always",
+      "before_he": "דלוק כל הזמן בזמן הקריאה",
+      "user_he": "דולק עד יציאה מהאפליקציה",
+      "before_en": "Keep on while reading",
+      "user_en": "Keep on while reading",
+      "proposed_en": "Keep on until leaving the app",
+      "meaning": "נשאר דולק בכל מסכי האפליקציה כל עוד היא מוצגת על המסך, לפי הבהרת המשתמש; חוזר לזמן המערכת במעבר לרקע או ביציאה. ההתנהגות טרם מומשה ב־Android."
+    },
+    {
+      "id": "awake_system",
+      "before_he": "לפי זמן הכיבוי של הטלפון",
+      "user_he": "כמוגדר במערכת",
+      "before_en": "Use phone timeout",
+      "user_en": "Use phone timeout",
+      "proposed_en": "System default",
+      "meaning": "אפשרות להשתמש בזמן הרגיל של המכשיר"
+    },
+    {
+      "id": "language_desc",
+      "before_he": "השפה של הכפתורים וההגדרות",
+      "user_he": "",
+      "before_en": "The language of buttons and settings",
+      "user_en": "",
+      "proposed_en": "",
+      "meaning": "הסבר להעדפת שפה; ברירת המחדל למוצר עדיין לא נבחרה"
+    }
+  ],
+  "confirmed_behavior": {
+    "setting": "awake_always",
+    "user_answer": "בכל מסכי האפליקציה כל עוד היא פתוחה על המסך",
+    "scope": "All foreground app screens; released when backgrounded or exited",
+    "implementation": "Requirement confirmed; not implemented in native Android",
+    "wording_approval": "Not inferred from behavior answer"
+  }
+}

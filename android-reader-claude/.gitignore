@@ -1,0 +1,16 @@
+# Local build tools, caches, and generated output.
+.android-sdk/
+.android-home/
+.gradle-home/
+**/.gradle/
+**/build/
+**/local.properties
+**/__pycache__/
+*.apk
+*.aab
+*.idsig
+
+# Signing credentials must never enter the repository.
+*.jks
+*.keystore
+signing.properties

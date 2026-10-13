@@ -1,0 +1,25 @@
+{
+  "title": "העיצוב שנבחר — יום ולילה",
+  "intro": "בחרת בב, עם הכתב של 1. אפשר לעבור כאן בין יום ללילה ובין רשימת המסמכים למסך הקריאה. במצב לילה גם עמוד החוברת מופיע עם רקע כהה וכתב בהיר.",
+  "scope": "דוגמת עיצוב עם מסמכי המחשה. שינוי התצוגה אינו שינוי בקובץ PDF. מיקום כפתור המעבר ומילות ההגדרות עדיין טיוטה.",
+  "output_name": "day-night-preview.html",
+  "fonts": ["NotoSansHebrew", "NotoSerifHebrew"],
+  "css_files": ["modern-refinement.css", "selected-day-night.css"],
+  "directions": [
+    {
+      "id": "b",
+      "className": "bold chosen-sans modern-color selected",
+      "icons": "filled",
+      "label": "ב · העיצוב שבחרת",
+      "name": "ב עם מצבי יום ולילה",
+      "description": "הסמל של הירח או השמש במסך מאפשר לעבור בין מצבי התצוגה."
+    }
+  ],
+  "preference": {
+    "scope": "selected-b-day-night",
+    "revision": "2026-10-12",
+    "storageKey": "pdf-reader-selected-b-day-night-2026-10-12",
+    "dayNight": true,
+    "selectedDesign": "b"
+  }
+}

@@ -1,0 +1,17 @@
+/* Every app interface uses the Noto Sans typography chosen from direction 1. */
+.bold.chosen-sans{--font:"Reader Sans",sans-serif;--heading-weight:600;--title-weight:550;--button-weight:550}
+.modern-light{--canvas:#f5f5fb;--header:#fff;--header-ink:#342e68;--ink:#252a40;--muted:#60667b;--accent:#484098;--edge:#d3d3e3;--row-border:1px solid #e5e5ee;--row-bottom:1px solid #e5e5ee;--row-radius:16px;--row-shadow:none;--dock:#f5f5fb;--button-bg:#484098;--button-radius:17px;--button-shadow:none;--icon-radius:14px;--icon-hover:#e9e7f7;--more-ink:#6b6886;--cover-shadow:0 1px 2px #31304825}
+.modern-light .toolbar .icon{background:#eeecf9;color:#484098;border-radius:14px}
+.modern-light .sort{color:#60667b}
+.modern-light .position{display:inline-block;max-width:100%;background:#eeecf9;color:#484098;border-radius:6px;padding:3px 7px}
+.modern-light .reading-tools{background:#fff;border-top:1px solid #e4e3ed}
+.modern-light .tool.active{background:#eeecf9;color:#484098}
+.modern-color{--canvas:#f1f0f8;--header:#342c69;--header-ink:#fff;--ink:#252438;--muted:#646279;--accent:#57479f;--edge:#cac5de;--row-border:1px solid #e0dceb;--row-bottom:1px solid #e0dceb;--row-radius:18px;--row-shadow:0 2px 4px #3933510a;--dock:#f1f0f8;--button-bg:#57479f;--button-radius:18px;--button-shadow:0 3px 5px #473a781a;--icon-radius:14px;--icon-hover:#ffffff26;--more-ink:#756b94}
+.modern-color .toolbar{border-radius:0 0 23px 23px}
+.modern-color .toolbar .icon{background:#ffffff14;border-radius:14px}
+.modern-color .sort{color:#646279}
+.modern-color .primary .symbol{box-sizing:content-box;padding:7px;background:#ffffff17;border-radius:9px}
+.modern-color .reading-tools{height:78px;margin:0 10px 10px;background:#fff;border:1px solid #e0dceb;border-radius:22px;box-shadow:0 3px 8px #40385c12}
+.modern-color .tool.active{background:#eeeaf9;color:#57479f;border-radius:15px}
+.modern-color .reading-surface{padding-bottom:12px}
+@media(max-width:690px){.bold.chosen-sans .doc-title{font-size:17px}}
