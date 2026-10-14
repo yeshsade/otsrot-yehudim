@@ -32,7 +32,7 @@ def make_label(parsha, date, color, edition, output, preview=None, brand=base.DE
     draw = ImageDraw.Draw(image)
     is_days = edition == "days"
     text = "לפי ימים" if is_days else "לפי נושאים"
-    font = ImageFont.truetype(r"C:\Windows\Fonts\davidbd.ttf", 54)
+    font = ImageFont.truetype(r"C:\Windows\Fonts\DAVIDB.TTF", 54)
     shaped = base.rtl(text)
     box = draw.textbbox((0, 0), shaped, font=font)
     width = box[2] - box[0]

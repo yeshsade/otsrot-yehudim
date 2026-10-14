@@ -89,12 +89,12 @@ def get_font(size, scale, candidates):
 def font_set(scale):
     title = [
         r"C:\Windows\Fonts\Guttman Hatzvi-Bold.TTF",
-        r"C:\Windows\Fonts\davidbd.ttf",
+        r"C:\Windows\Fonts\DAVIDB.TTF",
         r"C:\Windows\Fonts\arialbd.ttf",
     ]
     brand = [
         r"C:\Windows\Fonts\Guttman Hatzvi-Bold.TTF",
-        r"C:\Windows\Fonts\davidbd.ttf",
+        r"C:\Windows\Fonts\DAVIDB.TTF",
         r"C:\Windows\Fonts\arialbd.ttf",
     ]
     return {
@@ -222,7 +222,7 @@ def make_label(parsha, date, output, color, brand=DEFAULT_BRAND, preview=None):
     fonts = font_set(scale)
     title_candidates = [
         r"C:\Windows\Fonts\Guttman Hatzvi-Bold.TTF",
-        r"C:\Windows\Fonts\davidbd.ttf",
+        r"C:\Windows\Fonts\DAVIDB.TTF",
         r"C:\Windows\Fonts\arialbd.ttf",
     ]
     fonts["title"] = fit_font_to_width(draw, parsha, fonts["title"], 720, scale, 58, title_candidates)

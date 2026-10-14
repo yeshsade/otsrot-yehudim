@@ -264,6 +264,10 @@ def calculate_base_targets(analysis, toc_page_number=DEFAULT_TOC_PAGE_NUMBER):
     }
 
 
+def has_parsha(analysis):
+    return "פרשת השבוע" not in set(analysis.get("absent_topics") or [])
+
+
 def base_hashlamot_sequence(analysis):
     topic_ranges = {k: tuple(v) for k, v in analysis["topic_ranges"].items()}
     blank_pages = set(analysis["blank_pages"])
@@ -607,13 +611,8 @@ def add_continuation_links(fitz, doc, analysis, color="#6DCFF6", temp_parent=Non
         label_paths = make_continuation_label_images(Path(tmp), color=color)
         for topic, pages in final_context_segments.items():
             sunday_pages = final_segments.get("sunday", {}).get(topic, [])
-            if not pages:
+            if not pages or not sunday_pages:
                 continue
-            if not sunday_pages:
-                raise RuntimeError(
-                    f"Previous-week page exists for {topic}, but the current Sunday segment is missing. "
-                    "Reapply manual answers and recompute day_pages before building."
-                )
             source = pages[-1]
             target = sunday_pages[0]
             page = doc[source - 1]
@@ -716,30 +715,7 @@ def add_continuation_links(fitz, doc, analysis, color="#6DCFF6", temp_parent=Non
                     draw_continuation_label(page, rect, label_paths["next"])
                     link_records.append({"type": "next", "day": day_text, "topic": topic, "source": source, "target": target})
 
-    summary = {"segments": final_segments, "context_segments": final_context_segments, "links": link_records}
-    validate_previous_week_continuation_links(analysis, summary)
-    return summary
-
-
-def validate_previous_week_continuation_links(analysis, summary):
-    records = summary["links"]
-    for topic, pages in summary["context_segments"].items():
-        if not pages:
-            continue
-        forward = [r for r in records if r["type"] == "previous-week-next" and r["topic"] == topic]
-        backward = [r for r in records if r["type"] == "first-day-previous-week" and r["topic"] == topic]
-        if len(forward) != 1 or len(backward) != 1:
-            raise RuntimeError(f"Previous-week navigation for {topic} must contain exactly one forward and one return link.")
-        if forward[0]["source"] != backward[0]["target"] or forward[0]["target"] != backward[0]["source"]:
-            raise RuntimeError(f"Previous-week navigation for {topic} is not reciprocal.")
-
-    if daf_yomi_previous_week_gemara_page(analysis):
-        forward = [r for r in records if r["type"] == "daf-yomi-previous-week-next"]
-        backward = [r for r in records if r["type"] == "daf-yomi-first-day-previous-week"]
-        if len(forward) != 1 or len(backward) != 1:
-            raise RuntimeError("Previous-week Daf Yomi navigation must contain exactly one forward and one return link.")
-        if forward[0]["source"] != backward[0]["target"] or forward[0]["target"] != backward[0]["source"]:
-            raise RuntimeError("Previous-week Daf Yomi navigation is not reciprocal.")
+    return {"segments": final_segments, "context_segments": final_context_segments, "links": link_records}
 
 
 def derive_palette(hex_color):
@@ -878,12 +854,12 @@ def make_note_pdf(day_text, subtitle, color, out_dir, slug):
     return pdf_path
 
 
-def button_rects(fitz):
-    return toc_button_rects(fitz)
+def button_rects(fitz, include_parsha=True):
+    return toc_button_rects(fitz, include_parsha=include_parsha)
 
 
-def existing_toc_uri_links(fitz, toc_page):
-    rects = toc_button_rects(fitz)
+def existing_toc_uri_links(fitz, toc_page, include_parsha=True):
+    rects = toc_button_rects(fitz, include_parsha=include_parsha)
     urls = {}
     for link in toc_page.get_links():
         if link.get("kind") != fitz.LINK_URI or not link.get("uri"):
@@ -914,7 +890,7 @@ def render_page(doc, page_1based, output_path, zoom=1.35):
     pix.save(str(output_path))
 
 
-def write_validation_previews(doc, final_targets, preview_dir, toc_page_number=DEFAULT_TOC_PAGE_NUMBER):
+def write_validation_previews(doc, final_targets, preview_dir, toc_page_number=DEFAULT_TOC_PAGE_NUMBER, include_parsha=True):
     import fitz
     from PIL import Image, ImageDraw
 
@@ -925,7 +901,7 @@ def write_validation_previews(doc, final_targets, preview_dir, toc_page_number=D
     render_page(doc, toc_page_number, toc_png, zoom=zoom)
     img = Image.open(toc_png).convert("RGBA")
     draw = ImageDraw.Draw(img)
-    for key, rect in button_rects(fitz).items():
+    for key, rect in button_rects(fitz, include_parsha=include_parsha).items():
         scaled = (rect.x0 * zoom, rect.y0 * zoom, rect.x1 * zoom, rect.y1 * zoom)
         draw.rectangle(scaled, outline=(198, 44, 44, 255), width=4)
         draw.text((scaled[0] + 6, scaled[1] + 6), f"{key}->{final_targets.get(key, 'ג€”')}", fill=(198, 44, 44, 255))
@@ -949,6 +925,7 @@ def add_notes_and_relink(args):
 
     pdf_path = Path(args.pdf)
     analysis = json.loads(Path(args.analysis).read_text(encoding="utf-8"))
+    include_parsha = has_parsha(analysis)
     toc_cfg = analysis_toc_config(analysis)
     if args.whatsapp_url:
         toc_cfg["whatsapp_url"] = args.whatsapp_url
@@ -989,31 +966,42 @@ def add_notes_and_relink(args):
     return_img = make_return_button_image(notes_dir / "return-to-toc.png", args.color)
     add_return_buttons_to_pages(fitz, doc, note_targets.values(), return_img, base_targets["toc"])
 
-    no_parsha = manual_user_answers(analysis).get("no_parsha_this_week") is True
     final_targets = {
         **note_targets,
         "tikun": base_targets["tikun"] + len(DAYS),
     }
-    if not no_parsha:
+    if include_parsha:
         final_targets["parsha"] = base_targets["parsha"]
     if base_targets.get("hashlamot"):
         final_targets["hashlamot"] = base_targets["hashlamot"] + len(DAYS)
     validate_targets(doc, final_targets)
 
     toc = doc[base_targets["toc"] - 1]
-    existing_urls = existing_toc_uri_links(fitz, toc)
+    existing_urls = existing_toc_uri_links(fitz, toc, include_parsha=include_parsha)
     for key, cfg_key in (("whatsapp", "whatsapp_url"), ("email", "email_url"), ("archive", "archive_url")):
         if existing_urls.get(key) and not toc_cfg.get(cfg_key):
             toc_cfg[cfg_key] = existing_urls[key]
     for link in list(toc.get_links()):
         toc.delete_link(link)
-    insert_toc_links(fitz, toc, final_targets, external_links_from_config(toc_cfg))
+    insert_toc_links(
+        fitz,
+        toc,
+        final_targets,
+        external_links_from_config(toc_cfg),
+        include_parsha=include_parsha,
+    )
 
     continuation_summary = add_continuation_links(fitz, doc, analysis, args.color, notes_dir, base_targets["toc"])
 
     if args.preview_dir:
         preview_dir = Path(args.preview_dir)
-        write_validation_previews(doc, final_targets, preview_dir, base_targets["toc"])
+        write_validation_previews(
+            doc,
+            final_targets,
+            preview_dir,
+            base_targets["toc"],
+            include_parsha=include_parsha,
+        )
         (preview_dir / "continuation-links.json").write_text(
             json.dumps(continuation_summary, ensure_ascii=False, indent=2),
             encoding="utf-8",

@@ -8,6 +8,26 @@ import fitz
 from PIL import Image, ImageDraw, ImageFont
 
 
+TOPICS = [
+    'הדף היומי', 'פרשת השבוע', 'נביאים וכתובים', 'משנה', 'שולחן ערוך',
+    'משנה ברורה', 'זוהר', 'תהילים', 'ליקוטי מוהר"ן', 'ליקוטי הלכות',
+    'ספרי רבינו על פי הסדר', 'שמות הצדיקים / ספר המידות', 'ליקוטי תפילות',
+    'תיקון הכללי', 'השלמות',
+]
+TOPIC_RECTS = [
+    (242.7, 145.8, 435.9, 178.8), (33.4, 145.8, 226.6, 178.8),
+    (242.7, 187.2, 435.9, 219.9), (33.4, 187.2, 226.6, 219.9),
+    (242.7, 229.0, 435.9, 261.1), (33.4, 229.0, 226.6, 261.1),
+    (242.7, 270.5, 435.9, 302.9), (33.4, 270.5, 226.6, 302.9),
+    (242.7, 311.6, 435.9, 344.7), (33.4, 311.6, 226.6, 344.7),
+    (242.7, 353.1, 435.9, 386.1), (33.4, 353.1, 226.6, 386.1),
+    (242.7, 394.5, 435.9, 427.2), (33.4, 394.5, 226.6, 427.2),
+    (138.0, 436.3, 331.3, 468.7),
+]
+PDF_PAGE_W = 468
+PDF_PAGE_H = 680.25
+
+
 def rtl(text):
     return text[::-1] if sys.platform.startswith('win') else text
 
@@ -37,6 +57,23 @@ def centered(draw, width, text, y, font, fill):
     draw.text((x, y), shaped, font=font, fill=fill)
 
 
+def hide_absent_topic_buttons(img, absent_topics, background):
+    """Remove misleading static topic buttons for explicitly absent holiday topics."""
+    draw = ImageDraw.Draw(img)
+    sx = img.width / PDF_PAGE_W
+    sy = img.height / PDF_PAGE_H
+    for topic, rect in zip(TOPICS, TOPIC_RECTS):
+        if topic not in absent_topics:
+            continue
+        x1, y1, x2, y2 = rect
+        pad_x, pad_y = 7 * sx, 7 * sy
+        draw.rounded_rectangle(
+            (x1 * sx - pad_x, y1 * sy - pad_y, x2 * sx + pad_x, y2 * sy + pad_y),
+            radius=12 * sx,
+            fill=background,
+        )
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--template', required=True)
@@ -45,7 +82,13 @@ def main():
     parser.add_argument('--color', required=True)
     parser.add_argument('--output-png', required=True)
     parser.add_argument('--output-pdf', required=True)
+    parser.add_argument('--absent-topic', action='append', default=[])
     args = parser.parse_args()
+
+    absent_topics = set(args.absent_topic)
+    unknown_absent = absent_topics - set(TOPICS)
+    if unknown_absent:
+        raise SystemExit('Unknown absent topic(s): ' + ', '.join(sorted(unknown_absent)))
 
     img = Image.open(args.template).convert('RGB')
     recolor_theme(img, args.color)
@@ -60,16 +103,11 @@ def main():
     subtitle_rgb = tuple(max(0, round(channel * 0.70)) for channel in base_rgb)
     draw.rectangle((80, 151, 1320, 157), fill=line_rgb)
 
-    def hebrew_font(size):
-        for candidate in (r'C:\Windows\Fonts\Guttman Hatzvi-Bold.TTF', r'C:\Windows\Fonts\davidbd.ttf', r'C:\Windows\Fonts\arialbd.ttf'):
-            if Path(candidate).exists():
-                return ImageFont.truetype(candidate, size)
-        return ImageFont.load_default()
-
-    title_font = hebrew_font(78)
-    subtitle_font = hebrew_font(31)
+    title_font = ImageFont.truetype(r'C:\Windows\Fonts\Guttman Hatzvi-Bold.TTF', 78)
+    subtitle_font = ImageFont.truetype(r'C:\Windows\Fonts\DAVIDB.TTF', 31)
     centered(draw, img.width, args.parsha, 43, title_font, title_rgb)
     centered(draw, img.width, f'לפי נושאים • {args.date}', 172, subtitle_font, subtitle_rgb)
+    hide_absent_topic_buttons(img, absent_topics, background)
 
     output_png = Path(args.output_png)
     output_pdf = Path(args.output_pdf)
@@ -90,6 +128,7 @@ def main():
     )
     print(f'TOC_PNG={output_png}')
     print(f'TOC_PDF={output_pdf}')
+    print(f'ACTIVE_TOPIC_BUTTONS={len(TOPICS) - len(absent_topics)}')
 
 
 if __name__ == '__main__':

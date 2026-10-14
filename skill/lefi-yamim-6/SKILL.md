@@ -23,12 +23,6 @@ Treat `הכל`, `בשלמותו`, `הסקיל המלא`, or an equivalent reques
 - Use the exact labels `גמרא — שבוע קודם`, `משנה ברורה — שבוע קודם`, `ליקוטי מוהר״ן — שבוע קודם`, and `ליקוטי הלכות — שבוע קודם`.
 - A user-confirmed previous-week page overrides automatic topic detection and may be anywhere in the source PDF, not only in the supplements range.
 - Never describe a previous-week page merely as an "עמוד המשך".
-- Read `references/manual-answers.md`. Store answers separately and run
-  `scripts/apply_manual_answers.py`; never hand-edit derived `topic_ranges`,
-  `day_pages`, Daf Yomi runs, or `topic_starts_original`.
-- Previous-week pages are separate from current-week topic ranges. They never
-  shift the next current-week topic. In the topics edition, a previous-week
-  page is the TOC target when it is the first page readers must see.
 
 ## Fixed page identity
 
@@ -40,6 +34,9 @@ Treat `הכל`, `בשלמותו`, `הסקיל המלא`, or an equivalent reques
 - Read fresh source PDFs from `D:\מלמדים\הרב גלבך\אוצרות יהודים\בעבודה`.
 - Never overwrite source PDFs.
 - Rebuild each edition from pristine sources into a fresh output. Never repair a delivered PDF by stacking full-page overlays.
+- Before a days build, create and inspect a source map: every topic range, every weekday's source pages, and every detected weekday marker. Ask the user to confirm that map before the final build.
+- A source page may belong to one weekday only. If a physical page visibly contains more than one weekday, stop and obtain an explicit safe split plan; never silently duplicate the whole page across days.
+- Reject an analysis with reversed or overlapping topic ranges, out-of-range pages, a day/source-page mismatch, or a missing/duplicated daily source page. Do not "repair" an invalid source map by hand without recording and confirming the corrected map.
 - Compare final size with the source PDFs and reject unexplained inflation above 1.35 times the combined interior-and-cover size.
 - Never use Canva.
 - Preserve every navigation link through checkbox and label stages.
@@ -70,12 +67,12 @@ Render the final cover and reject missing, clipped, or stale-colored edition tex
 - Suffixes such as `_base`, `_notes`, `_vcheck`, and `_qa` are permitted only for temporary or QA files. Never upload or deliver them.
 - If the clean destination filename already exists, do not invent a `סופי` variant. Keep work on a temporary path and ask one question before replacing the delivered file.
 
-## Permanent Drive delivery for 5787
+## Permanent Drive delivery for 5786
 
 - Archive root: `https://drive.google.com/drive/folders/1SkAKg5tYbnOnoWoaFMQ692_4ojd8GyGB?usp=sharing`
-- Year `תשפ"ז`: `https://drive.google.com/drive/folders/1r-08C5sVzq-FJy3qIG00QQ0GNHbji_9U`
-- Topics folder ID: `1OzLVd0UwqpkST2td_SGMh-6ghhgFh5a1`
-- Days folder ID: `1Ov0eLEXjT4Q6uSaXF9dUKZ_Lwm1bf7B1`
+- Year `תשפ"ו`: `https://drive.google.com/drive/folders/17Db-KCgz_BuY4t7DXSR-2ElGdYl2hz8z`
+- Topics folder ID: `1nf_XIjuhzfG9FgGadd-obJTGMn0XhxBa`
+- Days folder ID: `1h0_hB7wcymjRDAvmFHJcktbKBqgN6_-y`
 
 After local validation, upload automatically to the matching folder. In `both` mode upload each edition to its own folder. Upload only final PDFs. Verify by listing the destination folder and report the observed Drive URL.
 
@@ -86,7 +83,3 @@ The user granted standing permission to upload final PDFs to these exact two fol
 Report for every requested edition: clean final filename, local path, page count, checkbox count, zero checkbox overlaps, link count, navigation equality, visible label style, local delivery, and Drive URL. Reject any delivered filename containing `סופי`.
 
 Keep QA files until user acceptance, then remove only temporary artifacts.
-
-Before accepting workflow changes, run the Sukkot and Bereshit cases in
-`references/regression-cases.md`. Do not change Tehillim repetition, Zohar, or
-V-checkbox behavior unless a specific failing case proves that change is needed.

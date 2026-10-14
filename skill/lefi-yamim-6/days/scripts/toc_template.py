@@ -297,7 +297,14 @@ def analysis_toc_config(analysis):
     return cfg
 
 
-def render_toc_image(parsha_name, date_label, color=DEFAULT_ACCENT, whatsapp_icon=None, email_icon=None, no_parsha=False):
+def render_toc_image(
+    parsha_name,
+    date_label,
+    color=DEFAULT_ACCENT,
+    whatsapp_icon=None,
+    email_icon=None,
+    include_parsha=True,
+):
     from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
     parsha_name = parsha_name or "פרשת השבוע"
@@ -365,8 +372,12 @@ def render_toc_image(parsha_name, date_label, color=DEFAULT_ACCENT, whatsapp_ico
         line_gap = 34
         lines = wrap_text(draw, intro, intro_font, intro_box[2] - intro_box[0] - 90)
     draw_center_wrapped(draw, lines, CANVAS_W / 2, intro_box[1] + 34, intro_font, ink, line_gap)
-    note = "תיקון הכללי מופיע בנפרד" if no_parsha else "פרשת השבוע ותיקון הכללי מופיעים בנפרד"
-    draw_center_top(draw, note, CANVAS_W / 2, intro_box[3] - 42, fonts["small_b"], mid)
+    separate_note = (
+        "פרשת השבוע ותיקון הכללי מופיעים בנפרד"
+        if include_parsha
+        else "תיקון הכללי מופיע בנפרד"
+    )
+    draw_center_top(draw, separate_note, CANVAS_W / 2, intro_box[3] - 42, fonts["small_b"], mid)
 
     arr_box = (left, 435, right, 608)
     shadowed_rect(img, draw, arr_box, 16, softer, mix(accent, (255, 255, 255), 0.20), width=2, shadow_alpha=18)
@@ -389,12 +400,12 @@ def render_toc_image(parsha_name, date_label, color=DEFAULT_ACCENT, whatsapp_ico
     draw_button(img, draw, "שבת קודש", shabbos_box, fonts["btn"], button_fill_2, accent, dark)
     special_y = shabbos_box[3] + 44
     draw.rectangle((left + 150, special_y - 22, right - 150, special_y - 18), fill=mix(accent, (255, 255, 255), 0.48))
-    if no_parsha:
-        single_box = ((CANVAS_W - btn_w) // 2, special_y, (CANVAS_W + btn_w) // 2, special_y + btn_h)
-        draw_button(img, draw, "לתיקון הכללי", single_box, fonts["btn_small"], button_fill, accent, dark, glow=True)
-    else:
+    if include_parsha:
         draw_button(img, draw, "לפרשת השבוע", (rx, special_y, rx + btn_w, special_y + btn_h), fonts["btn_small"], button_fill, accent, dark, glow=True)
-        draw_button(img, draw, "לתיקון הכללי", (lx, special_y, lx + btn_w, special_y + btn_h), fonts["btn_small"], button_fill, accent, dark, glow=True)
+        tikun_box = (lx, special_y, lx + btn_w, special_y + btn_h)
+    else:
+        tikun_box = ((CANVAS_W - btn_w) // 2, special_y, (CANVAS_W + btn_w) // 2, special_y + btn_h)
+    draw_button(img, draw, "לתיקון הכללי", tikun_box, fonts["btn_small"], button_fill, accent, dark, glow=True)
 
     nav_top = special_y + btn_h + 48
     nav_h = 405
@@ -447,7 +458,7 @@ def canvas_rect(x1, y1, x2, y2):
     return (x1 / SCALE, y1 / SCALE, x2 / SCALE, y2 / SCALE)
 
 
-def toc_rect_specs():
+def toc_rect_specs(include_parsha=True):
     btn_w, btn_h = 398, 78
     rx = CANVAS_W - 156 - btn_w
     lx = 156
@@ -464,8 +475,11 @@ def toc_rect_specs():
     shabbos_y = start_y + 3 * (btn_h + gap_y) + 4
     specs["shabbos"] = ((CANVAS_W - btn_w) // 2, shabbos_y, (CANVAS_W + btn_w) // 2, shabbos_y + btn_h)
     special_y = shabbos_y + btn_h + 44
-    specs["parsha"] = (rx, special_y, rx + btn_w, special_y + btn_h)
-    specs["tikun"] = (lx, special_y, lx + btn_w, special_y + btn_h)
+    if include_parsha:
+        specs["parsha"] = (rx, special_y, rx + btn_w, special_y + btn_h)
+        specs["tikun"] = (lx, special_y, lx + btn_w, special_y + btn_h)
+    else:
+        specs["tikun"] = ((CANVAS_W - btn_w) // 2, special_y, (CANVAS_W + btn_w) // 2, special_y + btn_h)
     footer_top = special_y + btn_h + 48 + 405 + 40
     left = 92
     right = CANVAS_W - 92
@@ -484,8 +498,11 @@ def toc_rect_specs():
     return specs
 
 
-def toc_button_rects(fitz):
-    return {key: fitz.Rect(*canvas_rect(*spec)) for key, spec in toc_rect_specs().items()}
+def toc_button_rects(fitz, include_parsha=True):
+    return {
+        key: fitz.Rect(*canvas_rect(*spec))
+        for key, spec in toc_rect_specs(include_parsha=include_parsha).items()
+    }
 
 
 def external_links_from_config(config):
@@ -506,8 +523,8 @@ def external_links_from_config(config):
     }
 
 
-def insert_toc_links(fitz, toc_page, internal_targets, external_links=None):
-    rects = toc_button_rects(fitz)
+def insert_toc_links(fitz, toc_page, internal_targets, external_links=None, include_parsha=True):
+    rects = toc_button_rects(fitz, include_parsha=include_parsha)
     for key, target in internal_targets.items():
         if key not in rects or not target:
             continue
@@ -518,10 +535,26 @@ def insert_toc_links(fitz, toc_page, internal_targets, external_links=None):
         toc_page.insert_link({"kind": fitz.LINK_URI, "from": rects[key], "uri": str(url)})
 
 
-def make_toc_pdf(output_pdf, parsha_name, date_label, color=DEFAULT_ACCENT, whatsapp_icon=None, email_icon=None, png_output=None, no_parsha=False):
+def make_toc_pdf(
+    output_pdf,
+    parsha_name,
+    date_label,
+    color=DEFAULT_ACCENT,
+    whatsapp_icon=None,
+    email_icon=None,
+    png_output=None,
+    include_parsha=True,
+):
     import fitz
 
-    image = render_toc_image(parsha_name, date_label, color, whatsapp_icon=whatsapp_icon, email_icon=email_icon, no_parsha=no_parsha)
+    image = render_toc_image(
+        parsha_name,
+        date_label,
+        color,
+        whatsapp_icon=whatsapp_icon,
+        email_icon=email_icon,
+        include_parsha=include_parsha,
+    )
     output_pdf = Path(output_pdf)
     output_pdf.parent.mkdir(parents=True, exist_ok=True)
     png_path = Path(png_output) if png_output else output_pdf.with_suffix(".png")

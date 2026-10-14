@@ -62,6 +62,8 @@ BOOKLET_METADATA_CONFIRMED_KEY = "booklet_metadata_confirmed_by_user"
 PREVIOUS_WEEK_CONFIRMED_KEY = "previous_week_pages_confirmed_by_user"
 DAF_YOMI_PREVIOUS_WEEK_CONFIRMED_KEY = "daf_yomi_previous_week_confirmed_by_user"
 DAF_YOMI_DUPLICATE_AMUD_CONFIRMED_KEY = "daf_yomi_duplicate_amud_confirmed_by_user"
+SOURCE_MAP_CONFIRMED_KEY = "source_map_confirmed_by_user"
+OPTIONAL_ABSENT_TOPICS = {"פרשת השבוע", "השלמות"}
 DEFAULT_PRE_TOC_PAGE = Path(__file__).resolve().parents[1] / "assets" / "pre-toc-page.pdf"
 
 
@@ -660,7 +662,7 @@ def assign_days(pdf_path, blank_pages, topic_ranges, sorted_topics):
                     teh_markers[day] = orig
         sorted_teh = sorted(teh_markers.items(), key=lambda x: x[1])
         for i, (day, marker_page) in enumerate(sorted_teh):
-            end_page = sorted_teh[i + 1][1] if i + 1 < len(sorted_teh) else teh_e
+            end_page = sorted_teh[i + 1][1] - 1 if i + 1 < len(sorted_teh) else teh_e
             for orig in range(marker_page, end_page + 1):
                 if orig not in blank_set and orig not in day_pages[day]:
                     day_pages[day].append(orig)
@@ -677,6 +679,127 @@ def assign_days(pdf_path, blank_pages, topic_ranges, sorted_topics):
         doc.close()
 
 
+def source_map_report(analysis, pdf_path=None):
+    """Return blocking errors for the topic and weekday source-page map."""
+    errors = []
+    total = int(analysis.get("total_original_pages") or 0)
+    ranges = analysis.get("topic_ranges") or {}
+    absent_topics = set(analysis.get("absent_topics") or [])
+    expected_topics = [DAF_YOMI_TOPIC, "פרשת השבוע", *TOPIC_ORDER, "תיקון הכללי", "השלמות"]
+    topic_owner = {}
+    for topic in expected_topics:
+        raw_range = ranges.get(topic)
+        if not isinstance(raw_range, (list, tuple)) or len(raw_range) != 2:
+            errors.append(f"Missing source range for {topic}.")
+            continue
+        try:
+            start, end = (int(raw_range[0]), int(raw_range[1]))
+        except (TypeError, ValueError):
+            errors.append(f"Invalid source range for {topic}: {raw_range!r}.")
+            continue
+        if end < start and topic in OPTIONAL_ABSENT_TOPICS and topic in absent_topics:
+            continue
+        if start < 1 or end < start or (total and end > total):
+            errors.append(f"Invalid source range for {topic}: {start}-{end}.")
+            continue
+        for page in range(start, end + 1):
+            previous = topic_owner.setdefault(page, topic)
+            if previous != topic:
+                errors.append(f"Source page {page} belongs to both {previous} and {topic}.")
+
+    blank_set = {int(page) for page in analysis.get("blank_pages", [])}
+    daily_topics = {DAF_YOMI_TOPIC, *TOPIC_ORDER}
+    expected_daily_pages = set()
+    for topic in daily_topics:
+        raw_range = ranges.get(topic)
+        if not isinstance(raw_range, (list, tuple)) or len(raw_range) != 2:
+            continue
+        try:
+            start, end = (int(raw_range[0]), int(raw_range[1]))
+        except (TypeError, ValueError):
+            continue
+        if start < 1 or end < start or (total and end > total):
+            continue
+        expected_daily_pages.update(page for page in range(start, end + 1) if page not in blank_set)
+    owners = {}
+    day_pages = analysis.get("day_pages") or {}
+    for day in DAYS_ORDER:
+        pages = day_pages.get(day)
+        if not isinstance(pages, list):
+            errors.append(f"Missing weekday page list for {day}.")
+            continue
+        seen = set()
+        for raw_page in pages:
+            try:
+                page = int(raw_page)
+            except (TypeError, ValueError):
+                errors.append(f"Invalid source page {raw_page!r} in {day}.")
+                continue
+            if page in seen:
+                errors.append(f"Source page {page} appears twice in {day}.")
+                continue
+            seen.add(page)
+            if page < 1 or (total and page > total):
+                errors.append(f"Source page {page} in {day} is out of range.")
+                continue
+            if page in blank_set:
+                errors.append(f"Blank source page {page} is assigned to {day}.")
+                continue
+            owners.setdefault(page, []).append(day)
+
+    for page, page_owners in sorted(owners.items()):
+        if len(page_owners) > 1:
+            errors.append(f"Source page {page} is assigned to multiple weekdays: {', '.join(page_owners)}.")
+    for page in sorted(expected_daily_pages):
+        if page not in owners:
+            errors.append(f"Daily source page {page} is not assigned to a weekday.")
+    for page in sorted(set(owners) - expected_daily_pages):
+        if topic_owner.get(page) == "פרשת השבוע" and owners[page] == ["שבת קודש"]:
+            continue
+        errors.append(f"Source page {page} is assigned to a weekday but is not daily material.")
+
+    source = Path(pdf_path or analysis.get("input_pdf", ""))
+    if source.exists():
+        fitz = require_deps("fitz")["fitz"]
+        doc = fitz.open(str(source))
+        try:
+            for page, page_owners in owners.items():
+                if page < 1 or page > len(doc) or len(page_owners) != 1:
+                    continue
+                markers = [day for day in DAYS_ORDER if day in doc[page - 1].get_text()]
+                if len(markers) > 1:
+                    errors.append(f"Source page {page} contains multiple weekday markers: {', '.join(markers)}.")
+                elif markers and markers[0] != page_owners[0]:
+                    errors.append(f"Source page {page} says {markers[0]} but is assigned to {page_owners[0]}.")
+        finally:
+            doc.close()
+    else:
+        errors.append(f"Source PDF for map validation was not found: {source}.")
+    return {"ok": not errors, "errors": errors, "weekday_source_pages": len(owners)}
+
+
+def require_validated_source_map(analysis, pdf_path):
+    recorded_source = Path(analysis.get("input_pdf", ""))
+    if not recorded_source.exists() or recorded_source.resolve() != Path(pdf_path).resolve():
+        raise RuntimeError(
+            "The analysis belongs to a different source PDF. Reanalyze the exact source before building."
+        )
+    report = source_map_report(analysis, pdf_path)
+    if not report["ok"]:
+        details = "\n- ".join(report["errors"][:12])
+        raise RuntimeError(
+            "Source-page map is invalid. Correct and show the map before building; do not duplicate a full page across days.\n- "
+            + details
+        )
+    require_user_confirmation(
+        analysis,
+        SOURCE_MAP_CONFIRMED_KEY,
+        "Before building, show the validated source-page map and ask the user to confirm it. "
+        f"Set analysis.{MANUAL_ANSWERS_KEY}.{SOURCE_MAP_CONFIRMED_KEY}=true only after confirmation.",
+    )
+    return report
+
+
 def analyze(args):
     input_pdf = resolve_path(args.input, args.workspace)
     cover_pdf = resolve_path(args.cover, args.workspace)
@@ -684,12 +807,6 @@ def analyze(args):
     blank_pages = detect_blank(str(input_pdf))
     topics = detect_topics(str(input_pdf), rotated_original)
     sorted_topics, topic_ranges, total_orig = build_topic_ranges(str(input_pdf), topics)
-    # תיקון הכללי מודפס לעיתים כרצף רוחבי. זיהוי עמוד בודד אינו מספיק:
-    # אם אחד מעמודי הרצף זוהה כסרוק לרוחב, מסובבים את כל רצף תיקון הכללי.
-    tikun_start, tikun_end = topic_ranges["תיקון הכללי"]
-    tikun_pages = set(range(tikun_start, tikun_end + 1))
-    if tikun_pages.intersection(rotated_original):
-        rotated_original = sorted(set(rotated_original).union(tikun_pages))
 
     warnings = []
     dy_count = topics["פרשת השבוע"] - topics[DAF_YOMI_TOPIC]
@@ -745,6 +862,12 @@ def analyze(args):
         "warnings": warnings,
         "lefi_yamim_6": metadata,
     }
+    analysis["source_map_validation"] = source_map_report(analysis, input_pdf)
+    if not analysis["source_map_validation"]["ok"]:
+        warnings.append(
+            "מפת עמודי המקור אינה תקינה. אסור לבנות עד שמתקנים אותה ומציגים למשתמש לאישור. "
+            + " | ".join(analysis["source_map_validation"]["errors"][:3])
+        )
     analysis_out = Path(args.analysis_out) if args.analysis_out else input_pdf.with_suffix(".lefi-yamim-analysis.json")
     analysis_out.parent.mkdir(parents=True, exist_ok=True)
     analysis_out.write_text(json.dumps(analysis, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -882,15 +1005,17 @@ def context_page_set(analysis):
 def build_pdf(args):
     fitz = require_deps("fitz")["fitz"]
     analysis = json.loads(Path(args.analysis).read_text(encoding="utf-8"))
+    workspace = Path(args.workspace) if args.workspace else Path(analysis["input_pdf"]).parent
+    input_pdf = resolve_path(args.input, workspace)
+    cover_pdf = resolve_path(args.cover, workspace)
+    require_validated_source_map(analysis, input_pdf)
     require_booklet_metadata_confirmation(analysis)
     require_previous_week_answers(analysis)
     require_daf_yomi_manual_answers(analysis)
 
-    workspace = Path(args.workspace) if args.workspace else Path(analysis["input_pdf"]).parent
-    input_pdf = resolve_path(args.input, workspace)
-    cover_pdf = resolve_path(args.cover, workspace)
     pre_toc_page = resolve_pre_toc_page(args, analysis, workspace)
     hex_color = detect_circle_hex(str(cover_pdf))
+    include_parsha = "פרשת השבוע" not in set(analysis.get("absent_topics") or [])
     toc_cfg = toc_config_from_args(args, analysis, input_pdf, cover_pdf)
     toc_dir = workspace / "__lefi_yamim_6_assets"
     toc_dir.mkdir(parents=True, exist_ok=True)
@@ -902,7 +1027,7 @@ def build_pdf(args):
             toc_cfg["date_label"],
             color=hex_color,
             png_output=toc_dir / "toc-lefi-yamim-6.png",
-            no_parsha=manual_user_answers(analysis).get("no_parsha_this_week") is True,
+            include_parsha=include_parsha,
         )
     else:
         days_toc_pdf = resolve_path(args.days_toc, workspace)
@@ -1001,6 +1126,7 @@ def build_pdf(args):
         tmp2_path,
         toc_page_number,
         external_links_from_config(toc_cfg),
+        include_parsha=include_parsha,
     )
 
     out_dir = Path(args.out_dir) if args.out_dir else workspace / "לפי ימים"
@@ -1070,7 +1196,7 @@ def unique_output_path(path):
         i += 1
 
 
-def add_buttons_and_links(fitz, tmp_in, button_img, rotated_new, total, parsha_new_pages, day_first_new, tikun_first_new, hash_first_new, tmp_out, toc_page_number, external_links=None):
+def add_buttons_and_links(fitz, tmp_in, button_img, rotated_new, total, parsha_new_pages, day_first_new, tikun_first_new, hash_first_new, tmp_out, toc_page_number, external_links=None, include_parsha=True):
     doc = fitz.open(tmp_in)
     toc_idx = toc_page_number - 1
     first_content_page = toc_page_number + 1
@@ -1100,7 +1226,7 @@ def add_buttons_and_links(fitz, tmp_in, button_img, rotated_new, total, parsha_n
         targets["tikun"] = tikun_first_new
 
         toc_page = doc[toc_idx]
-        insert_toc_links(fitz, toc_page, targets, external_links)
+        insert_toc_links(fitz, toc_page, targets, external_links, include_parsha=include_parsha)
         doc.save(
             tmp_out,
             garbage=4,
