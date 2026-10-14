@@ -54,8 +54,8 @@ class LogicTest {
     @Test fun undoReturnsMarksInReverse() {
         val u = UndoStack()
         u.push(UndoStack.Mark(0, 1, false)); u.push(UndoStack.Mark(2, 3, true))
-        assertEquals(3, u.pop()!!.annotation)
-        assertEquals(1, u.pop()!!.annotation)
+        assertEquals(3, (u.pop() as UndoStack.Mark).annotation)
+        assertEquals(1, (u.pop() as UndoStack.Mark).annotation)
         assertNull(u.pop())
         assertTrue(u.isEmpty)
     }
@@ -63,9 +63,66 @@ class LogicTest {
     @Test fun undoIsBounded() {
         val u = UndoStack(limit = 2)
         repeat(5) { u.push(UndoStack.Mark(it, it, false)) }
-        assertEquals(4, u.pop()!!.page)
-        assertEquals(3, u.pop()!!.page)
+        assertEquals(4, (u.pop() as UndoStack.Mark).page)
+        assertEquals(3, (u.pop() as UndoStack.Mark).page)
         assertNull(u.pop())
+    }
+
+    @Test fun undoKeepsBookmarkSteps() {
+        val u = UndoStack()
+        val b = Bookmark("a", 1, 50f, 60f, false, Bookmark.Size.MEDIUM, Bookmark.DEFAULT_COLOR)
+        u.push(UndoStack.BookmarkChange(null, b))
+        assertEquals(UndoStack.BookmarkChange(null, b), u.pop())
+    }
+
+    // ----- bookmarks -----
+    @Test fun bookmarkNameRoundTrips() {
+        val b = Bookmark("abc123", 4, 100f, 200f, true, Bookmark.Size.LARGE, 0x8031A0D0.toInt())
+        assertEquals("otzr-bm:v1;o=h;s=l;c=8031A0D0;id=abc123", b.name)
+        val back = Bookmark.parse(b.name, 4, b.frameRect())!!
+        assertEquals(b, back)
+    }
+
+    @Test fun foreignStampsAreNotBookmarks() {
+        assertNull(Bookmark.parse("some-other-stamp", 0, floatArrayOf(0f, 0f, 1f, 1f)))
+        assertNull(Bookmark.parse("otzr-bm:v1;o=v", 0, floatArrayOf(0f, 0f, 1f, 1f))) // no id
+    }
+
+    @Test fun verticalRibbonPointsUpAndHasNotchDown() {
+        val p = Bookmark.shape(false, 0f, 0f, 10f, 30f)
+        assertEquals(10, p.size)
+        // top edge slants: left corner lower than right corner
+        assertTrue(p[1] > p[3])
+        assertEquals(0f, p[3], 0.001f)
+        // the notch point is in the middle, above the bottom
+        assertEquals(5f, p[6], 0.001f)
+        assertTrue(p[7] < 30f && p[7] > 20f)
+    }
+
+    @Test fun horizontalRibbonIsLongSideways() {
+        val b = Bookmark("x", 0, 100f, 100f, true, Bookmark.Size.MEDIUM, 0)
+        assertTrue(b.width > b.height)
+        val v = b.copy(horizontal = false)
+        assertTrue(v.height > v.width)
+    }
+
+    @Test fun bookmarkStaysOnPage() {
+        val b = Bookmark("x", 0, -40f, 9999f, false, Bookmark.Size.MEDIUM, 0).keptOn(400f, 600f)
+        val r = b.frameRect()
+        assertTrue(r[0] >= 0f && r[2] <= 400f && r[1] >= 0f && r[3] <= 600f)
+    }
+
+    @Test fun opacityIsKeptInColour() {
+        val c = Bookmark.withOpacity(0xFF57479F.toInt(), .8f)
+        assertEquals(0xCC57479F.toInt(), c)
+        assertEquals(.8f, Bookmark.opacityOf(c), 0.01f)
+    }
+
+    @Test fun bookmarkLabelUsesNearestChapter() {
+        val chapters = listOf(0 to "פתיחה", 10 to "משניות", 20 to "גמרא")
+        assertEquals("משניות", BookmarkLabel.of(14, chapters) { "עמוד $it" })
+        assertEquals("גמרא", BookmarkLabel.of(20, chapters) { "עמוד $it" })
+        assertEquals("עמוד 4", BookmarkLabel.of(3, emptyList()) { "עמוד $it" })
     }
 
     // ----- screen timeout -----

@@ -38,6 +38,16 @@ class Settings(context: Context) {
     var sort: String
         get() = prefs.getString(SORT, "received")!!
         set(v) = prefs.edit().putString(SORT, v).apply()
+    /** Bookmark choices: the last one made becomes the next default (owner's decision). */
+    var bookmarkColor: Int
+        get() = prefs.getInt(BM_COLOR, Bookmark.DEFAULT_COLOR)
+        set(v) = prefs.edit().putInt(BM_COLOR, v).apply()
+    var bookmarkSize: Bookmark.Size
+        get() = Bookmark.Size.of(prefs.getString(BM_SIZE, null))
+        set(v) = prefs.edit().putString(BM_SIZE, v.code).apply()
+    var bookmarkHorizontal: Boolean
+        get() = prefs.getBoolean(BM_HORIZONTAL, false)
+        set(v) = prefs.edit().putBoolean(BM_HORIZONTAL, v).apply()
     var allFilesPromptDismissed: Boolean
         get() = prefs.getBoolean(ALL_FILES_DISMISSED, false)
         set(v) = prefs.edit().putBoolean(ALL_FILES_DISMISSED, v).apply()
@@ -58,6 +68,9 @@ class Settings(context: Context) {
         const val WA_DISMISSED = "whatsapp_prompt_dismissed"
         const val SORT = "sort"
         const val ALL_FILES_DISMISSED = "all_files_prompt_dismissed"
+        const val BM_COLOR = "bookmark_color"
+        const val BM_SIZE = "bookmark_size"
+        const val BM_HORIZONTAL = "bookmark_horizontal"
     }
 }
 

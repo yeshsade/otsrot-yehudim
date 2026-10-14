@@ -41,4 +41,20 @@
     <string name="sort_size">By size (largest first)</string>
     <string name="sort_last_read">By last read</string>
     <string name="sort_pages">By number of pages</string>
+    <!-- Bookmarks: DRAFT wording, awaiting the owner's approval -->
+    <string name="bm_color">Colour</string>
+    <string name="bm_opacity">Opacity</string>
+    <string name="bm_size">Size</string>
+    <string name="bm_size_small">Small</string>
+    <string name="bm_size_medium">Medium</string>
+    <string name="bm_size_large">Large</string>
+    <string name="bm_direction">Direction</string>
+    <string name="bm_vertical">Upright</string>
+    <string name="bm_horizontal">Sideways</string>
+    <string name="bm_remove">Remove bookmark</string>
+    <string name="bm_close">Close</string>
+    <string name="bm_list_title">Bookmarks in this document</string>
+    <string name="bm_list_empty">No bookmarks yet. Tap “Bookmark” below to add one.</string>
+    <string name="bm_page">Page %1$d</string>
+    <string name="bm_added_hint">Bookmark added. Drag it with your finger; long-press it for options. Long-press “Bookmark” below to see all bookmarks.</string>
 </resources>

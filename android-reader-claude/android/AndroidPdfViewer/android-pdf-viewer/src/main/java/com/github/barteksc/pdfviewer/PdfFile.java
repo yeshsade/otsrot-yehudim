@@ -1264,6 +1264,116 @@ class PdfFile {
         }
     }
 
+    // ---------- Otzarot reader bookmarks ----------
+    // Positions are in "frame" points: the page as it is seen, origin at its top-left corner.
+
+    /** Size of the page as seen, in points: {width, height}. */
+    public float[] getFrameSize(int pageIndex) {
+        PageGeometry geometry = getPageGeometry(pageIndex);
+        return new float[]{geometry.frameWidth(), geometry.frameHeight()};
+    }
+
+    /** Document (strip) coordinates to frame points on the given page. */
+    public PointF documentToFrame(int pageIndex, float zoom, float docX, float docY) {
+        PointF user = documentToPdf(pageIndex, zoom, docX, docY);
+        float[] frame = new float[2];
+        userToFrameTopDown(getPageGeometry(pageIndex), user.x, user.y, frame);
+        return new PointF(frame[0], frame[1]);
+    }
+
+    /** Frame rect (points) to document (strip) coordinates, not clipped to the page. */
+    public RectF frameRectToDocument(int pageIndex, float zoom, RectF frame) {
+        return frameRectToDocument(pageIndex, zoom, frame.left, frame.top, frame.right, frame.bottom, false);
+    }
+
+    /** framePolygon: x,y pairs in frame points. */
+    public boolean addAppBookmark(int pageIndex, String name, float[] framePolygon, int color) {
+        if (disposed || pdfDocument == null || framePolygon == null || framePolygon.length < 6) {
+            return false;
+        }
+        int docPage = documentPage(pageIndex);
+        if (docPage < 0) {
+            return false;
+        }
+        fenceRenders();
+        try {
+            try {
+                openPage(pageIndex);
+            } catch (PageRenderingException e) {
+                return false;
+            }
+            PageGeometry geometry = getPageGeometry(pageIndex);
+            float[] user = new float[2];
+            float[] polygon = new float[framePolygon.length];
+            float left = Float.MAX_VALUE, bottom = Float.MAX_VALUE;
+            float right = -Float.MAX_VALUE, top = -Float.MAX_VALUE;
+            for (int k = 0; k + 1 < framePolygon.length; k += 2) {
+                frameTopDownToUser(geometry, framePolygon[k], framePolygon[k + 1], user);
+                polygon[k] = user[0];
+                polygon[k + 1] = user[1];
+                left = Math.min(left, user[0]);
+                right = Math.max(right, user[0]);
+                bottom = Math.min(bottom, user[1]);
+                top = Math.max(top, user[1]);
+            }
+            return pdfiumCore.addAppBookmark(pdfDocument, docPage, name,
+                    new float[]{left, bottom, right, top}, polygon, color);
+        } finally {
+            renderGate.unlock();
+        }
+    }
+
+    /** Returns name -> frame rect (points) for the page's bookmarks. */
+    public LinkedHashMap<String, RectF> getAppBookmarks(int pageIndex) {
+        LinkedHashMap<String, RectF> result = new LinkedHashMap<>();
+        if (disposed || pdfDocument == null) {
+            return result;
+        }
+        int docPage = documentPage(pageIndex);
+        if (docPage < 0) {
+            return result;
+        }
+        PageGeometry geometry = getPageGeometry(pageIndex);
+        float[] a = new float[2];
+        float[] b = new float[2];
+        for (String row : pdfiumCore.getAppBookmarks(pdfDocument, docPage)) {
+            String[] parts = row.split("\t");
+            if (parts.length < 5) {
+                continue;
+            }
+            try {
+                userToFrameTopDown(geometry, Float.parseFloat(parts[1]), Float.parseFloat(parts[2]), a);
+                userToFrameTopDown(geometry, Float.parseFloat(parts[3]), Float.parseFloat(parts[4]), b);
+            } catch (NumberFormatException e) {
+                continue;
+            }
+            result.put(parts[0], new RectF(Math.min(a[0], b[0]), Math.min(a[1], b[1]),
+                    Math.max(a[0], b[0]), Math.max(a[1], b[1])));
+        }
+        return result;
+    }
+
+    public boolean removeAppBookmark(int pageIndex, String name) {
+        if (disposed || pdfDocument == null) {
+            return false;
+        }
+        int docPage = documentPage(pageIndex);
+        if (docPage < 0) {
+            return false;
+        }
+        fenceRenders();
+        try {
+            try {
+                openPage(pageIndex);
+            } catch (PageRenderingException e) {
+                return false;
+            }
+            return pdfiumCore.removeAppBookmark(pdfDocument, docPage, name);
+        } finally {
+            renderGate.unlock();
+        }
+    }
+
     public boolean addSignature(int pageIndex, RectF pdfRect, float[][] normalizedStrokes,
                                 int color, float normalizedStrokeWidth) {
         if (disposed || pdfDocument == null) {

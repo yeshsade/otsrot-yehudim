@@ -34,15 +34,19 @@ class SaveState {
 
 /** Undo of the last marks during this reading session (not kept after closing — as decided). */
 class UndoStack(private val limit: Int = 200) {
-    data class Mark(val page: Int, val annotation: Int, val before: Boolean)
+    sealed interface Step
+    /** A checkbox/radio changed; [before] is its state before the tap. */
+    data class Mark(val page: Int, val annotation: Int, val before: Boolean) : Step
+    /** A bookmark was added (before = null), removed (after = null), moved or changed. */
+    data class BookmarkChange(val before: Bookmark?, val after: Bookmark?) : Step
 
-    private val marks = ArrayDeque<Mark>()
+    private val marks = ArrayDeque<Step>()
     val isEmpty get() = marks.isEmpty()
 
-    fun push(mark: Mark) {
-        marks.addLast(mark)
+    fun push(step: Step) {
+        marks.addLast(step)
         while (marks.size > limit) marks.removeFirst()
     }
 
-    fun pop(): Mark? = marks.removeLastOrNull()
+    fun pop(): Step? = marks.removeLastOrNull()
 }

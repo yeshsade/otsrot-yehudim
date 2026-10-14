@@ -469,6 +469,28 @@ static bool isAppHighlightAnnotation(FPDF_ANNOTATION annot) {
     return wideEqualsAscii(getAnnotWideString(annot, "T"), "MJ PDF");
 }
 
+// Otzarot reader bookmark: a filled ribbon STAMP whose /NM starts with this prefix. Like the app's
+// highlights, it is hidden while the app renders (the app draws it itself so it can be dragged) and
+// visible in the saved file, so other readers show it too.
+static const char* kAppBookmarkPrefix = "otzr-bm:";
+
+static bool isAppBookmarkAnnotation(FPDF_ANNOTATION annot) {
+    if (annot == NULL || FPDFAnnot_GetSubtype(annot) != FPDF_ANNOT_STAMP) {
+        return false;
+    }
+    std::vector<FPDF_WCHAR> name = getAnnotWideString(annot, "NM");
+    size_t prefixLength = strlen(kAppBookmarkPrefix);
+    if (name.size() < prefixLength) {
+        return false;
+    }
+    for (size_t i = 0; i < prefixLength; i++) {
+        if (name[i] != static_cast<FPDF_WCHAR>(kAppBookmarkPrefix[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 static bool setAppHighlightsHidden(FPDF_PAGE page, bool hidden) {
     if (page == NULL) {
         return false;
@@ -480,7 +502,7 @@ static bool setAppHighlightsHidden(FPDF_PAGE page, bool hidden) {
         if (annot == NULL) {
             continue;
         }
-        if (isAppHighlightAnnotation(annot)) {
+        if (isAppHighlightAnnotation(annot) || isAppBookmarkAnnotation(annot)) {
             matchedAny = true;
             int flags = FPDFAnnot_GetFlags(annot);
             int updated = hidden ? (flags | FPDF_ANNOT_FLAG_HIDDEN)
@@ -1814,6 +1836,155 @@ JNI_FUNC(jboolean, PdfiumCore, nativeAddSignatureContent)(JNI_ARGS,
         FPDFPage_GenerateContent(page);
     }
     return success;
+}
+
+JNI_FUNC(jboolean, PdfiumCore, nativeAddAppBookmark)(JNI_ARGS,
+    jlong docPtr,
+    jlong pagePtr,
+    jstring name,
+    jfloatArray rectValues,
+    jfloatArray polygonValues,
+    jint red,
+    jint green,
+    jint blue,
+    jint alpha
+) {
+    DocumentFile *doc = reinterpret_cast<DocumentFile*>(docPtr);
+    FPDF_PAGE page = reinterpret_cast<FPDF_PAGE>(pagePtr);
+    if (doc == NULL || page == NULL || name == NULL || rectValues == NULL || polygonValues == NULL) {
+        return false;
+    }
+    std::string nameValue = jstringToUtf8(env, name);
+    if (nameValue.compare(0, strlen(kAppBookmarkPrefix), kAppBookmarkPrefix) != 0) {
+        return false;
+    }
+    if (env->GetArrayLength(rectValues) < 4) {
+        return false;
+    }
+    jsize length = env->GetArrayLength(polygonValues);
+    if (length < 6 || length % 2 != 0) {
+        return false;
+    }
+    jfloat r[4];
+    env->GetFloatArrayRegion(rectValues, 0, 4, r);
+    std::vector<jfloat> points(length);
+    env->GetFloatArrayRegion(polygonValues, 0, length, points.data());
+    if (env->ExceptionCheck()) {
+        return false;
+    }
+
+    FS_RECTF rect;
+    rect.left = fmin(r[0], r[2]);
+    rect.right = fmax(r[0], r[2]);
+    rect.top = fmax(r[1], r[3]);
+    rect.bottom = fmin(r[1], r[3]);
+    if (rect.right <= rect.left || rect.top <= rect.bottom) {
+        return false;
+    }
+
+    FPDF_ANNOTATION annot = FPDFPage_CreateAnnot(page, FPDF_ANNOT_STAMP);
+    if (annot == NULL) {
+        return false;
+    }
+    // The rectangle must be set before the shape is added: it becomes the appearance's bounding box.
+    // The colour entry must also come first: pdfium refuses it once the annotation has an appearance.
+    bool ok = FPDFAnnot_SetRect(annot, &rect)
+            && FPDFAnnot_SetColor(annot, FPDFANNOT_COLORTYPE_Color, red, green, blue, 255)
+            && setAnnotAsciiString(annot, "NM", nameValue.c_str())
+            && setAnnotAsciiString(annot, "T", "Otzarot Reader");
+    FPDF_PAGEOBJECT path = NULL;
+    if (ok) {
+        path = FPDFPageObj_CreateNewPath(points[0], points[1]);
+        ok = path != NULL;
+        for (jsize k = 2; ok && k + 1 < length; k += 2) {
+            ok = FPDFPath_LineTo(path, points[k], points[k + 1]);
+        }
+        ok = ok && FPDFPath_Close(path)
+                && FPDFPath_SetDrawMode(path, FPDF_FILLMODE_WINDING, false)
+                && FPDFPageObj_SetFillColor(path, red, green, blue, alpha);
+        if (ok) {
+            ok = FPDFAnnot_AppendObject(annot, path);
+            if (ok) {
+                path = NULL; // owned by the annotation now
+            }
+        }
+        if (path != NULL) {
+            FPDFPageObj_Destroy(path);
+        }
+    }
+    ok = ok && FPDFAnnot_SetFlags(annot, FPDF_ANNOT_FLAG_PRINT | FPDF_ANNOT_FLAG_HIDDEN);
+    int annotIndex = FPDFPage_GetAnnotIndex(page, annot);
+    FPDFPage_CloseAnnot(annot);
+    if (!ok) {
+        LOGE("nativeAddAppBookmark: could not build the bookmark annotation");
+        if (annotIndex >= 0) {
+            FPDFPage_RemoveAnnot(page, annotIndex);
+        }
+        return false;
+    }
+    doc->pagesWithAppHighlights.insert(page);
+    return true;
+}
+
+/** Returns "name\tleft\tbottom\tright\ttop" for every app bookmark on the page. */
+JNI_FUNC(jobjectArray, PdfiumCore, nativeGetAppBookmarks)(JNI_ARGS, jlong pagePtr) {
+    FPDF_PAGE page = reinterpret_cast<FPDF_PAGE>(pagePtr);
+    jclass stringClass = env->FindClass("java/lang/String");
+    std::vector<std::string> rows;
+    if (page != NULL) {
+        int annotCount = FPDFPage_GetAnnotCount(page);
+        for (int i = 0; i < annotCount; i++) {
+            FPDF_ANNOTATION annot = FPDFPage_GetAnnot(page, i);
+            if (annot == NULL) {
+                continue;
+            }
+            FS_RECTF rect;
+            if (isAppBookmarkAnnotation(annot) && FPDFAnnot_GetRect(annot, &rect)) {
+                std::vector<FPDF_WCHAR> wide = getAnnotWideString(annot, "NM");
+                std::string row;
+                for (size_t k = 0; k < wide.size(); k++) {
+                    FPDF_WCHAR c = wide[k];
+                    row.push_back(c < 0x80 ? static_cast<char>(c) : '?');
+                }
+                FS_RECTF b = normalizedRect(rect);
+                char numbers[128];
+                snprintf(numbers, sizeof(numbers), "\t%.3f\t%.3f\t%.3f\t%.3f", b.left, b.bottom, b.right, b.top);
+                row += numbers;
+                rows.push_back(row);
+            }
+            FPDFPage_CloseAnnot(annot);
+        }
+    }
+    jobjectArray result = env->NewObjectArray(rows.size(), stringClass, NULL);
+    for (jsize i = 0; i < static_cast<jsize>(rows.size()); i++) {
+        jstring value = env->NewStringUTF(rows[i].c_str());
+        env->SetObjectArrayElement(result, i, value);
+        env->DeleteLocalRef(value);
+    }
+    env->DeleteLocalRef(stringClass);
+    return result;
+}
+
+JNI_FUNC(jboolean, PdfiumCore, nativeRemoveAppBookmark)(JNI_ARGS, jlong pagePtr, jstring name) {
+    FPDF_PAGE page = reinterpret_cast<FPDF_PAGE>(pagePtr);
+    if (page == NULL || name == NULL) {
+        return false;
+    }
+    std::string wanted = jstringToUtf8(env, name);
+    bool removed = false;
+    for (int i = FPDFPage_GetAnnotCount(page) - 1; i >= 0; i--) {
+        FPDF_ANNOTATION annot = FPDFPage_GetAnnot(page, i);
+        if (annot == NULL) {
+            continue;
+        }
+        bool matches = isAppBookmarkAnnotation(annot)
+                && wideEqualsAscii(getAnnotWideString(annot, "NM"), wanted.c_str());
+        FPDFPage_CloseAnnot(annot);
+        if (matches && FPDFPage_RemoveAnnot(page, i)) {
+            removed = true;
+        }
+    }
+    return removed;
 }
 
 JNI_FUNC(jobjectArray, PdfiumCore, nativeGetHighlightAnnotations)(JNI_ARGS,

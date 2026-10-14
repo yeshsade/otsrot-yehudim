@@ -47,6 +47,7 @@ class ReaderActivity : AppCompatActivity() {
     private lateinit var titleView: TextView
     private lateinit var subtitle: TextView
     private lateinit var undoButton: ImageButton
+    private lateinit var bookmarks: Bookmarks
     private val main = Handler(Looper.getMainLooper())
     private val saveRunnable = Runnable { saveNow() }
 
@@ -127,6 +128,12 @@ class ReaderActivity : AppCompatActivity() {
         val body = FrameLayout(this)
         pdfView = PDFView(this, null).apply { setBackgroundColor(ui.colors.canvas) }
         body.addView(pdfView, FrameLayout.LayoutParams(-1, -1))
+        bookmarks = Bookmarks(this, pdfView, ui, app.settings, app.io) { step ->
+            undo.push(step)
+            marked()
+        }
+        pdfView.setOverlayDrawer { canvas -> bookmarks.draw(canvas) }
+        body.addView(Bookmarks.TouchLayer(this, bookmarks), FrameLayout.LayoutParams(-1, -1))
         body.addView(toolbar(), FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL).apply {
             bottomMargin = ui.dp(14)
         })
@@ -134,32 +141,41 @@ class ReaderActivity : AppCompatActivity() {
         ui.install(this, root, header)
     }
 
-    /** Floating reading bar. Only "reading" works in this build; the marking tools come next. */
+    /** Floating reading bar. Reading and bookmarks work; the marker and pen come next. */
     private fun toolbar(): View {
         val bar = ui.row().apply {
             background = ui.rounded(ui.colors.card, 26f, border = ui.colors.border)
             elevation = ui.dp(6).toFloat()
             setPadding(ui.dp(8), ui.dp(6), ui.dp(8), ui.dp(6))
         }
+        class Tool(val icon: Int, val label: Int, val selected: Boolean, val enabled: Boolean,
+                   val tap: (() -> Unit)? = null, val hold: (() -> Unit)? = null)
         listOf(
-            Triple(R.drawable.ic_book, R.string.tool_read, true),
-            Triple(R.drawable.ic_marker, R.string.tool_marker, false),
-            Triple(R.drawable.ic_pen, R.string.tool_pen, false),
-            Triple(R.drawable.ic_bookmark, R.string.tool_bookmark, false),
-        ).forEach { (icon, label, active) ->
+            Tool(R.drawable.ic_book, R.string.tool_read, selected = true, enabled = true),
+            Tool(R.drawable.ic_marker, R.string.tool_marker, selected = false, enabled = false),
+            Tool(R.drawable.ic_pen, R.string.tool_pen, selected = false, enabled = false),
+            Tool(R.drawable.ic_bookmark, R.string.tool_bookmark, selected = false, enabled = true,
+                tap = { addBookmark() }, hold = { bookmarks.showList(); Unit }),
+        ).forEach { tool ->
+            val ink = when {
+                tool.selected -> ui.colors.accent
+                else -> ui.colors.ink
+            }
             val item = ui.column().apply {
                 gravity = Gravity.CENTER
                 setPadding(ui.dp(8), ui.dp(6), ui.dp(8), ui.dp(6))
                 minimumWidth = ui.dp(72)
-                if (active) background = ui.rounded(ui.colors.selection, 18f)
-                alpha = if (active) 1f else .4f
-                contentDescription = getString(label)
+                if (tool.selected) background = ui.rounded(ui.colors.selection, 18f)
+                alpha = if (tool.enabled) 1f else .4f
+                contentDescription = getString(tool.label)
+                tool.tap?.let { action -> setOnClickListener { action() } }
+                tool.hold?.let { action -> setOnLongClickListener { action(); true } }
             }
             item.addView(ImageView(this).apply {
-                setImageResource(icon)
-                imageTintList = ColorStateList.valueOf(if (active) ui.colors.accent else ui.colors.muted)
+                setImageResource(tool.icon)
+                imageTintList = ColorStateList.valueOf(if (tool.enabled) ink else ui.colors.muted)
             }, LinearLayout.LayoutParams(ui.dp(24), ui.dp(24)))
-            item.addView(ui.label(getString(label), 12f, if (active) ui.colors.accent else ui.colors.muted).apply {
+            item.addView(ui.label(getString(tool.label), 12f, if (tool.enabled) ink else ui.colors.muted).apply {
                 gravity = Gravity.CENTER
                 maxLines = 1
             }, LinearLayout.LayoutParams(-2, -2))
@@ -200,6 +216,7 @@ class ReaderActivity : AppCompatActivity() {
     private fun show(target: Doc) {
         if (doc?.id == target.id && pageCount > 0) return
         doc = target
+        bookmarks.clear()
         titleView.text = target.name
         subtitle.text = " "
         app.io.execute {
@@ -239,6 +256,7 @@ class ReaderActivity : AppCompatActivity() {
             .onLoad { pages ->
                 pageCount = pages
                 showPage(pdfView.currentPage)
+                bookmarks.load(pages)
                 app.io.execute { app.library.update(target.id) { it.copy(pages = pages, lastOpened = System.currentTimeMillis()) } }
             }
             .onPageChange { page, pages ->
@@ -271,9 +289,20 @@ class ReaderActivity : AppCompatActivity() {
     }
 
     private fun undoLast() {
-        val mark = undo.pop() ?: return
-        pdfView.setFormFieldChecked(mark.page, mark.annotation, mark.before)
+        when (val step = undo.pop() ?: return) {
+            is UndoStack.Mark -> pdfView.setFormFieldChecked(step.page, step.annotation, step.before)
+            is UndoStack.BookmarkChange -> bookmarks.revert(step)
+        }
         marked()
+    }
+
+    private fun addBookmark() {
+        if (pageCount == 0) return
+        bookmarks.add() ?: return
+        if (!app.settings.prefs.getBoolean(HINT_SHOWN, false)) {
+            app.settings.prefs.edit().putBoolean(HINT_SHOWN, true).apply()
+            Toast.makeText(this, R.string.bm_added_hint, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun marked() {
@@ -356,6 +385,7 @@ class ReaderActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_DOC = "doc"
         private const val STATE_DOC = "doc"
+        private const val HINT_SHOWN = "bookmark_hint_shown"
         private const val SAVE_DELAY_MS = 1500L
         private const val RETRY_DELAY_MS = 300L
 

@@ -155,6 +155,13 @@ public class PdfiumCore {
 
     private native PdfDocument.HighlightAnnotation[] nativeGetHighlightAnnotations(long pagePtr);
 
+    private native boolean nativeAddAppBookmark(long docPtr, long pagePtr, String name, float[] rect,
+                                                float[] polygon, int red, int green, int blue, int alpha);
+
+    private native String[] nativeGetAppBookmarks(long pagePtr);
+
+    private native boolean nativeRemoveAppBookmark(long pagePtr, String name);
+
     private native String[] nativeGetPageFonts(long pagePtr);
 
     private native boolean nativeAddSignatureContent(long docPtr, long pagePtr,
@@ -935,6 +942,62 @@ public class PdfiumCore {
             }
             return nativeAddSignatureContent(doc.mNativeDocPtr, nativePagePtr, strokes,
                     Color.red(color), Color.green(color), Color.blue(color), strokeWidthPts);
+        }
+    }
+
+    /**
+     * Adds an Otzarot reader bookmark: a filled shape (polygon x,y pairs in PDF points) inside
+     * rect {left, bottom, right, top}. The name must start with "otzr-bm:". The page must be open.
+     */
+    public boolean addAppBookmark(PdfDocument doc, int pageIndex, String name, float[] rect,
+                                  float[] polygon, int color) {
+        synchronized (lock) {
+            Long nativePagePtr = doc.mNativePagesPtr.get(pageIndex);
+            if (nativePagePtr == null || name == null || rect == null || polygon == null) {
+                return false;
+            }
+            return nativeAddAppBookmark(doc.mNativeDocPtr, nativePagePtr, name, rect, polygon,
+                    Color.red(color), Color.green(color), Color.blue(color), Color.alpha(color));
+        }
+    }
+
+    /** Rows "name\tleft\tbottom\tright\ttop"; opens (and closes again) the page if needed. */
+    public List<String> getAppBookmarks(PdfDocument doc, int pageIndex) {
+        synchronized (lock) {
+            List<String> result = new ArrayList<>();
+            if (doc.closed) {
+                return result;
+            }
+            boolean wasOpen = doc.mNativePagesPtr.get(pageIndex) != null;
+            long pagePtr = openPage(doc, pageIndex);
+            if (pagePtr == 0L) {
+                return result;
+            }
+            try {
+                String[] rows = nativeGetAppBookmarks(pagePtr);
+                if (rows != null) {
+                    for (String row : rows) {
+                        if (row != null) {
+                            result.add(row);
+                        }
+                    }
+                }
+            } finally {
+                if (!wasOpen) {
+                    closePage(doc, pageIndex);
+                }
+            }
+            return result;
+        }
+    }
+
+    public boolean removeAppBookmark(PdfDocument doc, int pageIndex, String name) {
+        synchronized (lock) {
+            Long nativePagePtr = doc.mNativePagesPtr.get(pageIndex);
+            if (nativePagePtr == null || name == null) {
+                return false;
+            }
+            return nativeRemoveAppBookmark(nativePagePtr, name);
         }
     }
 

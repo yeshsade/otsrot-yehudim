@@ -42,4 +42,20 @@
     <string name="sort_size">לפי גודל (מהגדול)</string>
     <string name="sort_last_read">לפי קריאה אחרונה</string>
     <string name="sort_pages">לפי מספר עמודים</string>
+    <!-- Bookmarks: DRAFT wording, awaiting the owner's approval -->
+    <string name="bm_color">צבע</string>
+    <string name="bm_opacity">שקיפות</string>
+    <string name="bm_size">גודל</string>
+    <string name="bm_size_small">קטן</string>
+    <string name="bm_size_medium">בינוני</string>
+    <string name="bm_size_large">גדול</string>
+    <string name="bm_direction">כיוון</string>
+    <string name="bm_vertical">לאורך</string>
+    <string name="bm_horizontal">לרוחב</string>
+    <string name="bm_remove">הסרת הסימנייה</string>
+    <string name="bm_close">סגירה</string>
+    <string name="bm_list_title">הסימניות במסמך</string>
+    <string name="bm_list_empty">עדיין אין סימניות. לחיצה על „סימנייה” למטה מוסיפה אחת.</string>
+    <string name="bm_page">עמוד %1$d</string>
+    <string name="bm_added_hint">נוספה סימנייה. אפשר לגרור אותה באצבע; לחיצה ארוכה עליה פותחת אפשרויות. לחיצה ארוכה על „סימנייה” למטה מציגה את כל הסימניות.</string>
 </resources>

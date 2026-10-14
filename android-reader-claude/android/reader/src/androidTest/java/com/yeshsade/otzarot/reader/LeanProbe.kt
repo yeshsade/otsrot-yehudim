@@ -14,6 +14,7 @@ import android.view.View
 import com.github.barteksc.pdfviewer.PDFView
 import com.shockwave.pdfium.PdfDocument
 import com.shockwave.pdfium.PdfiumCore
+import com.yeshsade.otzarot.reader.data.Bookmark
 import com.yeshsade.otzarot.reader.ui.LibraryActivity
 import com.yeshsade.otzarot.reader.ui.ReaderActivity
 import com.yeshsade.otzarot.reader.ui.SettingsActivity
@@ -40,6 +41,8 @@ class LeanProbe : Instrumentation() {
     override fun onStart() {
         if (mode == "shots") { shots(); return }
         if (mode == "files") { files(); return }
+        if (mode == "bookmarks") { bookmarks(); return }
+        if (mode == "bmshots") { bookmarkShots(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -252,6 +255,191 @@ class LeanProbe : Instrumentation() {
             result.putString("stream", "FAILED after $passed checks: ${e.stackTraceToString()}")
             finish(Activity.RESULT_CANCELED, result)
         }
+    }
+
+    /** Ribbon bookmarks: add, save into the PDF, seen by another reader, drag, undo, change, reopen, remove. */
+    private fun bookmarks() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            app.settings.whatsAppPromptDismissed = true
+            app.settings.allFilesPromptDismissed = true
+            var reader = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
+            waitLoaded(reader)
+            val doc = app.library.all().first { it.name == "booklet-1" }
+            val controller = bookmarkController(reader)
+            waitFor("bookmarks read", 30_000) { var ok = false; runOnMainSync { ok = controller.loaded }; ok }
+            val earlier = bookmarksIn(doc.uri).size
+            check(controller.all().size == earlier) { "screen ${controller.all().size}, file $earlier" }
+            // start clean (ribbons left by an earlier run)
+            runOnMainSync { controller.all().forEach { check(controller.change(it, null)) } }
+            waitFor("clean start", 90_000) { bookmarksIn(doc.uri).isEmpty() }
+            val before = 0
+
+            var added: Bookmark? = null
+            runOnMainSync {
+                added = ReaderActivity::class.java.getDeclaredMethod("addBookmark").apply { isAccessible = true }
+                    .invoke(reader).let { controller.all().lastOrNull() }
+            }
+            val b = added ?: error("no bookmark added")
+            check(controller.all().size == before + 1)
+            check(b.color == app.settings.bookmarkColor)
+            waitFor("bookmark saved", 90_000) { bookmarksIn(doc.uri).size == before + 1 }
+            val saved = bookmarksIn(doc.uri).single { it.id == b.id }
+            check(saved.name == b.name) { "${saved.name} vs ${b.name}" }
+            record("Tapping Bookmark adds a purple ribbon in the middle of the screen and saves it into the PDF")
+            SystemClock.sleep(800); waitForIdleSync()
+            runOnMainSync { snapshot(reader, "bm-added.png") }
+
+            // Kept for a check on the computer with another PDF engine (Android's own renderer skips all annotations).
+            targetContext.contentResolver.openInputStream(Uri.parse(doc.uri))!!.use { input ->
+                File(targetContext.filesDir, "bm-saved.pdf").outputStream().use { input.copyTo(it) }
+            }
+
+            // drag with the finger, through the real touch path
+            val v = pdfView(reader)
+            var from = FloatArray(2)
+            runOnMainSync {
+                val r = b.frameRect()
+                val box = v.frameRectToView(b.page, android.graphics.RectF(r[0], r[1], r[2], r[3]))!!
+                val loc = IntArray(2); v.getLocationInWindow(loc)
+                from = floatArrayOf(box.centerX() + loc[0], box.centerY() + loc[1])
+            }
+            val shift = 160f
+            touch(reader, MotionEvent.ACTION_DOWN, from[0], from[1])
+            for (step in 1..8) { touch(reader, MotionEvent.ACTION_MOVE, from[0], from[1] + shift * step / 8); SystemClock.sleep(16) }
+            touch(reader, MotionEvent.ACTION_UP, from[0], from[1] + shift)
+            waitForIdleSync()
+            val moved = controller.all().single { it.id == b.id }
+            check(moved.y > b.y + 10 || moved.page != b.page) { "did not move: $b -> $moved" }
+            waitFor("move saved", 90_000) { bookmarksIn(doc.uri).single { it.id == b.id }.let { kotlin.math.abs(it.y - moved.y) < 2 && it.page == moved.page } }
+            check(bookmarksIn(doc.uri).size == before + 1)
+            record("Dragging the ribbon moves it, and the new place is saved (still one ribbon)")
+
+            undoLast(reader)
+            waitFor("undo move saved", 90_000) { bookmarksIn(doc.uri).single { it.id == b.id }.let { kotlin.math.abs(it.y - b.y) < 2 && it.page == b.page } }
+            record("Undo puts the ribbon back where it was, also in the file")
+
+            var changed: Bookmark? = null
+            runOnMainSync {
+                val now = controller.all().single { it.id == b.id }
+                val next = now.copy(horizontal = true, size = Bookmark.Size.LARGE, color = Bookmark.withOpacity(Bookmark.PALETTE[3], .5f))
+                check(controller.change(now, next)); changed = next
+            }
+            waitFor("change saved", 90_000) { bookmarksIn(doc.uri).singleOrNull { it.id == b.id }?.name == changed!!.name }
+            record("Colour, opacity, size and direction changes are saved into the PDF")
+
+            runOnMainSync { reader.finish() }
+            waitFor("closed", 60_000) { reader.isDestroyed }
+            reader = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
+            waitLoaded(reader)
+            val reopened = bookmarkController(reader)
+            waitFor("bookmarks loaded", 30_000) { var n = -1; runOnMainSync { if (reopened.loaded) n = reopened.all().size }; n == before + 1 }
+            SystemClock.sleep(800); waitForIdleSync()
+            runOnMainSync { snapshot(reader, "bm-reopened.png") }
+            record("Opening the document again shows the ribbon where it was saved")
+
+            runOnMainSync { check(reopened.change(reopened.all().single { it.id == b.id }, null)) }
+            waitFor("removal saved", 90_000) { bookmarksIn(doc.uri).size == before }
+            record("Removing the ribbon removes it from the PDF")
+
+            // A turned page (/Rotate 90): the ribbon must stand upright as the page is seen, in its centre.
+            var turned: Bookmark? = null
+            runOnMainSync {
+                val size = pdfView(reader).getFrameSize(1)!!
+                val t = Bookmark(Bookmark.newId(), 1, size[0] / 2, size[1] / 2, false, Bookmark.Size.LARGE, Bookmark.DEFAULT_COLOR)
+                check(reopened.change(null, t)); turned = t
+            }
+            waitFor("turned page saved", 90_000) { bookmarksIn(doc.uri).any { it.id == turned!!.id } }
+            targetContext.contentResolver.openInputStream(Uri.parse(doc.uri))!!.use { input ->
+                File(targetContext.filesDir, "bm-turned.pdf").outputStream().use { input.copyTo(it) }
+            }
+            runOnMainSync { check(reopened.change(turned!!, null)) }
+            waitFor("turned removal saved", 90_000) { bookmarksIn(doc.uri).isEmpty() }
+            record("A ribbon on a turned page is saved (checked by eye on the computer)")
+            runOnMainSync { reader.finish() }
+
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /** Pictures of the ribbon menu and the list, in Hebrew by day. Needs booklet-1 in the list. */
+    private fun bookmarkShots() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; true }.getOrDefault(false) }
+            runOnMainSync {
+                app.settings.language = "he"
+                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags("he"))
+            }
+            val reader = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
+            waitLoaded(reader)
+            val c = bookmarkController(reader)
+            waitFor("bookmarks read", 30_000) { var ok = false; runOnMainSync { ok = c.loaded }; ok }
+            var b: Bookmark? = null
+            runOnMainSync { b = c.add() }
+            runOnMainSync { c.change(b!!, b!!.copy(id = b!!.id, x = b!!.x - 60).also { b = it }) }
+            runOnMainSync { c.change(null, b!!.copy(id = Bookmark.newId(), page = 1, color = Bookmark.withOpacity(Bookmark.PALETTE[4], .8f))) }
+            SystemClock.sleep(800); waitForIdleSync()
+            var menu: android.app.Dialog? = null
+            runOnMainSync { menu = c.showMenu(b!!) }
+            SystemClock.sleep(1000); waitForIdleSync()
+            runOnMainSync { snapshotView(menu!!.window!!.decorView, "bm-menu.png"); menu!!.dismiss() }
+            var list: android.app.Dialog? = null
+            runOnMainSync { list = c.showList() }
+            SystemClock.sleep(1000); waitForIdleSync()
+            runOnMainSync { snapshotView(list!!.window!!.decorView, "bm-list.png"); list!!.dismiss() }
+            runOnMainSync { c.all().forEach { c.change(it, null) }; reader.finish() }
+            result.putString("stream", "Shots done.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (e: Throwable) {
+            result.putString("stream", "FAILED: ${e.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    private fun snapshotView(view: View, name: String) {
+        val bitmap = Bitmap.createBitmap(view.width.coerceAtLeast(1), view.height.coerceAtLeast(1), Bitmap.Config.ARGB_8888)
+        bitmap.eraseColor(android.graphics.Color.GRAY)
+        view.draw(Canvas(bitmap))
+        File(targetContext.filesDir, name).outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        bitmap.recycle()
+    }
+
+    private fun bookmarkController(a: ReaderActivity): com.yeshsade.otzarot.reader.ui.Bookmarks =
+        ReaderActivity::class.java.getDeclaredField("bookmarks").apply { isAccessible = true }.get(a) as com.yeshsade.otzarot.reader.ui.Bookmarks
+
+    private fun touch(a: Activity, action: Int, x: Float, y: Float) {
+        runOnMainSync {
+            val now = SystemClock.uptimeMillis()
+            val e = MotionEvent.obtain(now, now, action, x, y, 0)
+            a.dispatchTouchEvent(e)
+            e.recycle()
+        }
+    }
+
+    /** The bookmarks stored in a file, read with the engine (frame = page as seen, top-left origin). */
+    private fun bookmarksIn(uri: String): List<Bookmark> {
+        val bytes = targetContext.contentResolver.openInputStream(Uri.parse(uri))!!.use { it.readBytes() }
+        val core = PdfiumCore(targetContext)
+        val doc = core.newDocument(bytes)
+        val out = mutableListOf<Bookmark>()
+        try {
+            for (page in 0 until core.getPageCount(doc)) {
+                core.openPage(doc, page)
+                val height = core.getPageHeightPoint(doc, page)
+                for (row in core.getAppBookmarks(doc, page)) {
+                    val f = row.split('\t')
+                    val l = f[1].toFloat(); val bottom = f[2].toFloat(); val r = f[3].toFloat(); val top = f[4].toFloat()
+                    Bookmark.parse(f[0], page, floatArrayOf(l, height - top, r, height - bottom))?.let { out += it }
+                }
+            }
+        } finally { core.closeDocument(doc) }
+        return out
     }
 
     private fun openShared(uri: Uri, from: Activity? = null): ReaderActivity {

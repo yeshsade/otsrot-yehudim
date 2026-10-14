@@ -1466,6 +1466,127 @@ public class PDFView extends RelativeLayout {
         }
 
         canvas.translate(-currentXOffset, -currentYOffset);
+
+        if (overlayDrawer != null) {
+            overlayDrawer.draw(canvas);
+        }
+    }
+
+    // ---------- app overlay (Otzarot reader bookmarks) ----------
+
+    /** Draws on top of the pages, in view coordinates, in the same frame as the pages. */
+    public interface OverlayDrawer {
+        void draw(Canvas canvas);
+    }
+
+    private OverlayDrawer overlayDrawer;
+
+    public void setOverlayDrawer(OverlayDrawer drawer) {
+        overlayDrawer = drawer;
+        invalidate();
+    }
+
+    /** A point on a page, in frame points (the page as seen, origin top-left). */
+    public static final class FramePoint {
+        public final int page;
+        public final float x;
+        public final float y;
+
+        FramePoint(int page, float x, float y) {
+            this.page = page;
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    /** The page under a view point (the nearest one in a gap) and the point on it. */
+    public FramePoint viewToFrame(float viewX, float viewY) {
+        if (pdfFile == null || (state != State.SHOWN && state != State.LOADED)) {
+            return null;
+        }
+        float docX = -getCurrentXOffset() + viewX;
+        float docY = -getCurrentYOffset() + viewY;
+        int page = pdfFile.getPageAtOffset(isSwipeVertical() ? docY : docX,
+                isSwipeVertical() ? docX : docY, getZoom());
+        if (page < 0 || page >= pdfFile.getPagesCount()) {
+            return null;
+        }
+        pdfFile.ensurePageGeometry(page);
+        PointF point = pdfFile.documentToFrame(page, getZoom(), docX, docY);
+        return new FramePoint(page, point.x, point.y);
+    }
+
+    /** A frame rect (points) on a page, in view coordinates. */
+    public RectF frameRectToView(int page, RectF frame) {
+        if (pdfFile == null || page < 0 || page >= pdfFile.getPagesCount()) {
+            return null;
+        }
+        RectF rect = pdfFile.frameRectToDocument(page, getZoom(), frame);
+        if (rect != null) {
+            rect.offset(getCurrentXOffset(), getCurrentYOffset());
+        }
+        return rect;
+    }
+
+    /** {width, height} of the page as seen, in points. */
+    public float[] getFrameSize(int page) {
+        if (pdfFile == null || page < 0 || page >= pdfFile.getPagesCount()) {
+            return null;
+        }
+        pdfFile.ensurePageGeometry(page);
+        return pdfFile.getFrameSize(page);
+    }
+
+    /** First and last page that are at least partly on screen, or null. */
+    public int[] getVisiblePageRange() {
+        long range = visiblePageRange();
+        if (range < 0L) {
+            return null;
+        }
+        return new int[]{(int) (range >>> 32), (int) range};
+    }
+
+    public boolean addAppBookmark(int page, String name, float[] framePolygon, int color) {
+        if (pdfFile == null) {
+            return false;
+        }
+        try {
+            boolean added = pdfFile.addAppBookmark(page, name, framePolygon, color);
+            invalidate();
+            return added;
+        } catch (Throwable throwable) {
+            Log.e(TAG, "addAppBookmark failed", throwable);
+            return false;
+        }
+    }
+
+    public boolean removeAppBookmark(int page, String name) {
+        if (pdfFile == null) {
+            return false;
+        }
+        try {
+            boolean removed = pdfFile.removeAppBookmark(page, name);
+            invalidate();
+            return removed;
+        } catch (Throwable throwable) {
+            Log.e(TAG, "removeAppBookmark failed", throwable);
+            return false;
+        }
+    }
+
+    /** name -> frame rect (points). Safe to call from a background thread. */
+    public java.util.Map<String, RectF> getAppBookmarks(int page) {
+        PdfFile file = pdfFile;
+        if (file == null || page < 0 || page >= file.getPagesCount()) {
+            return new java.util.LinkedHashMap<>();
+        }
+        try {
+            file.ensurePageGeometry(page);
+            return file.getAppBookmarks(page);
+        } catch (Throwable throwable) {
+            Log.e(TAG, "getAppBookmarks failed", throwable);
+            return new java.util.LinkedHashMap<>();
+        }
     }
 
     private void drawFormFieldIndicators(Canvas canvas, Set<Integer> pages) {
