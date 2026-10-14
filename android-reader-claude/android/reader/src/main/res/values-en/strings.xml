@@ -31,8 +31,9 @@
     <string name="tool_bookmark">Bookmark</string>
     <string name="open_failed">The file can’t be opened.</string>
     <string name="save_failed">The mark wasn’t saved to the file. It stays on screen; we’ll retry with the next mark.</string>
-    <string name="all_files_title">All PDFs on this device — automatically</string>
-    <string name="all_files_body">So that every PDF on this device, including what arrives in WhatsApp, appears here by itself and your marks are saved in the file itself without an extra copy: tap “Turn on”, then switch on the toggle on the next screen.</string>
+    <string name="all_files_title">So that booklets from WhatsApp appear here by themselves</string>
+    <string name="all_files_subtitle">One permission is needed: access to files</string>
+    <string name="all_files_body">Tap “Turn on”, then switch on the toggle on the screen that opens. Every PDF on this device will then appear here, and your marks will be saved inside the file itself, with no extra copy.</string>
     <string name="all_files_allow">Turn on</string>
     <string name="library_sort_prefix">Sort:</string>
     <string name="sort_title">Sort the list</string>
@@ -41,13 +42,10 @@
     <string name="sort_size">By size (largest first)</string>
     <string name="sort_last_read">By last read</string>
     <string name="sort_pages">By number of pages</string>
-    <!-- Bookmarks: DRAFT wording, awaiting the owner's approval -->
+    <!-- Bookmarks: approved by the owner 2026-10-14 (English: draft) -->
     <string name="bm_color">Colour</string>
     <string name="bm_opacity">Opacity</string>
     <string name="bm_size">Size</string>
-    <string name="bm_size_small">Small</string>
-    <string name="bm_size_medium">Medium</string>
-    <string name="bm_size_large">Large</string>
     <string name="bm_direction">Direction</string>
     <string name="bm_vertical">Upright</string>
     <string name="bm_horizontal">Sideways</string>
@@ -55,6 +53,11 @@
     <string name="bm_close">Close</string>
     <string name="bm_list_title">Bookmarks in this document</string>
     <string name="bm_list_empty">No bookmarks yet. Tap “Bookmark” below to add one.</string>
+    <!-- DRAFT: awaiting the owner's approval -->
+    <string name="bm_list_searching">Looking for bookmarks on the other pages… %1$d of %2$d</string>
     <string name="bm_page">Page %1$d</string>
     <string name="bm_added_hint">Bookmark added. Drag it with your finger; long-press it for options. Long-press “Bookmark” below to see all bookmarks.</string>
+    <string name="bm_third_question">Are you sure you want more than 2 bookmarks on this page?</string>
+    <string name="bm_third_yes">Yes, add</string>
+    <string name="bm_third_no">No</string>
 </resources>

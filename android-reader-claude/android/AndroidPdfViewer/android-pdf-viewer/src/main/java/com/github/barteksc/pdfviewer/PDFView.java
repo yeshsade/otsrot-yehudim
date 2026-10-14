@@ -1574,6 +1574,26 @@ public class PDFView extends RelativeLayout {
         }
     }
 
+    /** Bookmark names on a page, for a list; does not keep the page open. Safe from a background thread. */
+    public java.util.List<String> getAppBookmarkNames(int page) {
+        PdfFile file = pdfFile;
+        if (file == null || page < 0 || page >= file.getPagesCount()) {
+            return new java.util.ArrayList<>();
+        }
+        try {
+            return file.getAppBookmarkNames(page);
+        } catch (Throwable throwable) {
+            Log.e(TAG, "getAppBookmarkNames failed", throwable);
+            return new java.util.ArrayList<>();
+        }
+    }
+
+    /** Whether the engine already has the page open (reading its bookmarks is then cheap). */
+    public boolean isPageOpen(int page) {
+        PdfFile file = pdfFile;
+        return file != null && file.isPageGeometryKnown(page);
+    }
+
     /** name -> frame rect (points). Safe to call from a background thread. */
     public java.util.Map<String, RectF> getAppBookmarks(int page) {
         PdfFile file = pdfFile;

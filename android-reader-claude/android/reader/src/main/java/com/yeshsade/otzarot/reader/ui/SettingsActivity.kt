@@ -28,6 +28,8 @@ import com.yeshsade.otzarot.reader.R
 import com.yeshsade.otzarot.reader.ReaderApp
 import com.yeshsade.otzarot.reader.app
 import com.yeshsade.otzarot.reader.data.AwakeMode
+import com.yeshsade.otzarot.reader.data.FramePolicy
+import com.yeshsade.otzarot.reader.data.ScrubberPolicy
 import com.yeshsade.otzarot.reader.data.Settings
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.json.JSONObject
@@ -44,7 +46,9 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var scroll: ScrollView
 
     private data class Choice(val value: String, val label: Int)
-    private data class Setting(val key: String, val label: Int, val description: Int, val choices: List<Choice>, val enabled: Boolean = true)
+    private enum class Kind { RADIO, CHECKS, HOLD }
+    private data class Setting(val key: String, val label: Int, val description: Int, val choices: List<Choice>,
+                               val enabled: Boolean = true, val kind: Kind = Kind.RADIO)
     private data class Palette(val canvas: Int, val card: Int, val header: Int, val ink: Int, val muted: Int, val accent: Int, val border: Int, val selection: Int)
     private val night get() = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     private val colors get() = if (night) Palette(c("#171720"), c("#24232F"), c("#252047"), c("#F2EFF9"), c("#C1BBD0"), c("#C5B8FF"), c("#3E394C"), c("#443C64"))
@@ -56,7 +60,10 @@ class SettingsActivity : AppCompatActivity() {
         val approved = JSONObject(assets.open("settings-copy.json").bufferedReader().use { it.readText() })
         require(approved.getInt("version") == 4 && approved.getString("status") == "approved")
         val entries = approved.getJSONArray("entries")
-        wording = (0 until entries.length()).map { entries.getJSONObject(it) }.associateBy { it.getString("id") }
+        // New rows use a separate draft catalog until the owner approves their wording.
+        val draft = JSONObject(assets.open("settings-copy-draft.json").bufferedReader().use { it.readText() }).getJSONArray("entries")
+        wording = ((0 until draft.length()).map { draft.getJSONObject(it) } + (0 until entries.length()).map { entries.getJSONObject(it) })
+            .associateBy { it.getString("id") }
         font = Typeface.createFromAsset(assets, "fonts/NotoSansHebrew-Regular.ttf")
         mediumFont = Typeface.createFromAsset(assets, "fonts/NotoSansHebrew-Medium.ttf")
         headingFont = Typeface.createFromAsset(assets, "fonts/NotoSansHebrew-SemiBold.ttf")
@@ -82,6 +89,10 @@ class SettingsActivity : AppCompatActivity() {
             // Repeat marking requires the forthcoming inline pen/highlighter tools; do not offer a no-op control.
             Setting("marks", R.id.otzr_marks_label, R.id.otzr_marks_desc, listOf(Choice("once", R.id.otzr_marks_once), Choice("repeat", R.id.otzr_marks_repeat)), enabled = false),
             Setting("awake", R.id.otzr_awake_label, R.id.otzr_awake_desc, listOf(Choice("more", R.id.otzr_awake_more), Choice("always", R.id.otzr_awake_always), Choice("system", R.id.otzr_awake_system))),
+            Setting("frame", R.id.otzr_frame_label, R.id.otzr_frame_desc, listOf(Choice(FramePolicy.AUTO, R.id.otzr_frame_auto), Choice(FramePolicy.TAP, R.id.otzr_frame_tap), Choice(FramePolicy.ALWAYS, R.id.otzr_frame_always))),
+            Setting("info", R.id.otzr_info_label, R.id.otzr_info_desc, listOf(Choice("page", R.id.otzr_info_page), Choice("battery", R.id.otzr_info_battery), Choice("clock", R.id.otzr_info_clock)), kind = Kind.CHECKS),
+            Setting("scrub_side", R.id.otzr_scrub_side_label, R.id.otzr_scrub_side_desc, listOf(Choice("right", R.id.otzr_scrub_right), Choice("left", R.id.otzr_scrub_left))),
+            Setting("scrub_hold", R.id.otzr_scrub_hold_label, R.id.otzr_scrub_hold_desc, emptyList(), kind = Kind.HOLD),
         ),
         R.id.otzr_group_display to listOf(
             Setting("rotation", R.id.otzr_rotation_label, R.id.otzr_rotation_desc, listOf(Choice("phone", R.id.otzr_rotation_phone), Choice("lock", R.id.otzr_rotation_lock))),
@@ -100,6 +111,8 @@ class SettingsActivity : AppCompatActivity() {
         "rotation" -> if (settings.lockedOrientation == Settings.UNLOCKED) "phone" else "lock"
         "theme" -> if (settings.night) "night" else "day"
         "language" -> settings.language ?: if (resources.configuration.localesLanguage() in setOf("he", "iw")) "he" else "en"
+        "frame" -> settings.frameMode
+        "scrub_side" -> settings.scrubberSide
         else -> error("Unknown setting")
     }
 
@@ -117,11 +130,15 @@ class SettingsActivity : AppCompatActivity() {
                 settings.language = value
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(value))
             }
+            "frame" -> settings.frameMode = value
+            "scrub_side" -> settings.scrubberSide = value
         }
         scrollPosition = scroll.scrollY
         sheet?.dismiss()
         sheet = null
         render()
+        // "hides by itself" was just chosen: show its time bar right away
+        if (key == "frame" && value == FramePolicy.AUTO) definitions().flatMap { it.second }.firstOrNull { it.key == "frame" }?.let { showChoices(it) }
     }
 
     @Suppress("DEPRECATION")
@@ -181,16 +198,68 @@ class SettingsActivity : AppCompatActivity() {
         isFocusable = setting.enabled
         isClickable = setting.enabled
         alpha = if (setting.enabled) 1f else .55f
-        val selected = setting.choices.first { it.value == current(setting.key) }
+        val summary = summary(setting)
         val text = column()
         text.addView(label(copy(setting.label), 16f, colors.ink, true))
-        text.addView(label(copy(selected.label), 13f, colors.accent).apply { setPadding(0, dp(5), 0, 0) })
-        contentDescription = copy(setting.label) + ", " + copy(selected.label)
+        text.addView(label(summary, 13f, colors.accent).apply { setPadding(0, dp(5), 0, 0) })
+        contentDescription = copy(setting.label) + ", " + summary
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
         text.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
         addView(text, LinearLayout.LayoutParams(0, -2, 1f))
         addView(ImageView(this@SettingsActivity).apply { setImageResource(R.drawable.otzr_ic_chevron); imageTintList = ColorStateList.valueOf(colors.muted); importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO }, LinearLayout.LayoutParams(dp(18), dp(18)))
         if (setting.enabled) setOnClickListener { showChoices(setting) }
+    }
+
+    /** The line under a setting's name: what is chosen now. */
+    private fun summary(setting: Setting): String = when (setting.kind) {
+        Kind.RADIO -> choiceText(setting.choices.first { it.value == current(setting.key) })
+        Kind.CHECKS -> setting.choices.filter { checked(it.value) }.joinToString(" · ") { copy(it.label) }
+            .ifEmpty { copy(R.id.otzr_info_none) }
+        Kind.HOLD -> holdText(settings.scrubberHoldMillis)
+    }
+
+    private fun choiceText(choice: Choice): String =
+        if (choice.label == R.id.otzr_frame_auto) copy(choice.label).format(secondsText(settings.frameSeconds)) else copy(choice.label)
+
+    private fun secondsText(seconds: Int) =
+        if (seconds >= 60) copy(R.id.otzr_minute_one) else copy(R.id.otzr_seconds_n).format(seconds)
+
+    private fun holdText(ms: Int): String = when (ms) {
+        0 -> copy(R.id.otzr_hold_now)
+        500 -> copy(R.id.otzr_hold_half)
+        1000 -> copy(R.id.otzr_hold_one)
+        1500 -> copy(R.id.otzr_hold_one_half)
+        else -> copy(R.id.otzr_hold_n).format(java.text.DecimalFormat("0.##").format(ms / 1000.0))
+    }
+
+    private fun checked(value: String) = when (value) {
+        "page" -> settings.infoPage
+        "battery" -> settings.infoBattery
+        else -> settings.infoClock
+    }
+
+    private fun setChecked(value: String, on: Boolean) = when (value) {
+        "page" -> settings.infoPage = on
+        "battery" -> settings.infoBattery = on
+        else -> settings.infoClock = on
+    }
+
+    /** A bar inside a sheet; [text] describes the value, [changed] saves it. */
+    private fun sliderBlock(max: Int, progress: Int, text: (Int) -> String, changed: (Int) -> Unit): View {
+        val block = column().apply { setPadding(dp(10), dp(4), dp(10), dp(10)) }
+        val value = label(text(progress), 15f, colors.accent, true)
+        block.addView(value)
+        block.addView(android.widget.SeekBar(this).apply {
+            this.max = max
+            this.progress = progress
+            tag = "slider"
+            setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(bar: android.widget.SeekBar, p: Int, fromUser: Boolean) { value.text = text(p); changed(p) }
+                override fun onStartTrackingTouch(bar: android.widget.SeekBar) {}
+                override fun onStopTrackingTouch(bar: android.widget.SeekBar) {}
+            })
+        }, LinearLayout.LayoutParams(-1, dp(48)))
+        return block
     }
 
     private fun showChoices(setting: Setting) {
@@ -203,21 +272,48 @@ class SettingsActivity : AppCompatActivity() {
         box.addView(title)
         val description = copy(setting.description)
         if (description.isNotBlank()) box.addView(label(description, 13f, colors.muted).apply { setPadding(dp(9), dp(5), dp(9), dp(14)) })
-        setting.choices.forEach { choice ->
+        if (setting.kind == Kind.HOLD) {
+            box.addView(sliderBlock(ScrubberPolicy.MAX_HOLD_MS / ScrubberPolicy.STEP_MS, settings.scrubberHoldMillis / ScrubberPolicy.STEP_MS,
+                { holdText(it * ScrubberPolicy.STEP_MS) }) { settings.scrubberHoldMillis = it * ScrubberPolicy.STEP_MS })
+        }
+        if (setting.kind == Kind.CHECKS) setting.choices.forEach { choice ->
+            val option = row().apply { minimumHeight = dp(58); gravity = Gravity.CENTER_VERTICAL; setPadding(dp(10), dp(8), dp(10), dp(8)) }
+            val box2 = android.widget.CheckBox(this).apply {
+                isChecked = checked(choice.value); buttonTintList = ColorStateList.valueOf(colors.accent)
+                isClickable = false; isFocusable = false; importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            }
+            option.addView(box2, LinearLayout.LayoutParams(dp(36), dp(42)))
+            option.addView(label(copy(choice.label), 15f, colors.ink), LinearLayout.LayoutParams(0, -2, 1f))
+            option.tag = "choice_" + choice.value
+            option.isFocusable = true
+            option.contentDescription = copy(choice.label)
+            option.setOnClickListener { box2.isChecked = !box2.isChecked; setChecked(choice.value, box2.isChecked) }
+            box.addView(option)
+        }
+        if (setting.kind == Kind.RADIO) setting.choices.forEach { choice ->
             val selected = choice.value == current(setting.key)
             val option = row().apply { minimumHeight = dp(58); gravity = Gravity.CENTER_VERTICAL; setPadding(dp(10), dp(8), dp(10), dp(8)); background = rounded(if (selected) colors.selection else Color.TRANSPARENT, 12f) }
             val radio = RadioButton(this).apply { isChecked = selected; isClickable = false; isFocusable = false; buttonTintList = ColorStateList.valueOf(if (selected) colors.accent else colors.ink); importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO }
             option.addView(radio, LinearLayout.LayoutParams(dp(36), dp(42)))
-            option.addView(label(copy(choice.label), 15f, if (selected) colors.accent else colors.ink), LinearLayout.LayoutParams(0, -2, 1f))
+            option.addView(label(choiceText(choice), 15f, if (selected) colors.accent else colors.ink), LinearLayout.LayoutParams(0, -2, 1f))
             option.tag = "choice_" + choice.value
             option.isFocusable = true
             option.contentDescription = copy(choice.label)
             option.setOnClickListener { choose(setting.key, choice.value) }
             box.addView(option)
+            // "hides by itself": its time bar sits right under it, and the time can be changed in place
+            if (choice.value == FramePolicy.AUTO && selected) {
+                box.addView(sliderBlock(FramePolicy.MAX_SECONDS - FramePolicy.MIN_SECONDS, settings.frameSeconds - FramePolicy.MIN_SECONDS,
+                    { secondsText(it + FramePolicy.MIN_SECONDS) }) { settings.frameSeconds = it + FramePolicy.MIN_SECONDS })
+            }
         }
         dialog.setContentView(box)
         dialog.setOnShowListener { dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundColor(Color.TRANSPARENT) }
-        dialog.setOnDismissListener { if (sheet === dialog) sheet = null }
+        dialog.setOnDismissListener {
+            if (sheet === dialog) sheet = null
+            // bars and check boxes save as they change; show the new value in the list
+            if (setting.kind != Kind.RADIO || setting.key == "frame") { scrollPosition = scroll.scrollY; render() }
+        }
         sheet = dialog
         dialog.show()
     }

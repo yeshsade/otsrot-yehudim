@@ -36,13 +36,21 @@ class LeanProbe : Instrumentation() {
 
     private var mode: String? = null
 
-    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); mode = arguments?.getString("mode"); start() }
+    private var fileArg: String? = null
+
+    override fun onCreate(arguments: Bundle?) {
+        super.onCreate(arguments)
+        mode = arguments?.getString("mode"); fileArg = arguments?.getString("file"); start()
+    }
 
     override fun onStart() {
         if (mode == "shots") { shots(); return }
         if (mode == "files") { files(); return }
         if (mode == "bookmarks") { bookmarks(); return }
         if (mode == "bmshots") { bookmarkShots(); return }
+        if (mode == "chrome") { chromeChecks(); return }
+        if (mode == "settingsshots") { settingsShots(); return }
+        if (mode == "look") { look(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -323,7 +331,7 @@ class LeanProbe : Instrumentation() {
             var changed: Bookmark? = null
             runOnMainSync {
                 val now = controller.all().single { it.id == b.id }
-                val next = now.copy(horizontal = true, size = Bookmark.Size.LARGE, color = Bookmark.withOpacity(Bookmark.PALETTE[3], .5f))
+                val next = now.copy(horizontal = true, thickness = 27f, color = Bookmark.withOpacity(Bookmark.PALETTE[3], .5f))
                 check(controller.change(now, next)); changed = next
             }
             waitFor("change saved", 90_000) { bookmarksIn(doc.uri).singleOrNull { it.id == b.id }?.name == changed!!.name }
@@ -343,11 +351,46 @@ class LeanProbe : Instrumentation() {
             waitFor("removal saved", 90_000) { bookmarksIn(doc.uri).size == before }
             record("Removing the ribbon removes it from the PDF")
 
+            // a third ribbon on one page asks first; "No" adds nothing, "Yes" adds it
+            val added3 = mutableListOf<Bookmark?>()
+            runOnMainSync { reopened.add { added3 += it }; reopened.add { added3 += it } }
+            check(added3.size == 2 && added3.all { it != null })
+            runOnMainSync { reopened.add { added3 += it } }
+            var asked: androidx.appcompat.app.AlertDialog? = null
+            runOnMainSync { asked = reopened.lastQuestion; check(asked?.isShowing == true) { "no question for a third ribbon" } }
+            runOnMainSync { snapshotView(asked!!.window!!.decorView, "bm-third.png"); asked!!.getButton(android.content.DialogInterface.BUTTON_NEGATIVE).performClick() }
+            waitForIdleSync()
+            check(added3.size == 3 && added3[2] == null)
+            runOnMainSync { check(reopened.all().size == 2) }
+            runOnMainSync { reopened.add { added3 += it } }
+            runOnMainSync { reopened.lastQuestion!!.getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick() }
+            waitForIdleSync()
+            runOnMainSync { check(reopened.all().size == 3) { "yes did not add" } }
+            waitFor("three saved", 90_000) { bookmarksIn(doc.uri).size == 3 }
+            runOnMainSync { reopened.all().forEach { check(reopened.change(it, null)) } }
+            waitFor("three removed", 90_000) { bookmarksIn(doc.uri).isEmpty() }
+            record("A third ribbon on the same page asks first: No adds nothing, Yes adds it")
+
+            // size bar: a big ribbon is saved with its size
+            var big: Bookmark? = null
+            runOnMainSync {
+                reopened.add { a -> big = a }
+            }
+            runOnMainSync {
+                val max = Bookmark.maxThickness(pdfView(reader).getFrameSize(big!!.page)!![1])
+                val next = big!!.copy(thickness = Bookmark.thicknessAt(100, max))
+                check(reopened.change(big!!, next)); big = next
+            }
+            waitFor("big saved", 90_000) { bookmarksIn(doc.uri).singleOrNull()?.let { kotlin.math.abs(it.thickness - big!!.thickness) < .1f } == true }
+            runOnMainSync { check(reopened.change(big!!, null)) }
+            waitFor("big removed", 90_000) { bookmarksIn(doc.uri).isEmpty() }
+            record("The size bar's biggest ribbon (a third of the page long) is saved with its size")
+
             // A turned page (/Rotate 90): the ribbon must stand upright as the page is seen, in its centre.
             var turned: Bookmark? = null
             runOnMainSync {
                 val size = pdfView(reader).getFrameSize(1)!!
-                val t = Bookmark(Bookmark.newId(), 1, size[0] / 2, size[1] / 2, false, Bookmark.Size.LARGE, Bookmark.DEFAULT_COLOR)
+                val t = Bookmark(Bookmark.newId(), 1, size[0] / 2, size[1] / 2, false, 27f, Bookmark.DEFAULT_COLOR)
                 check(reopened.change(null, t)); turned = t
             }
             waitFor("turned page saved", 90_000) { bookmarksIn(doc.uri).any { it.id == turned!!.id } }
@@ -381,7 +424,7 @@ class LeanProbe : Instrumentation() {
             val c = bookmarkController(reader)
             waitFor("bookmarks read", 30_000) { var ok = false; runOnMainSync { ok = c.loaded }; ok }
             var b: Bookmark? = null
-            runOnMainSync { b = c.add() }
+            runOnMainSync { c.add { b = it } }
             runOnMainSync { c.change(b!!, b!!.copy(id = b!!.id, x = b!!.x - 60).also { b = it }) }
             runOnMainSync { c.change(null, b!!.copy(id = Bookmark.newId(), page = 1, color = Bookmark.withOpacity(Bookmark.PALETTE[4], .8f))) }
             SystemClock.sleep(800); waitForIdleSync()
@@ -406,8 +449,248 @@ class LeanProbe : Instrumentation() {
         val bitmap = Bitmap.createBitmap(view.width.coerceAtLeast(1), view.height.coerceAtLeast(1), Bitmap.Config.ARGB_8888)
         bitmap.eraseColor(android.graphics.Color.GRAY)
         view.draw(Canvas(bitmap))
-        File(targetContext.filesDir, name).outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-        bitmap.recycle()
+        writePng(bitmap, name)
+    }
+
+    /**
+     * Hiding the frame, the thin line and the page handle. With -e file <path on the device> it uses that PDF
+     * (all-files access must be granted), else the test booklet.
+     */
+    private fun chromeChecks() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            val s = app.settings
+            s.whatsAppPromptDismissed = true; s.allFilesPromptDismissed = true
+            s.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.AUTO; s.frameSeconds = 3
+            s.infoPage = false; s.infoBattery = true; s.infoClock = true
+            s.scrubberSide = "right"; s.scrubberHoldMillis = 500; s.scroll = "vertical"
+            s.language = "he"
+            onMainChecked { androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags("he")) }
+
+            var reader = openDoc()
+            waitLoaded(reader)
+            val header = field<View>(reader, "header"); val toolbar = field<View>(reader, "toolbar")
+            val info = field<View>(reader, "infoLine"); val scrubber = field<com.yeshsade.otzarot.reader.ui.Scrubber>(reader, "scrubber")
+            val v = pdfView(reader)
+            var shownSize = IntArray(2); var shownOffset = 0f
+            // opening a big booklet can take longer than the 3 s used here: start the frame's time now
+            onMainChecked { field<com.yeshsade.otzarot.reader.ui.Chrome>(reader, "chrome").show() }
+            onMainChecked {
+                check(header.visibility == View.VISIBLE && toolbar.visibility == View.VISIBLE && scrubber.visibility == View.VISIBLE)
+                shownSize = intArrayOf(v.width, v.height); shownOffset = v.currentYOffset
+                snapshot(reader, "chrome-shown.png")
+            }
+            record("The frame is shown when a document opens")
+
+            waitFor("frame hides by itself", 15_000) { var h = false; onMainChecked { h = header.visibility != View.VISIBLE }; h }
+            SystemClock.sleep(600); waitForIdleSync()
+            onMainChecked {
+                check(toolbar.visibility != View.VISIBLE && scrubber.visibility != View.VISIBLE) { "toolbar or handle still shown" }
+                check(info.visibility == View.VISIBLE) { "no thin line" }
+                val text = (info as android.widget.LinearLayout).let { l -> (0 until l.childCount).joinToString("|") { (l.getChildAt(it) as android.widget.TextView).text } }
+                check(text.contains("%") && Regex("\\d{1,2}:\\d{2}").containsMatchIn(text)) { "thin line shows '$text'" }
+                val insets = androidx.core.view.ViewCompat.getRootWindowInsets(reader.window.decorView)!!
+                check(!insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.statusBars())) { "phone's bar still shown" }
+                check(v.width == shownSize[0] && v.height == shownSize[1]) { "page area changed size ${v.width}x${v.height} vs ${shownSize.toList()}" }
+                check(kotlin.math.abs(v.currentYOffset - shownOffset) < 1f) { "page moved" }
+                snapshot(reader, "chrome-hidden.png")
+            }
+            record("After the set time the frame, the handle and the phone's bars hide together; the page does not move; the thin line shows battery and time")
+
+            tapPage(reader)
+            onMainChecked { check(header.visibility == View.VISIBLE && info.visibility != View.VISIBLE) }
+            tapPage(reader)
+            onMainChecked { check(header.visibility != View.VISIBLE) }
+            record("A tap on the page shows the frame, another tap hides it")
+
+            // the page handle: holding less than the set time does nothing; holding longer moves through the document
+            tapPage(reader)
+            val pages = v.pageCount
+            val startPage = v.currentPage
+            val c = scrubber.thumbCentre()
+            val loc = IntArray(2); onMainChecked { scrubber.getLocationInWindow(loc) }
+            val x = c[0] + loc[0]; val y0 = c[1] + loc[1]
+            val yTo = y0 + (scrubber.height - c[1]) * .6f
+            touch(reader, MotionEvent.ACTION_DOWN, x, y0)
+            touch(reader, MotionEvent.ACTION_MOVE, x, yTo)
+            touch(reader, MotionEvent.ACTION_UP, x, yTo)
+            waitForIdleSync()
+            check(v.currentPage == startPage) { "a quick swipe on the handle moved the page" }
+            touch(reader, MotionEvent.ACTION_DOWN, x, y0)
+            SystemClock.sleep(800)
+            for (i in 1..10) { touch(reader, MotionEvent.ACTION_MOVE, x, y0 + (yTo - y0) * i / 10); SystemClock.sleep(30) }
+            SystemClock.sleep(300); waitForIdleSync()
+            onMainChecked { snapshot(reader, "chrome-handle.png") }
+            touch(reader, MotionEvent.ACTION_UP, x, yTo)
+            waitForIdleSync(); SystemClock.sleep(500)
+            check(pages < 3 || v.currentPage > startPage) { "holding and dragging the handle did not move (page ${v.currentPage})" }
+            record("The page handle moves only after being held (0.5 s), then jumps through the document (now page ${v.currentPage + 1} of $pages)")
+
+            // "shows and hides with a tap": never hides by itself
+            onMainChecked { reader.finish() }; waitFor("closed", 30_000) { reader.isDestroyed }
+            s.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP
+            reader = openDoc(); waitLoaded(reader)
+            SystemClock.sleep(5000)
+            onMainChecked { check(field<View>(reader, "header").visibility == View.VISIBLE) { "tap mode hid by itself" } }
+            tapPage(reader)
+            onMainChecked { check(field<View>(reader, "header").visibility != View.VISIBLE) }
+            record("In 'shows and hides with a tap' the frame stays until tapped")
+
+            // "always shown": the top bar sits above the page, a tap does not hide it
+            onMainChecked { reader.finish() }; waitFor("closed", 30_000) { reader.isDestroyed }
+            s.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.ALWAYS
+            reader = openDoc(); waitLoaded(reader)
+            SystemClock.sleep(4000)
+            tapPage(reader)
+            onMainChecked {
+                val h = field<View>(reader, "header"); val pv = pdfView(reader)
+                val hl = IntArray(2); h.getLocationInWindow(hl); val pl = IntArray(2); pv.getLocationInWindow(pl)
+                check(h.visibility == View.VISIBLE) { "always mode hid" }
+                check(pl[1] >= hl[1] + h.height - 1) { "page is under the top bar" }
+            }
+            record("In 'always shown' the frame never hides and the page starts below the top bar")
+
+            // side-to-side reading: the handle runs along the bottom
+            onMainChecked { reader.finish() }; waitFor("closed", 30_000) { reader.isDestroyed }
+            s.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP; s.scroll = "horizontal"; s.scrubberHoldMillis = 0
+            reader = openDoc(); waitLoaded(reader)
+            val hs = field<com.yeshsade.otzarot.reader.ui.Scrubber>(reader, "scrubber")
+            val hc = hs.thumbCentre()
+            check(hc[1] > hs.height * .7f) { "handle is not at the bottom" }
+            val hl = IntArray(2); onMainChecked { hs.getLocationInWindow(hl) }
+            val hv = pdfView(reader); val before = hv.currentPage
+            val toX = if (hc[0] > hs.width / 2) hs.width * .2f else hs.width * .8f
+            touch(reader, MotionEvent.ACTION_DOWN, hc[0] + hl[0], hc[1] + hl[1])
+            for (i in 1..10) { touch(reader, MotionEvent.ACTION_MOVE, hc[0] + (toX - hc[0]) * i / 10 + hl[0], hc[1] + hl[1]); SystemClock.sleep(30) }
+            onMainChecked { snapshot(reader, "chrome-handle-horizontal.png") }
+            touch(reader, MotionEvent.ACTION_UP, toX + hl[0], hc[1] + hl[1])
+            waitForIdleSync(); SystemClock.sleep(500)
+            check(hv.pageCount < 3 || hv.currentPage != before) { "horizontal handle did not move" }
+            record("In side-to-side reading the handle runs along the bottom and moves through the document")
+            onMainChecked { reader.finish() }
+            s.scroll = "vertical"; s.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.AUTO; s.frameSeconds = 10; s.scrubberHoldMillis = 500
+
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /** The settings screen with its new rows and their sheets, and the all-files explanation (Hebrew). */
+    private fun settingsShots() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; true }.getOrDefault(false) }
+            app.settings.language = "he" // the settings screen takes its wording language from here
+            val settingsScreen = startActivitySync(Intent(targetContext, SettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as SettingsActivity
+            SystemClock.sleep(1500); waitForIdleSync()
+            onMainChecked {
+                val scroll = settingsScreen.window.decorView.findViewWithTag<View>("setting_frame").parent.parent.parent as android.widget.ScrollView
+                scroll.scrollTo(0, settingsScreen.window.decorView.findViewWithTag<View>("setting_awake").top)
+            }
+            SystemClock.sleep(500); waitForIdleSync()
+            onMainChecked { snapshot(settingsScreen, "settings-new-rows.png") }
+            for (key in listOf("frame", "info", "scrub_hold")) {
+                onMainChecked { settingsScreen.window.decorView.findViewWithTag<View>("setting_$key").performClick() }
+                SystemClock.sleep(1200); waitForIdleSync()
+                onMainChecked {
+                    val sheet = SettingsActivity::class.java.getDeclaredField("sheet").apply { isAccessible = true }.get(settingsScreen) as android.app.Dialog
+                    snapshotView(sheet.window!!.decorView, "settings-sheet-$key.png"); sheet.dismiss()
+                }
+                SystemClock.sleep(500); waitForIdleSync()
+            }
+            onMainChecked { settingsScreen.finish() }
+            record("The settings screen shows the new rows (frame, thin line, handle side and hold time)")
+
+            val lib = startActivitySync(Intent(targetContext, LibraryActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK).putExtra(LibraryActivity.EXTRA_STAY, true)) as LibraryActivity
+            SystemClock.sleep(1000); waitForIdleSync()
+            var d: android.app.Dialog? = null
+            onMainChecked { d = LibraryActivity::class.java.getDeclaredMethod("allFilesDialog").apply { isAccessible = true }.invoke(lib) as android.app.Dialog }
+            SystemClock.sleep(1500); waitForIdleSync()
+            onMainChecked { snapshotView(d!!.window!!.decorView, "all-files-dialog.png"); d!!.dismiss(); lib.finish() }
+
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /** Encodes off the main thread: on a slow emulator PNG encoding there makes Android think the app hangs. */
+    private fun writePng(bitmap: Bitmap, name: String) {
+        pendingPngs.incrementAndGet()
+        Thread {
+            try { File(targetContext.filesDir, name).outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) } }
+            finally { bitmap.recycle(); pendingPngs.decrementAndGet() }
+        }.start()
+    }
+
+    private val pendingPngs = java.util.concurrent.atomic.AtomicInteger()
+
+    override fun finish(resultCode: Int, results: Bundle?) {
+        val end = SystemClock.uptimeMillis() + 60_000
+        while (pendingPngs.get() > 0 && SystemClock.uptimeMillis() < end) SystemClock.sleep(100)
+        super.finish(resultCode, results)
+    }
+
+    /** Opens -e file, waits for the pages to draw, and takes a picture with the frame shown and hidden. */
+    private fun look() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; true }.getOrDefault(false) }
+            app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP
+            val reader = openDoc(); waitLoaded(reader)
+            SystemClock.sleep(20_000); waitForIdleSync()
+            onMainChecked { snapshot(reader, "look-shown.png") }
+            tapPage(reader); SystemClock.sleep(3000)
+            onMainChecked { snapshot(reader, "look-hidden.png"); reader.finish() }
+            app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.AUTO
+            result.putString("stream", "Look done.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /** Runs on the main thread; a failed check is reported here instead of crashing the app. */
+    private fun onMainChecked(block: () -> Unit) {
+        var error: Throwable? = null
+        runOnMainSync { try { block() } catch (t: Throwable) { error = t } }
+        error?.let { throw it }
+    }
+
+    private fun openDoc(): ReaderActivity {
+        val path = fileArg ?: return openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
+        val doc = com.yeshsade.otzarot.reader.data.Intake(targetContext, app.library, app.settings).open(Uri.fromFile(File(path)))
+            ?: error("cannot open $path")
+        val monitor = addMonitor(ReaderActivity::class.java.name, null, false)
+        targetContext.startActivity(Intent(targetContext, ReaderActivity::class.java).putExtra(ReaderActivity.EXTRA_DOC, doc.id)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        val a = waitForMonitorWithTimeout(monitor, 60_000) as? ReaderActivity ?: error("reader did not open")
+        removeMonitor(monitor)
+        return a
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> field(a: Any, name: String): T = a.javaClass.getDeclaredField(name).apply { isAccessible = true }.get(a) as T
+
+    /** A tap on the page away from check boxes (the middle of the left edge area). */
+    private fun tapPage(a: ReaderActivity) {
+        runOnMainSync {
+            val v = pdfView(a)
+            val m = ReaderActivity::class.java.getDeclaredMethod("tap", MotionEvent::class.java).apply { isAccessible = true }
+            val now = SystemClock.uptimeMillis()
+            var e = MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, v.width * .5f, v.height * .62f, 0)
+            if (v.findFormFieldAt(e.x, e.y) != null) { e.recycle(); e = MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, v.width * .1f, v.height * .5f, 0) }
+            m.invoke(a, e); e.recycle()
+        }
+        waitForIdleSync(); SystemClock.sleep(400)
     }
 
     private fun bookmarkController(a: ReaderActivity): com.yeshsade.otzarot.reader.ui.Bookmarks =
@@ -536,8 +819,7 @@ class LeanProbe : Instrumentation() {
         val decor = a.window.decorView
         val bitmap = Bitmap.createBitmap(decor.width.coerceAtLeast(1), decor.height.coerceAtLeast(1), Bitmap.Config.ARGB_8888)
         decor.draw(Canvas(bitmap))
-        File(targetContext.filesDir, name).outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-        bitmap.recycle()
+        writePng(bitmap, name)
     }
 
     private fun waitFor(what: String, timeout: Long, condition: () -> Boolean) {

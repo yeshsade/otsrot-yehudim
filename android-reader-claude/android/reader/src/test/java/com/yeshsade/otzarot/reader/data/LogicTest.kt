@@ -70,15 +70,15 @@ class LogicTest {
 
     @Test fun undoKeepsBookmarkSteps() {
         val u = UndoStack()
-        val b = Bookmark("a", 1, 50f, 60f, false, Bookmark.Size.MEDIUM, Bookmark.DEFAULT_COLOR)
+        val b = Bookmark("a", 1, 50f, 60f, false, 19f, Bookmark.DEFAULT_COLOR)
         u.push(UndoStack.BookmarkChange(null, b))
         assertEquals(UndoStack.BookmarkChange(null, b), u.pop())
     }
 
     // ----- bookmarks -----
     @Test fun bookmarkNameRoundTrips() {
-        val b = Bookmark("abc123", 4, 100f, 200f, true, Bookmark.Size.LARGE, 0x8031A0D0.toInt())
-        assertEquals("otzr-bm:v1;o=h;s=l;c=8031A0D0;id=abc123", b.name)
+        val b = Bookmark("abc123", 4, 100f, 200f, true, 27f, 0x8031A0D0.toInt())
+        assertEquals("otzr-bm:v1;o=h;s=27.0;c=8031A0D0;id=abc123", b.name)
         val back = Bookmark.parse(b.name, 4, b.frameRect())!!
         assertEquals(b, back)
     }
@@ -100,14 +100,14 @@ class LogicTest {
     }
 
     @Test fun horizontalRibbonIsLongSideways() {
-        val b = Bookmark("x", 0, 100f, 100f, true, Bookmark.Size.MEDIUM, 0)
+        val b = Bookmark("x", 0, 100f, 100f, true, 19f, 0)
         assertTrue(b.width > b.height)
         val v = b.copy(horizontal = false)
         assertTrue(v.height > v.width)
     }
 
     @Test fun bookmarkStaysOnPage() {
-        val b = Bookmark("x", 0, -40f, 9999f, false, Bookmark.Size.MEDIUM, 0).keptOn(400f, 600f)
+        val b = Bookmark("x", 0, -40f, 9999f, false, 19f, 0).keptOn(400f, 600f)
         val r = b.frameRect()
         assertTrue(r[0] >= 0f && r[2] <= 400f && r[1] >= 0f && r[3] <= 600f)
     }
@@ -116,6 +116,57 @@ class LogicTest {
         val c = Bookmark.withOpacity(0xFF57479F.toInt(), .8f)
         assertEquals(0xCC57479F.toInt(), c)
         assertEquals(.8f, Bookmark.opacityOf(c), 0.01f)
+    }
+
+    @Test fun ribbonsFrom022KeepTheirSize() {
+        val r = floatArrayOf(0f, 0f, 10f, 30f)
+        assertEquals(13f, Bookmark.parse("otzr-bm:v1;o=v;s=s;c=CC57479F;id=a", 0, r)!!.thickness, 0f)
+        assertEquals(27f, Bookmark.parse("otzr-bm:v1;o=v;s=l;c=CC57479F;id=a", 0, r)!!.thickness, 0f)
+        assertEquals(41.5f, Bookmark.parse("otzr-bm:v1;o=v;s=41.5;c=CC57479F;id=a", 0, r)!!.thickness, 0f)
+        assertEquals(Bookmark.DEFAULT_THICKNESS, Bookmark.parse("otzr-bm:v1;o=v;s=x;c=CC57479F;id=a", 0, r)!!.thickness, 0f)
+    }
+
+    @Test fun sizeBarCoversOwnersRange() {
+        val pageHeight = 842f // A4
+        val max = Bookmark.maxThickness(pageHeight)
+        // smallest = half the old "small"; largest = a ribbon a third of the page long
+        assertEquals(6.5f, Bookmark.thicknessAt(0, max), 0.01f)
+        assertEquals(pageHeight / 3, Bookmark.thicknessAt(100, max) * Bookmark.LENGTH_RATIO, 0.1f)
+        // the default sits on the bar, and the bar goes back and forth without drift
+        val p = Bookmark.progressOf(Bookmark.DEFAULT_THICKNESS, max)
+        assertTrue(p in 1..99)
+        assertEquals(Bookmark.DEFAULT_THICKNESS, Bookmark.thicknessAt(p, max), 0.6f)
+        assertEquals(p, Bookmark.progressOf(Bookmark.thicknessAt(p, max), max))
+        // always grows
+        for (i in 1..100) assertTrue(Bookmark.thicknessAt(i, max) > Bookmark.thicknessAt(i - 1, max))
+    }
+
+    // ----- frame and page handle -----
+    @Test fun frameHidesAfterTenSecondsByDefault() {
+        assertEquals(10_000L, FramePolicy.hideAfterMillis(FramePolicy.AUTO, FramePolicy.DEFAULT_SECONDS))
+        assertNull(FramePolicy.hideAfterMillis(FramePolicy.TAP, 10))
+        assertNull(FramePolicy.hideAfterMillis(FramePolicy.ALWAYS, 10))
+        assertFalse(FramePolicy.canHide(FramePolicy.ALWAYS))
+        assertTrue(FramePolicy.canHide(FramePolicy.TAP))
+    }
+
+    @Test fun frameTimeStaysBetweenThreeSecondsAndAMinute() {
+        assertEquals(3_000L, FramePolicy.hideAfterMillis(FramePolicy.AUTO, 0))
+        assertEquals(60_000L, FramePolicy.hideAfterMillis(FramePolicy.AUTO, 600))
+    }
+
+    @Test fun handleHoldTimeIsInQuarterSeconds() {
+        assertEquals(500, ScrubberPolicy.DEFAULT_HOLD_MS)
+        assertEquals(0, ScrubberPolicy.clampHold(-5))
+        assertEquals(2000, ScrubberPolicy.clampHold(9000))
+        assertEquals(750, ScrubberPolicy.clampHold(700))
+    }
+
+    @Test fun handleMapsTrackToPages() {
+        assertEquals(0, ScrubberPolicy.pageAt(0f, 40))
+        assertEquals(39, ScrubberPolicy.pageAt(1f, 40))
+        assertEquals(20, ScrubberPolicy.pageAt(.5f, 40))
+        assertEquals(0, ScrubberPolicy.pageAt(.7f, 0))
     }
 
     @Test fun bookmarkLabelUsesNearestChapter() {

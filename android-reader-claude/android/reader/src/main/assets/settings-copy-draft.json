@@ -1,0 +1,127 @@
+{
+ "version": 5,
+ "status": "draft",
+ "note": "New settings rows (2026-10-14). DRAFT wording — awaiting the owner's approval; the approved catalog is settings-copy.json (v4).",
+ "entries": [
+  {
+   "id": "frame_label",
+   "he": "הסתרת המסגרת",
+   "en": "Hiding the frame"
+  },
+  {
+   "id": "frame_desc",
+   "he": "הפס העליון, הסרגל התחתון ושורת הטלפון, בזמן קריאה. נגיעה בדף מציגה אותם שוב.",
+   "en": "The top bar, the toolbar and the phone's bars, while reading. Tap the page to bring them back."
+  },
+  {
+   "id": "frame_auto",
+   "he": "נעלמת לבד אחרי %s",
+   "en": "Hides by itself after %s"
+  },
+  {
+   "id": "frame_tap",
+   "he": "מופיעה ונעלמת בנגיעה",
+   "en": "Shows and hides with a tap"
+  },
+  {
+   "id": "frame_always",
+   "he": "תמיד מופיעה",
+   "en": "Always shown"
+  },
+  {
+   "id": "seconds_n",
+   "he": "%d שניות",
+   "en": "%d seconds"
+  },
+  {
+   "id": "minute_one",
+   "he": "דקה",
+   "en": "1 minute"
+  },
+  {
+   "id": "info_label",
+   "he": "כשהמסגרת מוסתרת, למעלה יופיעו",
+   "en": "While the frame is hidden, show at the top"
+  },
+  {
+   "id": "info_desc",
+   "he": "שורה דקה בראש המסך",
+   "en": "A thin line at the top of the screen"
+  },
+  {
+   "id": "info_page",
+   "he": "מספר העמוד",
+   "en": "Page number"
+  },
+  {
+   "id": "info_battery",
+   "he": "סוללה",
+   "en": "Battery"
+  },
+  {
+   "id": "info_clock",
+   "he": "שעה",
+   "en": "Time"
+  },
+  {
+   "id": "info_none",
+   "he": "שום דבר",
+   "en": "Nothing"
+  },
+  {
+   "id": "scrub_side_label",
+   "he": "ידית הדפדוף — צד",
+   "en": "Page handle — side"
+  },
+  {
+   "id": "scrub_side_desc",
+   "he": "ידית בצד המסך לקפיצה מהירה בין עמודים. מופיעה יחד עם המסגרת.",
+   "en": "A handle at the edge of the screen to jump between pages. Shown together with the frame."
+  },
+  {
+   "id": "scrub_right",
+   "he": "ימין",
+   "en": "Right"
+  },
+  {
+   "id": "scrub_left",
+   "he": "שמאל",
+   "en": "Left"
+  },
+  {
+   "id": "scrub_hold_label",
+   "he": "ידית הדפדוף — זמן לחיצה",
+   "en": "Page handle — hold time"
+  },
+  {
+   "id": "scrub_hold_desc",
+   "he": "כמה זמן להחזיק את הידית עד שהיא זזה, כדי שלא תזוז בטעות",
+   "en": "How long to hold the handle before it moves, so it doesn't move by accident"
+  },
+  {
+   "id": "hold_now",
+   "he": "מיד",
+   "en": "Immediately"
+  },
+  {
+   "id": "hold_half",
+   "he": "חצי שנייה",
+   "en": "Half a second"
+  },
+  {
+   "id": "hold_one",
+   "he": "שנייה",
+   "en": "1 second"
+  },
+  {
+   "id": "hold_one_half",
+   "he": "שנייה וחצי",
+   "en": "1.5 seconds"
+  },
+  {
+   "id": "hold_n",
+   "he": "%s שניות",
+   "en": "%s seconds"
+  }
+ ]
+}

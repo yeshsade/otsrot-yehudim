@@ -20,6 +20,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import com.yeshsade.otzarot.reader.data.FramePolicy
 import com.github.barteksc.pdfviewer.PDFView
 import com.github.barteksc.pdfviewer.util.FitPolicy
 import com.shockwave.pdfium.PdfDocument
@@ -48,6 +52,13 @@ class ReaderActivity : AppCompatActivity() {
     private lateinit var subtitle: TextView
     private lateinit var undoButton: ImageButton
     private lateinit var bookmarks: Bookmarks
+    private lateinit var header: View
+    private lateinit var toolbar: View
+    private lateinit var scrubber: Scrubber
+    private lateinit var infoLine: InfoLine
+    private lateinit var chrome: Chrome
+    /** Frame and handle settings this screen was built with; a change rebuilds it. */
+    private var builtWith = ""
     private val main = Handler(Looper.getMainLooper())
     private val saveRunnable = Runnable { saveNow() }
 
@@ -66,6 +77,7 @@ class ReaderActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ui = Ui(this)
+        builtWith = layoutSettings()
         buildScreen()
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() = leave()
@@ -90,6 +102,21 @@ class ReaderActivity : AppCompatActivity() {
         (application as ReaderApp).windowPolicy.touched(this)
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (layoutSettings() != builtWith) { recreate(); return }
+        infoLine.listen(true)
+        chrome.show()
+    }
+
+    override fun onPause() {
+        infoLine.listen(false)
+        chrome.stop()
+        super.onPause()
+    }
+
+    private fun layoutSettings() = app.settings.run { "$frameMode|$scrubberSide|$scrubberHoldMillis|$scroll" }
+
     override fun onStop() {
         if (saveState.dirty) saveNow()
         super.onStop()
@@ -113,8 +140,10 @@ class ReaderActivity : AppCompatActivity() {
     // ---------- screen ----------
 
     private fun buildScreen() {
+        val settings = app.settings
         val root = ui.column().apply { setBackgroundColor(ui.colors.canvas) }
         val (header, titles) = ui.header(getString(R.string.app_name), " ")
+        this.header = header
         titleView = titles.getChildAt(0) as TextView
         subtitle = titles.findViewWithTag("subtitle")
         undoButton = ui.headerButton(R.drawable.ic_undo, getString(R.string.reader_undo)) { undoLast() }
@@ -123,22 +152,86 @@ class ReaderActivity : AppCompatActivity() {
         header.addView(ui.headerButton(if (ui.night) R.drawable.otzr_ic_sun else R.drawable.otzr_ic_moon,
             getString(if (ui.night) R.string.library_day else R.string.library_night)) { toggleNight() })
         header.addView(ui.headerButton(R.drawable.otzr_ic_back, getString(R.string.reader_back)) { leave() })
-        root.addView(header)
+        header.elevation = ui.dp(4).toFloat()
+
+        // The frame can hide: then the top bar floats over the page, so hiding it never resizes (and moves) the page.
+        val hides = FramePolicy.canHide(settings.frameMode)
+        if (!hides) root.addView(header)
 
         val body = FrameLayout(this)
         pdfView = PDFView(this, null).apply { setBackgroundColor(ui.colors.canvas) }
         body.addView(pdfView, FrameLayout.LayoutParams(-1, -1))
-        bookmarks = Bookmarks(this, pdfView, ui, app.settings, app.io) { step ->
+        bookmarks = Bookmarks(this, pdfView, ui, settings, app.io) { step ->
             undo.push(step)
             marked()
         }
         pdfView.setOverlayDrawer { canvas -> bookmarks.draw(canvas) }
         body.addView(Bookmarks.TouchLayer(this, bookmarks), FrameLayout.LayoutParams(-1, -1))
-        body.addView(toolbar(), FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL).apply {
+
+        val toolbar = toolbar()
+        this.toolbar = toolbar
+        scrubber = Scrubber(this, ui, settings.scrubberSide, horizontal = settings.scrollHorizontal,
+            holdMillis = settings.scrubberHoldMillis,
+            topInset = { if (hides) header.height else 0 },
+            bottomInset = { toolbar.height + (toolbar.layoutParams as FrameLayout.LayoutParams).bottomMargin },
+            listener = object : Scrubber.Listener {
+                override fun scrubTo(fraction: Float): String {
+                    pdfView.setPositionOffset(fraction, false)
+                    val page = if (pageCount > 0) pdfView.currentPage else 0
+                    return getString(R.string.reader_page, page + 1, pageCount)
+                }
+                override fun scrubStarted() = chrome.hold()
+                override fun scrubEnded() = chrome.used()
+            })
+        body.addView(scrubber, FrameLayout.LayoutParams(-1, -1))
+        if (hides) body.addView(header, FrameLayout.LayoutParams(-1, -2, Gravity.TOP))
+        body.addView(toolbar, FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL).apply {
             bottomMargin = ui.dp(14)
         })
+        infoLine = InfoLine(this, settings)
+        body.addView(infoLine, FrameLayout.LayoutParams(-1, -2, Gravity.TOP))
         root.addView(body, LinearLayout.LayoutParams(-1, 0, 1f))
-        ui.install(this, root, header)
+
+        if (hides) installFloating(root, header, toolbar) else ui.install(this, root, header)
+        chrome = Chrome(window, root, listOf(header, toolbar, scrubber), infoLine, settings)
+        chrome.start()
+    }
+
+    /**
+     * Window insets when the frame can hide. Uses the phone's bars' size even while they are hidden, so the
+     * layout stays the same when they come and go (the page never jumps).
+     */
+    private fun installFloating(root: LinearLayout, header: View, toolbar: View) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
+            val bars = insets.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars())
+            val cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
+            header.setPadding(header.paddingLeft, bars.top + ui.dp(8), header.paddingRight, header.paddingBottom)
+            root.setPadding(bars.left, 0, bars.right, 0)
+            (toolbar.layoutParams as FrameLayout.LayoutParams).bottomMargin = ui.dp(14) + bars.bottom
+            toolbar.requestLayout()
+            (infoLine.layoutParams as FrameLayout.LayoutParams).topMargin = cutout.top
+            infoLine.requestLayout()
+            insets
+        }
+        setContentView(root)
+        WindowCompat.getInsetsController(window, root).isAppearanceLightStatusBars = false
+        WindowCompat.getInsetsController(window, root).isAppearanceLightNavigationBars = !ui.night
+        ViewCompat.requestApplyInsets(root)
+    }
+
+    /** Touching the top bar, the toolbar or the handle keeps the frame up for its full time again. */
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (event.actionMasked == MotionEvent.ACTION_DOWN && ::chrome.isInitialized && chrome.shown) {
+            if (inside(header, event) || inside(toolbar, event)) chrome.used()
+        }
+        return super.dispatchTouchEvent(event)
+    }
+
+    private fun inside(view: View, event: MotionEvent): Boolean {
+        if (view.visibility != View.VISIBLE) return false
+        val at = IntArray(2); view.getLocationOnScreen(at)
+        return event.rawX >= at[0] && event.rawX < at[0] + view.width && event.rawY >= at[1] && event.rawY < at[1] + view.height
     }
 
     /** Floating reading bar. Reading and bookmarks work; the marker and pen come next. */
@@ -253,6 +346,7 @@ class ReaderActivity : AppCompatActivity() {
             .enableDoubleTap(true)
             .spacing(8)
             .onTap { event -> tap(event) }
+            .onPageScroll { _, offset -> scrubber.fraction = offset }
             .onLoad { pages ->
                 pageCount = pages
                 showPage(pdfView.currentPage)
@@ -269,13 +363,17 @@ class ReaderActivity : AppCompatActivity() {
     }
 
     private fun showPage(page: Int) {
-        subtitle.text = getString(R.string.reader_page, page + 1, pageCount)
+        val text = getString(R.string.reader_page, page + 1, pageCount)
+        subtitle.text = text
+        infoLine.setPage(text)
+        scrubber.fraction = pdfView.positionOffset
     }
 
     // ---------- marking ----------
 
     private fun tap(event: MotionEvent): Boolean {
-        val field = pdfView.findFormFieldAt(event.x, event.y) ?: return false
+        // a tap on the page shows or hides the frame; a tap on a check box only marks it
+        val field = pdfView.findFormFieldAt(event.x, event.y) ?: run { chrome.toggle(); return true }
         if (field.readOnly) return false
         val checked = when (field.type) {
             PdfDocument.FormField.TYPE_CHECKBOX -> !field.checked
@@ -298,10 +396,12 @@ class ReaderActivity : AppCompatActivity() {
 
     private fun addBookmark() {
         if (pageCount == 0) return
-        bookmarks.add() ?: return
-        if (!app.settings.prefs.getBoolean(HINT_SHOWN, false)) {
-            app.settings.prefs.edit().putBoolean(HINT_SHOWN, true).apply()
-            Toast.makeText(this, R.string.bm_added_hint, Toast.LENGTH_LONG).show()
+        bookmarks.add { added ->
+            if (added == null || isDestroyed) return@add
+            if (!app.settings.prefs.getBoolean(HINT_SHOWN, false)) {
+                app.settings.prefs.edit().putBoolean(HINT_SHOWN, true).apply()
+                Toast.makeText(this, R.string.bm_added_hint, Toast.LENGTH_LONG).show()
+            }
         }
     }
 

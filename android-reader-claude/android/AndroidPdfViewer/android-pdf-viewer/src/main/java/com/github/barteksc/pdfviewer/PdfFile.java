@@ -695,6 +695,10 @@ class PdfFile {
         }
     }
 
+    public boolean isPageGeometryKnown(int pageIndex) {
+        return pageIndex >= 0 && pageIndex < pageGeometries.length() && pageGeometries.get(pageIndex) != null;
+    }
+
     public void ensurePageGeometry(int pageIndex) {
         if (pageIndex >= 0 && pageIndex < pageGeometries.length()
                 && pageGeometries.get(pageIndex) != null) {
@@ -1351,6 +1355,23 @@ class PdfFile {
                     Math.max(a[0], b[0]), Math.max(a[1], b[1])));
         }
         return result;
+    }
+
+    /** Names of the page's bookmarks, without loading the page's geometry or keeping the page open. */
+    public List<String> getAppBookmarkNames(int pageIndex) {
+        List<String> names = new ArrayList<>();
+        if (disposed || pdfDocument == null) {
+            return names;
+        }
+        int docPage = documentPage(pageIndex);
+        if (docPage < 0) {
+            return names;
+        }
+        for (String row : pdfiumCore.getAppBookmarks(pdfDocument, docPage)) {
+            int tab = row.indexOf('\t');
+            names.add(tab > 0 ? row.substring(0, tab) : row);
+        }
+        return names;
     }
 
     public boolean removeAppBookmark(int pageIndex, String name) {

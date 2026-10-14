@@ -284,9 +284,21 @@ class LibraryActivity : AppCompatActivity() {
     private fun maybeAskForAllFiles() {
         val settings = app.settings
         if (settings.allFilesPromptDismissed || AllFiles.granted(this)) return
-        AlertDialog.Builder(this)
+        allFilesDialog()
+    }
+
+    /** The explanation before Android's "access to all files" screen (wording approved 2026-10-14). */
+    private fun allFilesDialog(): AlertDialog {
+        val settings = app.settings
+        val subtitle = getString(R.string.all_files_subtitle)
+        val message = android.text.SpannableStringBuilder(subtitle).apply {
+            setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, subtitle.length, 0)
+            append("\n\n")
+            append(getString(R.string.all_files_body))
+        }
+        return AlertDialog.Builder(this)
             .setTitle(R.string.all_files_title)
-            .setMessage(R.string.all_files_body)
+            .setMessage(message)
             .setPositiveButton(R.string.all_files_allow) { _, _ ->
                 settings.allFilesPromptDismissed = true
                 AllFiles.request(this, REQUEST_FILES)

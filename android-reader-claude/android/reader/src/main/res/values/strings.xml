@@ -18,8 +18,9 @@
     <string name="library_day">מצב יום</string>
     <string name="action_cancel">ביטול</string>
     <string name="action_remove">הסרה</string>
-    <string name="all_files_title">כל קובצי ה־PDF במכשיר — אוטומטית</string>
-    <string name="all_files_body">כדי שכל קובצי ה־PDF במכשיר, גם מה שמגיע בוואטסאפ, יופיעו כאן לבד, והסימונים יישמרו בקובץ עצמו בלי עותק נוסף: לחץ „הפעלה”, ובמסך הבא הדלק את המתג.</string>
+    <string name="all_files_title">כדי שהחוברות מוואטסאפ יופיעו כאן לבד</string>
+    <string name="all_files_subtitle">צריך אישור אחד: גישה לקבצים</string>
+    <string name="all_files_body">לחץ „הפעלה”, ובמסך שייפתח הדלק את המתג. כך כל קובצי ה־PDF במכשיר יופיעו כאן, והסימונים יישמרו בתוך הקובץ עצמו, בלי עותק נוסף.</string>
     <string name="all_files_allow">הפעלה</string>
     <string name="wa_title">חוברות מוואטסאפ — אוטומטית</string>
     <string name="wa_body">לחץ „בחירת התיקייה” ואז „אישור”, כדי שחוברות שמגיעות בוואטסאפ יופיעו כאן לבד, והסימונים יישמרו בקובץ עצמו בלי לתפוס מקום כפול.</string>
@@ -42,13 +43,10 @@
     <string name="sort_size">לפי גודל (מהגדול)</string>
     <string name="sort_last_read">לפי קריאה אחרונה</string>
     <string name="sort_pages">לפי מספר עמודים</string>
-    <!-- Bookmarks: DRAFT wording, awaiting the owner's approval -->
+    <!-- Bookmarks: approved by the owner 2026-10-14 (English: draft) -->
     <string name="bm_color">צבע</string>
     <string name="bm_opacity">שקיפות</string>
     <string name="bm_size">גודל</string>
-    <string name="bm_size_small">קטן</string>
-    <string name="bm_size_medium">בינוני</string>
-    <string name="bm_size_large">גדול</string>
     <string name="bm_direction">כיוון</string>
     <string name="bm_vertical">לאורך</string>
     <string name="bm_horizontal">לרוחב</string>
@@ -56,6 +54,11 @@
     <string name="bm_close">סגירה</string>
     <string name="bm_list_title">הסימניות במסמך</string>
     <string name="bm_list_empty">עדיין אין סימניות. לחיצה על „סימנייה” למטה מוסיפה אחת.</string>
+    <!-- DRAFT: awaiting the owner's approval -->
+    <string name="bm_list_searching">מחפש סימניות בשאר העמודים… %1$d מתוך %2$d</string>
     <string name="bm_page">עמוד %1$d</string>
     <string name="bm_added_hint">נוספה סימנייה. אפשר לגרור אותה באצבע; לחיצה ארוכה עליה פותחת אפשרויות. לחיצה ארוכה על „סימנייה” למטה מציגה את כל הסימניות.</string>
+    <string name="bm_third_question">בטוח שתרצה יותר מ־2 סימניות על עמוד זה?</string>
+    <string name="bm_third_yes">כן, להוסיף</string>
+    <string name="bm_third_no">לא</string>
 </resources>

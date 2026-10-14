@@ -19,6 +19,7 @@ import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
@@ -46,7 +47,11 @@ class Bookmarks(
     /** Called after every change the user made, for undo and auto-save. */
     private val changed: (UndoStack.BookmarkChange) -> Unit,
 ) {
-    private companion object { const val TAG = "Bookmarks" }
+    private companion object {
+        const val TAG = "Bookmarks"
+        /** Owner's decision: adding a third ribbon to one page asks first. */
+        const val MAX_WITHOUT_ASKING = 2
+    }
     private val main = Handler(Looper.getMainLooper())
     private val byPage = HashMap<Int, MutableList<Bookmark>>()
     private var loadGeneration = 0
@@ -63,48 +68,73 @@ class Bookmarks(
     fun all(): List<Bookmark> = byPage.values.flatten().sortedWith(compareBy({ it.page }, { it.y }, { it.x }))
 
     // ---------- loading ----------
+    // Ribbons are read page by page, only for pages on screen: those pages are open in the engine anyway,
+    // so reading them is cheap. Reading every page of a big booklet up front would hold the engine for a long
+    // time and leave the screen blank.
 
-    /** True once the ribbons already in the document have been read. */
+    private val scanned = HashSet<Int>()
+    private val scanning = HashSet<Int>()
+    /** Ribbons removed on screen; a read that started before the removal must not bring them back. */
+    private val removedIds = HashSet<String>()
+
+    /** True once the ribbons on the first pages shown have been read. */
     var loaded = false
         private set
 
     fun clear() {
         loaded = false
         loadGeneration++
-        byPage.clear()
+        byPage.clear(); scanned.clear(); scanning.clear(); removedIds.clear(); listFound.clear()
         pdfView.invalidate()
     }
 
-    /** Reads the bookmarks already in the document (from this app, possibly on another device). */
+    /** The document is open: read the ribbons on the pages now on screen. */
     fun load(pageCount: Int) {
         loaded = false
-        val generation = ++loadGeneration
+        loadGeneration++
+        scanned.clear(); scanning.clear()
+        readVisible()
+    }
+
+    private fun readVisible() {
+        val range = pdfView.visiblePageRange ?: return
+        val pages = (range[0]..range[1]).filter { it !in scanned && it !in scanning }
+        if (pages.isEmpty()) return
+        scanning += pages
+        val generation = loadGeneration
         io.execute {
-            val found = HashMap<Int, MutableList<Bookmark>>()
-            for (page in 0 until pageCount) {
-                if (generation != loadGeneration) return@execute
-                for ((name, rect) in pdfView.getAppBookmarks(page)) {
-                    Bookmark.parse(name, page, floatArrayOf(rect.left, rect.top, rect.right, rect.bottom))
-                        ?.let { found.getOrPut(page) { mutableListOf() }.add(it) }
-                }
-            }
+            val found = pages.associateWith { read(it) }
             main.post {
                 if (generation != loadGeneration) return@post
-                // Ribbons added or moved while the scan ran are already here and win over what the scan saw.
-                val fresh = byPage.values.flatten().map { it.id }.toSet()
-                for ((page, list) in found) {
-                    val keep = list.filter { it.id !in fresh }
-                    if (keep.isNotEmpty()) byPage.getOrPut(page) { mutableListOf() }.addAll(0, keep)
-                }
+                found.forEach { (page, list) -> merge(page, list) }
                 loaded = true
                 pdfView.invalidate()
             }
         }
     }
 
+    private fun read(page: Int): List<Bookmark> = pdfView.getAppBookmarks(page).mapNotNull { (name, rect) ->
+        Bookmark.parse(name, page, floatArrayOf(rect.left, rect.top, rect.right, rect.bottom))
+    }
+
+    /** What was read wins only for ribbons not touched on screen meanwhile. */
+    private fun merge(page: Int, list: List<Bookmark>) {
+        scanning -= page
+        scanned += page
+        val known = byPage.values.flatten().map { it.id }.toSet()
+        val keep = list.filter { it.id !in known && it.id !in removedIds }
+        if (keep.isNotEmpty()) byPage.getOrPut(page) { mutableListOf() }.addAll(0, keep)
+    }
+
+    /** Before counting the ribbons on a page: make sure that page has been read (it is on screen, so it is cheap). */
+    private fun ensureRead(page: Int) {
+        if (page !in scanned) merge(page, read(page))
+    }
+
     // ---------- drawing ----------
 
     fun draw(canvas: Canvas) {
+        readVisible()
         val range = pdfView.visiblePageRange ?: return
         for (page in range[0]..range[1]) {
             byPage[page]?.forEach { b ->
@@ -186,14 +216,35 @@ class Bookmarks(
 
     // ---------- changing ----------
 
-    /** Toolbar "bookmark": a new ribbon in the middle of what is on screen. */
-    fun add(): Bookmark? {
+    /**
+     * Toolbar "bookmark": a new ribbon in the middle of what is on screen. A third ribbon on the same page
+     * asks first (owner's decision). [done] gets the new ribbon, or null if none was added.
+     */
+    fun add(done: (Bookmark?) -> Unit = {}) {
         val at = pdfView.viewToFrame(pdfView.width / 2f, pdfView.height / 2f)
-            ?: return null.also { android.util.Log.w(TAG, "add: no page under the centre") }
+        if (at == null) {
+            android.util.Log.w(TAG, "add: no page under the centre")
+            done(null); return
+        }
         val b = keptOn(Bookmark(Bookmark.newId(), at.page, at.x, at.y,
-            settings.bookmarkHorizontal, settings.bookmarkSize, settings.bookmarkColor))
-        return if (change(null, b)) b else null.also { android.util.Log.w(TAG, "add: engine refused $b") }
+            settings.bookmarkHorizontal, settings.bookmarkThickness, settings.bookmarkColor))
+        val write = {
+            if (change(null, b)) done(b)
+            else { android.util.Log.w(TAG, "add: engine refused $b"); done(null) }
+        }
+        ensureRead(b.page)
+        if ((byPage[b.page]?.size ?: 0) < MAX_WITHOUT_ASKING) { write(); return }
+        lastQuestion = AlertDialog.Builder(context)
+            .setMessage(R.string.bm_third_question)
+            .setPositiveButton(R.string.bm_third_yes) { _, _ -> write() }
+            .setNegativeButton(R.string.bm_third_no) { _, _ -> done(null) }
+            .setOnCancelListener { done(null) }
+            .show()
     }
+
+    /** The last "more than 2 on this page?" question shown (for tests and screenshots). */
+    var lastQuestion: AlertDialog? = null
+        private set
 
     /** Writes a change into the document; [before] null = add, [after] null = remove. */
     fun change(before: Bookmark?, after: Bookmark?, record: Boolean = true): Boolean {
@@ -211,7 +262,9 @@ class Bookmarks(
         if (before != null) {
             pdfView.removeAppBookmark(before.page, before.name)
             byPage[before.page]?.removeAll { it.id == before.id }
+            if (after == null) removedIds += before.id
         }
+        if (after != null) removedIds -= after.id
         // the cache may hold a live preview of this ribbon on another page
         if (after != null) byPage.values.forEach { list -> list.removeAll { it.id == after.id } }
         var ok = true
@@ -244,7 +297,7 @@ class Bookmarks(
 
     private fun remember(b: Bookmark) {
         settings.bookmarkColor = b.color
-        settings.bookmarkSize = b.size
+        settings.bookmarkThickness = b.thickness
         settings.bookmarkHorizontal = b.horizontal
     }
 
@@ -303,17 +356,28 @@ class Bookmarks(
             })
         }, LinearLayout.LayoutParams(-1, ui.dp(48)))
 
-        // size
+        // size: one bar, from half the old "small" up to a ribbon a third of the page long
         box.addView(heading(R.string.bm_size))
-        val sizes = ui.row()
-        val sizeChoices = listOf(Bookmark.Size.SMALL to R.string.bm_size_small,
-            Bookmark.Size.MEDIUM to R.string.bm_size_medium, Bookmark.Size.LARGE to R.string.bm_size_large)
-        fun refreshSizes() = sizeChoices.forEachIndexed { i, (s, _) -> choice(sizes.getChildAt(i) as TextView, current.size == s) }
-        sizeChoices.forEach { (s, label) ->
-            sizes.addView(chip(label) { update(current.copy(size = s)); refreshSizes() }, chipParams())
-        }
-        refreshSizes()
-        box.addView(sizes)
+        box.addView(SeekBar(context).apply {
+            val maxThickness = Bookmark.maxThickness(pdfView.getFrameSize(current.page)?.get(1) ?: 842f)
+            max = 100
+            progress = Bookmark.progressOf(current.thickness, maxThickness)
+            var before: Bookmark? = null
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(bar: SeekBar, value: Int, fromUser: Boolean) {
+                    if (!fromUser) return
+                    if (before == null) before = current
+                    current = keptOn(current.copy(thickness = Bookmark.thicknessAt(value, maxThickness)))
+                    preview(current)
+                }
+                override fun onStartTrackingTouch(bar: SeekBar) { before = current }
+                override fun onStopTrackingTouch(bar: SeekBar) {
+                    val old = before ?: return
+                    before = null
+                    if (old != current && change(old, current)) remember(current)
+                }
+            })
+        }, LinearLayout.LayoutParams(-1, ui.dp(48)))
 
         // direction
         box.addView(heading(R.string.bm_direction))
@@ -391,6 +455,18 @@ class Bookmarks(
 
     // ---------- list (long press on the toolbar button) ----------
 
+    /** Ribbons on pages never shown yet, found by the list's search (page → ribbons). Kept for this document. */
+    private val listFound = HashMap<Int, List<Bookmark>>()
+
+    /** Every ribbon in the document: those read on screen, plus those the list's search found elsewhere. */
+    private fun everything(): List<Bookmark> {
+        val known = all()
+        val knownIds = known.map { it.id }.toSet()
+        val elsewhere = listFound.filterKeys { it !in scanned }.values.flatten()
+            .filter { it.id !in knownIds && it.id !in removedIds }
+        return (known + elsewhere).sortedWith(compareBy({ it.page }, { it.y }, { it.x }))
+    }
+
     fun showList(): Dialog {
         val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -401,14 +477,20 @@ class Bookmarks(
         box.addView(ui.label(context.getString(R.string.bm_list_title), 18f, ui.colors.ink, bold = true).apply {
             setPadding(ui.dp(12), 0, ui.dp(12), ui.dp(8))
         })
-        val items = all()
-        if (items.isEmpty()) {
-            box.addView(ui.label(context.getString(R.string.bm_list_empty), 15f, ui.colors.muted).apply {
-                setPadding(ui.dp(12), ui.dp(8), ui.dp(12), ui.dp(16))
-            })
-        } else {
-            val chapters = chapters()
-            val rows = ui.column()
+        val status = ui.label("", 13f, ui.colors.muted).apply { setPadding(ui.dp(12), 0, ui.dp(12), ui.dp(8)) }
+        box.addView(status)
+        val rows = ui.column()
+        box.addView(ScrollView(context).apply { addView(rows) }, LinearLayout.LayoutParams(-1, -2))
+        val chapters = chapters()
+
+        fun fill(searching: Boolean) {
+            rows.removeAllViews()
+            val items = everything()
+            if (items.isEmpty() && !searching) {
+                rows.addView(ui.label(context.getString(R.string.bm_list_empty), 15f, ui.colors.muted).apply {
+                    setPadding(ui.dp(12), ui.dp(8), ui.dp(12), ui.dp(16))
+                })
+            }
             items.forEach { b ->
                 val pageText = context.getString(R.string.bm_page, b.page + 1)
                 val label = BookmarkLabel.of(b.page, chapters) { pageText }
@@ -425,9 +507,31 @@ class Bookmarks(
                 row.addView(texts, LinearLayout.LayoutParams(0, -2, 1f))
                 rows.addView(row, LinearLayout.LayoutParams(-1, -2))
             }
-            box.addView(ScrollView(context).apply { addView(rows) },
-                LinearLayout.LayoutParams(-1, -2).apply { height = ViewGroup.LayoutParams.WRAP_CONTENT })
         }
+
+        // Look through the pages not seen yet, one page at a time so the pages behind can still draw.
+        val pages = pdfView.pageCount
+        val toSearch = (0 until pages).filter { it !in scanned && it !in listFound }
+        val generation = loadGeneration
+        fill(searching = toSearch.isNotEmpty())
+        fun searchFrom(i: Int) {
+            if (!dialog.isShowing || generation != loadGeneration) return
+            if (i >= toSearch.size) { status.visibility = View.GONE; fill(searching = false); return }
+            status.text = context.getString(R.string.bm_list_searching, i + 1, toSearch.size)
+            val page = toSearch[i]
+            io.execute {
+                val names = pdfView.getAppBookmarkNames(page)
+                main.post {
+                    if (generation != loadGeneration) return@post
+                    listFound[page] = names.mapNotNull { Bookmark.parse(it, page, floatArrayOf(0f, 0f, 0f, 0f)) }
+                    if (listFound[page]!!.isNotEmpty()) fill(searching = true)
+                    searchFrom(i + 1)
+                }
+            }
+        }
+        if (toSearch.isEmpty()) status.visibility = View.GONE
+        dialog.setOnShowListener { searchFrom(0) }
+
         dialog.setContentView(box)
         dialog.window?.apply {
             setBackgroundDrawableResource(android.R.color.transparent)

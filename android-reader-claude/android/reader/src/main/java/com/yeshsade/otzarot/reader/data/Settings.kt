@@ -12,6 +12,7 @@ class Settings(context: Context) {
     var scroll: String
         get() = prefs.getString(SCROLL, "vertical")!!
         set(v) = prefs.edit().putString(SCROLL, v).apply()
+    val scrollHorizontal get() = scroll == "horizontal"
     var resume: String
         get() = prefs.getString(RESUME, "last")!!
         set(v) = prefs.edit().putString(RESUME, v).apply()
@@ -42,12 +43,36 @@ class Settings(context: Context) {
     var bookmarkColor: Int
         get() = prefs.getInt(BM_COLOR, Bookmark.DEFAULT_COLOR)
         set(v) = prefs.edit().putInt(BM_COLOR, v).apply()
-    var bookmarkSize: Bookmark.Size
-        get() = Bookmark.Size.of(prefs.getString(BM_SIZE, null))
-        set(v) = prefs.edit().putString(BM_SIZE, v.code).apply()
+    var bookmarkThickness: Float
+        get() = prefs.getFloat(BM_THICKNESS, Bookmark.DEFAULT_THICKNESS)
+        set(v) = prefs.edit().putFloat(BM_THICKNESS, v).apply()
     var bookmarkHorizontal: Boolean
         get() = prefs.getBoolean(BM_HORIZONTAL, false)
         set(v) = prefs.edit().putBoolean(BM_HORIZONTAL, v).apply()
+    /** Hiding the top bar, the toolbar and the phone's bars while reading (owner's decisions 2026-10-14). */
+    var frameMode: String
+        get() = prefs.getString(FRAME, FramePolicy.AUTO)!!.takeIf { it in FramePolicy.MODES } ?: FramePolicy.AUTO
+        set(v) = prefs.edit().putString(FRAME, v).apply()
+    var frameSeconds: Int
+        get() = FramePolicy.clampSeconds(prefs.getInt(FRAME_SECONDS, FramePolicy.DEFAULT_SECONDS))
+        set(v) = prefs.edit().putInt(FRAME_SECONDS, FramePolicy.clampSeconds(v)).apply()
+    /** What the thin line shows while the frame is hidden. Default: battery and clock. */
+    var infoPage: Boolean
+        get() = prefs.getBoolean(INFO_PAGE, false)
+        set(v) = prefs.edit().putBoolean(INFO_PAGE, v).apply()
+    var infoBattery: Boolean
+        get() = prefs.getBoolean(INFO_BATTERY, true)
+        set(v) = prefs.edit().putBoolean(INFO_BATTERY, v).apply()
+    var infoClock: Boolean
+        get() = prefs.getBoolean(INFO_CLOCK, true)
+        set(v) = prefs.edit().putBoolean(INFO_CLOCK, v).apply()
+    /** Page scrubber: side of the screen ("right" by default) and how long to hold before it moves. */
+    var scrubberSide: String
+        get() = if (prefs.getString(SCRUB_SIDE, "right") == "left") "left" else "right"
+        set(v) = prefs.edit().putString(SCRUB_SIDE, v).apply()
+    var scrubberHoldMillis: Int
+        get() = ScrubberPolicy.clampHold(prefs.getInt(SCRUB_HOLD, ScrubberPolicy.DEFAULT_HOLD_MS))
+        set(v) = prefs.edit().putInt(SCRUB_HOLD, ScrubberPolicy.clampHold(v)).apply()
     var allFilesPromptDismissed: Boolean
         get() = prefs.getBoolean(ALL_FILES_DISMISSED, false)
         set(v) = prefs.edit().putBoolean(ALL_FILES_DISMISSED, v).apply()
@@ -69,7 +94,14 @@ class Settings(context: Context) {
         const val SORT = "sort"
         const val ALL_FILES_DISMISSED = "all_files_prompt_dismissed"
         const val BM_COLOR = "bookmark_color"
-        const val BM_SIZE = "bookmark_size"
+        const val BM_THICKNESS = "bookmark_thickness"
+        const val FRAME = "frame"
+        const val FRAME_SECONDS = "frame_seconds"
+        const val INFO_PAGE = "info_page"
+        const val INFO_BATTERY = "info_battery"
+        const val INFO_CLOCK = "info_clock"
+        const val SCRUB_SIDE = "scrubber_side"
+        const val SCRUB_HOLD = "scrubber_hold_ms"
         const val BM_HORIZONTAL = "bookmark_horizontal"
     }
 }
@@ -88,4 +120,37 @@ object AwakePolicy {
             AwakeMode.MORE -> reading && idleMillis < EXTRA_MILLIS
         }
     }
+}
+
+/** When the frame hides by itself. Pure logic; unit-tested. */
+object FramePolicy {
+    const val AUTO = "auto"
+    const val TAP = "tap"
+    const val ALWAYS = "always"
+    val MODES = setOf(AUTO, TAP, ALWAYS)
+    const val DEFAULT_SECONDS = 10
+    const val MIN_SECONDS = 3
+    const val MAX_SECONDS = 60
+
+    fun clampSeconds(seconds: Int) = seconds.coerceIn(MIN_SECONDS, MAX_SECONDS)
+
+    /** Milliseconds until the shown frame hides by itself; null = it never hides by itself. */
+    fun hideAfterMillis(mode: String, seconds: Int): Long? =
+        if (mode == AUTO) clampSeconds(seconds) * 1000L else null
+
+    /** Whether the frame can be hidden at all. */
+    fun canHide(mode: String) = mode != ALWAYS
+}
+
+/** The page scrubber. Pure logic; unit-tested. */
+object ScrubberPolicy {
+    const val DEFAULT_HOLD_MS = 500
+    const val MAX_HOLD_MS = 2000
+    const val STEP_MS = 250
+
+    fun clampHold(ms: Int) = (((ms.coerceIn(0, MAX_HOLD_MS) + STEP_MS / 2) / STEP_MS) * STEP_MS).coerceAtMost(MAX_HOLD_MS)
+
+    /** Page (0-based) for a position along the track, 0..1. */
+    fun pageAt(fraction: Float, pages: Int): Int =
+        if (pages <= 0) 0 else (fraction.coerceIn(0f, 1f) * pages).toInt().coerceAtMost(pages - 1)
 }

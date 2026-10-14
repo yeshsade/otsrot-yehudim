@@ -17,20 +17,13 @@ data class Bookmark(
     val x: Float,
     val y: Float,
     val horizontal: Boolean,
-    val size: Size,
+    /** Width of the ribbon across, in points; its length is [LENGTH_RATIO] times that. */
+    val thickness: Float,
     /** ARGB; the alpha is the chosen opacity. */
     val color: Int,
 ) {
-    enum class Size(val code: String, val thickness: Float) {
-        SMALL("s", 13f), MEDIUM("m", 19f), LARGE("l", 27f);
-
-        companion object {
-            fun of(code: String?) = values().firstOrNull { it.code == code } ?: MEDIUM
-        }
-    }
-
-    val width get() = if (horizontal) size.thickness * LENGTH_RATIO else size.thickness
-    val height get() = if (horizontal) size.thickness else size.thickness * LENGTH_RATIO
+    val width get() = if (horizontal) thickness * LENGTH_RATIO else thickness
+    val height get() = if (horizontal) thickness else thickness * LENGTH_RATIO
 
     /** {left, top, right, bottom} in frame points. */
     fun frameRect() = floatArrayOf(x - width / 2, y - height / 2, x + width / 2, y + height / 2)
@@ -39,8 +32,8 @@ data class Bookmark(
     fun polygon(): FloatArray = frameRect().let { shape(horizontal, it[0], it[1], it[2], it[3]) }
 
     val name: String
-        get() = String.format(Locale.US, "%sv1;o=%s;s=%s;c=%08X;id=%s",
-            PREFIX, if (horizontal) "h" else "v", size.code, color, id)
+        get() = String.format(Locale.US, "%sv1;o=%s;s=%.1f;c=%08X;id=%s",
+            PREFIX, if (horizontal) "h" else "v", thickness, color, id)
 
     /** Same ribbon, moved so it stays fully on the page. */
     fun keptOn(frameWidth: Float, frameHeight: Float): Bookmark {
@@ -54,6 +47,30 @@ data class Bookmark(
         const val LENGTH_RATIO = 3f
         /** Owner's decision: purple (the app colour) at about 80% opacity. */
         const val DEFAULT_COLOR = 0xCC57479F.toInt()
+
+        /** Owner's decisions (2026-10-14): start as the old "small"; the bar goes from half of that up to
+         *  a ribbon as long as a third of the page's height. */
+        const val DEFAULT_THICKNESS = 13f
+        const val MIN_THICKNESS = DEFAULT_THICKNESS / 2
+        /** Sizes written by 0.2.2 (s/m/l). */
+        private val OLD_SIZES = mapOf("s" to 13f, "m" to 19f, "l" to 27f)
+
+        fun maxThickness(pageHeight: Float): Float = (pageHeight / 3f / LENGTH_RATIO).coerceAtLeast(MIN_THICKNESS)
+
+        /**
+         * The size bar (0..100). The scale grows by the same factor at every step, so the small sizes that
+         * are used most get as much of the bar as the big ones.
+         */
+        fun thicknessAt(progress: Int, max: Float): Float {
+            val p = progress.coerceIn(0, 100) / 100.0
+            return (MIN_THICKNESS * Math.pow((max / MIN_THICKNESS).toDouble(), p)).toFloat()
+        }
+
+        fun progressOf(thickness: Float, max: Float): Int {
+            if (max <= MIN_THICKNESS) return 0
+            val t = thickness.coerceIn(MIN_THICKNESS, max)
+            return (Math.log((t / MIN_THICKNESS).toDouble()) / Math.log((max / MIN_THICKNESS).toDouble()) * 100 + .5).toInt()
+        }
 
         /** Slant of the pointed end and depth of the V notch, as parts of the ribbon's length. */
         private const val SLANT = .12f
@@ -95,7 +112,8 @@ data class Bookmark(
             return Bookmark(
                 id = id, page = page,
                 x = (rect[0] + rect[2]) / 2, y = (rect[1] + rect[3]) / 2,
-                horizontal = fields["o"] == "h", size = Size.of(fields["s"]), color = color,
+                horizontal = fields["o"] == "h", color = color,
+                thickness = fields["s"]?.let { OLD_SIZES[it] ?: it.toFloatOrNull() }?.takeIf { it > 0 } ?: DEFAULT_THICKNESS,
             )
         }
 

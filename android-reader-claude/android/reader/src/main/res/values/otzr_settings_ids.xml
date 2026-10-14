@@ -36,4 +36,28 @@
   <item type="id" name="otzr_language_he" />
   <item type="id" name="otzr_language_en" />
   <item type="id" name="otzr_settings_footer" />
+  <item type="id" name="otzr_frame_label" />
+  <item type="id" name="otzr_frame_desc" />
+  <item type="id" name="otzr_frame_auto" />
+  <item type="id" name="otzr_frame_tap" />
+  <item type="id" name="otzr_frame_always" />
+  <item type="id" name="otzr_seconds_n" />
+  <item type="id" name="otzr_minute_one" />
+  <item type="id" name="otzr_info_label" />
+  <item type="id" name="otzr_info_desc" />
+  <item type="id" name="otzr_info_page" />
+  <item type="id" name="otzr_info_battery" />
+  <item type="id" name="otzr_info_clock" />
+  <item type="id" name="otzr_info_none" />
+  <item type="id" name="otzr_scrub_side_label" />
+  <item type="id" name="otzr_scrub_side_desc" />
+  <item type="id" name="otzr_scrub_right" />
+  <item type="id" name="otzr_scrub_left" />
+  <item type="id" name="otzr_scrub_hold_label" />
+  <item type="id" name="otzr_scrub_hold_desc" />
+  <item type="id" name="otzr_hold_now" />
+  <item type="id" name="otzr_hold_half" />
+  <item type="id" name="otzr_hold_one" />
+  <item type="id" name="otzr_hold_one_half" />
+  <item type="id" name="otzr_hold_n" />
 </resources>
