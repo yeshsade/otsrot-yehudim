@@ -1,0 +1,4 @@
+interface:
+  display_name: "לפי ימים 6"
+  short_description: "הפקת לפי ימים ו/או לפי נושאים עם בדיקות מלאות"
+  default_prompt: "השתמש ב-$lefi-yamim-6 להכנת המהדורות שביקשתי, ושאל כל שאלת חובה בנפרד."

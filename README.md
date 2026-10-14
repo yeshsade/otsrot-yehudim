@@ -1,14 +1,40 @@
-# otsrot-yehudim
+# אוצרות יהודים — מקור הסקיל
 
-## Skill versions
+המאגר הזה הוא מקור האמת המשותף לשני המחשבים.
 
-Each `lefi-yamim-6` version is stored as a separate timestamp-prefixed archive
-before the active installation is replaced. Existing archives are never
-overwritten.
+## הגרסה הפעילה
 
-- `versions/10481210_lefi-yamim-6_old-before-install.zip` — previously active
-  version, archived before the 2026-10-12 installation. SHA-256:
-  `466898B6D80246AD954DA5B9EB45CE088A4EECEFB1CE7C2D146AECB94B5B0DF9`.
-- `versions/10481210_lefi-yamim-6_new-installed.zip` — reviewed replacement
-  prepared for the 2026-10-12 installation. SHA-256:
-  `15FB18B6C583CFD57671EA5D2D8AE0663694EBEDA59B81BD337DAF1E5DEE7873`.
+הסקיל הפעיל והבדוק נמצא ב־`skill/lefi-yamim-6`.
+
+זוהי גרסת הבסיס שעבדה בהצלחה על חוברות לך־לך, לאחר תיקוני הקישורים,
+עמודי השבוע הקודם, ליקוטי תפילות, תהילים וזוהר. אין לערבב לתוכה קבצים
+מתיקיות `versions` או מארכיוני ZIP.
+
+## מבנה המאגר
+
+- `skill/lefi-yamim-6` — קוד המקור הפעיל להתקנה.
+- `versions` — ארכיוני ZIP היסטוריים בלבד; אינם מקור להתקנה שוטפת.
+- `notes/pending-other-computer-changes.md` — בקשות ושינויים מהמחשב השני
+  שממתינים לבדיקה לפני כניסה לגרסה הבאה.
+- קובץ ה־ZIP שבשורש — חבילת ההעברה המקורית מ־5 באוקטובר 2026.
+
+## עבודה משני מחשבים
+
+1. לפני שינוי מושכים את `main`.
+2. יוצרים ענף חדש לגרסה המועמדת.
+3. משנים רק את קוד המקור תחת `skill/lefi-yamim-6`.
+4. מריצים בדיקת תקינות ואת מקרי הרגרסיה הנדרשים.
+5. ממזגים ל־`main` רק גרסה שעברה בדיקה.
+6. מתקינים במחשב השני מן הגרסה הממוזגת; לא מעתיקים תיקיות ידנית בין מחשבים.
+
+אין לתקן את `main` בטלאים מהירים ואין להעלות חוברות מקור, חוברות שהופקו,
+קובצי עבודה או `__pycache__`.
+
+## התקנה
+
+מעתיקים את `skill/lefi-yamim-6` בשלמותה אל:
+
+`%USERPROFILE%\.codex\skills\lefi-yamim-6`
+
+לפני ההחלפה משנים את שם ההתקנה הישנה לגיבוי, ולעולם לא ממזגים את שתי
+התיקיות זו לתוך זו.
