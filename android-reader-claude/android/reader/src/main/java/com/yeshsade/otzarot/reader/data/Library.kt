@@ -24,16 +24,22 @@ data class Doc(
     val kind: Kind,
     /** The original location when kind == COPY (for reference only; never deleted). */
     val sourceUri: String? = null,
+    /** File size in bytes when known; lets a same-size file be checked by content only when needed. */
+    val size: Long = 0,
 ) {
     enum class Kind { SOURCE, COPY }
 
-    fun matches(otherIdentity: String) = identity == otherIdentity || originIdentity == otherIdentity
+    fun matches(otherIdentity: String) = otherIdentity.isNotEmpty() && (identity == otherIdentity || originIdentity == otherIdentity)
+
+    /** Found on the device but its content identity not computed yet (computed only when needed). */
+    val identityUnknown get() = identity.isEmpty()
 
     fun toJson() = JSONObject().apply {
         put("id", id); put("uri", uri); put("name", name); put("receivedAt", receivedAt)
         put("lastOpened", lastOpened); put("page", page); put("pages", pages)
         put("identity", identity); put("originIdentity", originIdentity); put("kind", kind.name)
         sourceUri?.let { put("sourceUri", it) }
+        put("size", size)
     }
 
     companion object {
@@ -44,6 +50,7 @@ data class Doc(
             originIdentity = o.optString("originIdentity", o.getString("identity")),
             kind = runCatching { Kind.valueOf(o.getString("kind")) }.getOrDefault(Kind.COPY),
             sourceUri = if (o.has("sourceUri")) o.getString("sourceUri") else null,
+            size = o.optLong("size"),
         )
     }
 }
@@ -77,6 +84,7 @@ class Library(private val file: File) {
     fun get(id: String): Doc? = synchronized(lock) { load().firstOrNull { it.id == id } }
     fun byUri(uri: String): Doc? = synchronized(lock) { load().firstOrNull { it.uri == uri || it.sourceUri == uri } }
     fun byIdentity(identity: String): Doc? = synchronized(lock) { load().firstOrNull { it.matches(identity) } }
+    fun withSize(size: Long): List<Doc> = synchronized(lock) { load().filter { size > 0 && it.size == size } }
     fun lastRead(): Doc? = synchronized(lock) { load().filter { it.lastOpened > 0 }.maxByOrNull { it.lastOpened } }
 
     fun upsert(doc: Doc) = synchronized(lock) {

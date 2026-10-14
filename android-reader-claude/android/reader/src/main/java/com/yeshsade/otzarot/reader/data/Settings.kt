@@ -34,6 +34,13 @@ class Settings(context: Context) {
     var whatsAppTree: String?
         get() = prefs.getString(WA_TREE, null)
         set(v) = prefs.edit().putString(WA_TREE, v).apply()
+    /** List order; default "received" = newest received first (owner's requirement). */
+    var sort: String
+        get() = prefs.getString(SORT, "received")!!
+        set(v) = prefs.edit().putString(SORT, v).apply()
+    var allFilesPromptDismissed: Boolean
+        get() = prefs.getBoolean(ALL_FILES_DISMISSED, false)
+        set(v) = prefs.edit().putBoolean(ALL_FILES_DISMISSED, v).apply()
     var whatsAppPromptDismissed: Boolean
         get() = prefs.getBoolean(WA_DISMISSED, false)
         set(v) = prefs.edit().putBoolean(WA_DISMISSED, v).apply()
@@ -49,6 +56,8 @@ class Settings(context: Context) {
         const val START = "start"
         const val WA_TREE = "whatsapp_tree"
         const val WA_DISMISSED = "whatsapp_prompt_dismissed"
+        const val SORT = "sort"
+        const val ALL_FILES_DISMISSED = "all_files_prompt_dismissed"
     }
 }
 

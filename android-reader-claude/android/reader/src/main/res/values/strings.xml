@@ -18,6 +18,9 @@
     <string name="library_day">מצב יום</string>
     <string name="action_cancel">ביטול</string>
     <string name="action_remove">הסרה</string>
+    <string name="all_files_title">כל קובצי ה־PDF במכשיר — אוטומטית</string>
+    <string name="all_files_body">כדי שכל קובצי ה־PDF במכשיר, גם מה שמגיע בוואטסאפ, יופיעו כאן לבד, והסימונים יישמרו בקובץ עצמו בלי עותק נוסף: לחץ „הפעלה”, ובמסך הבא הדלק את המתג.</string>
+    <string name="all_files_allow">הפעלה</string>
     <string name="wa_title">חוברות מוואטסאפ — אוטומטית</string>
     <string name="wa_body">לחץ „בחירת התיקייה” ואז „אישור”, כדי שחוברות שמגיעות בוואטסאפ יופיעו כאן לבד, והסימונים יישמרו בקובץ עצמו בלי לתפוס מקום כפול.</string>
     <string name="wa_choose">בחירת התיקייה</string>
@@ -32,4 +35,11 @@
     <string name="tool_bookmark">סימנייה</string>
     <string name="open_failed">לא ניתן לפתוח את הקובץ.</string>
     <string name="save_failed">הסימון לא נשמר בקובץ. הוא נשאר על המסך; ננסה שוב בסימון הבא.</string>
+    <string name="library_sort_prefix">סידור:</string>
+    <string name="sort_title">סידור הרשימה</string>
+    <string name="sort_received">מהחדש לישן לפי קבלה</string>
+    <string name="sort_name">לפי שם (א–ת)</string>
+    <string name="sort_size">לפי גודל (מהגדול)</string>
+    <string name="sort_last_read">לפי קריאה אחרונה</string>
+    <string name="sort_pages">לפי מספר עמודים</string>
 </resources>

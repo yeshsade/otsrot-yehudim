@@ -23,10 +23,12 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.shockwave.pdfium.PdfiumCore
 import com.yeshsade.otzarot.reader.R
 import com.yeshsade.otzarot.reader.ReaderApp
 import com.yeshsade.otzarot.reader.app
+import com.yeshsade.otzarot.reader.data.AllFiles
 import com.yeshsade.otzarot.reader.data.Doc
 import com.yeshsade.otzarot.reader.data.Intake
 import com.yeshsade.otzarot.reader.data.WhatsAppFolder
@@ -36,6 +38,9 @@ import java.io.File
 class LibraryActivity : AppCompatActivity() {
     private lateinit var ui: Ui
     private lateinit var list: LinearLayout
+    private lateinit var refresher: SwipeRefreshLayout
+    private lateinit var sortLabel: TextView
+    @Volatile private var scanning = false
     private val main = Handler(Looper.getMainLooper())
 
     private val pickPdf = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let(::openPicked) }
@@ -53,7 +58,7 @@ class LibraryActivity : AppCompatActivity() {
         if (savedInstanceState == null && !intent.getBooleanExtra(EXTRA_STAY, false) && app.settings.startScreen == "last") {
             app.library.lastRead()?.let { ReaderActivity.open(this, it) }
         }
-        if (savedInstanceState == null) maybeAskForWhatsAppFolder()
+        if (savedInstanceState == null) maybeAskForAllFiles()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -85,11 +90,21 @@ class LibraryActivity : AppCompatActivity() {
         })
         root.addView(header)
 
-        root.addView(ui.label(getString(R.string.library_sort), 13f, ui.colors.muted).apply {
-            setPadding(ui.dp(20), ui.dp(14), ui.dp(20), ui.dp(4))
-        })
+        sortLabel = ui.label("", 13f, ui.colors.accent, true).apply {
+            setPadding(ui.dp(20), ui.dp(12), ui.dp(20), ui.dp(6))
+            minimumHeight = ui.dp(44)
+            isClickable = true
+            setOnClickListener { chooseSort() }
+        }
+        root.addView(sortLabel)
         list = ui.column().apply { setPadding(ui.dp(14), ui.dp(6), ui.dp(14), ui.dp(12)) }
-        root.addView(ScrollView(this).apply { addView(list); clipToPadding = false }, LinearLayout.LayoutParams(-1, 0, 1f))
+        refresher = SwipeRefreshLayout(this).apply {
+            setColorSchemeColors(ui.colors.accent)
+            setProgressBackgroundColorSchemeColor(ui.colors.card)
+            setOnRefreshListener { scanAndRefresh(userAsked = true) }
+            addView(ScrollView(this@LibraryActivity).apply { addView(list); clipToPadding = false; isFillViewport = true })
+        }
+        root.addView(refresher, LinearLayout.LayoutParams(-1, 0, 1f))
 
         val open = ui.row().apply {
             gravity = Gravity.CENTER
@@ -109,7 +124,9 @@ class LibraryActivity : AppCompatActivity() {
 
     private fun refresh() {
         list.removeAllViews()
-        val docs = app.library.all()
+        val sort = Sort.of(app.settings.sort)
+        sortLabel.text = getString(R.string.library_sort_prefix) + " " + getString(sort.label) + "  ▾"
+        val docs = sort.apply(app.library.all())
         if (docs.isEmpty()) {
             list.addView(ui.label(getString(R.string.library_empty), 15f, ui.colors.muted).apply {
                 gravity = Gravity.CENTER; setPadding(ui.dp(24), ui.dp(48), ui.dp(24), ui.dp(48))
@@ -158,6 +175,40 @@ class LibraryActivity : AppCompatActivity() {
         }
     }
 
+    /** Ways to order the list. Default: newest received first (owner's requirement); the choice is remembered. */
+    enum class Sort(val key: String, val label: Int) {
+        RECEIVED("received", R.string.sort_received),
+        NAME("name", R.string.sort_name),
+        SIZE("size", R.string.sort_size),
+        LAST_READ("last_read", R.string.sort_last_read),
+        PAGES("pages", R.string.sort_pages);
+
+        fun apply(docs: List<Doc>): List<Doc> = when (this) {
+            RECEIVED -> docs.sortedByDescending { it.receivedAt }
+            NAME -> docs.sortedWith(compareBy(java.text.Collator.getInstance()) { it.name })
+            SIZE -> docs.sortedByDescending { it.size }
+            LAST_READ -> docs.sortedWith(compareByDescending<Doc> { it.lastOpened }.thenByDescending { it.receivedAt })
+            PAGES -> docs.sortedByDescending { it.pages }
+        }
+
+        companion object {
+            fun of(key: String) = entries.firstOrNull { it.key == key } ?: RECEIVED
+        }
+    }
+
+    private fun chooseSort() {
+        val options = Sort.entries
+        val current = options.indexOf(Sort.of(app.settings.sort))
+        AlertDialog.Builder(this)
+            .setTitle(R.string.sort_title)
+            .setSingleChoiceItems(options.map { getString(it.label) }.toTypedArray(), current) { dialog, which ->
+                app.settings.sort = options[which].key
+                dialog.dismiss()
+                refresh()
+            }
+            .show()
+    }
+
     private fun receivedLabel(time: Long): String = when {
         DateUtils.isToday(time) -> getString(R.string.library_today)
         DateUtils.isToday(time + DateUtils.DAY_IN_MILLIS) -> getString(R.string.library_yesterday)
@@ -176,7 +227,7 @@ class LibraryActivity : AppCompatActivity() {
     }
 
     private fun loadCover(doc: Doc, view: ImageView) {
-        val file = File(File(cacheDir, "covers").apply { mkdirs() }, doc.originIdentity.takeLast(24) + ".png")
+        val file = File(File(cacheDir, "covers").apply { mkdirs() }, doc.id + ".png")
         if (file.exists()) { view.setImageBitmap(BitmapFactory.decodeFile(file.path)); return }
         app.io.execute {
             val bitmap = runCatching {
@@ -213,32 +264,47 @@ class LibraryActivity : AppCompatActivity() {
         }
     }
 
-    private fun scanAndRefresh() {
+    /** Looks for new PDFs on the device (or in the WhatsApp folder). Pull down on the list to run it by hand. */
+    private fun scanAndRefresh(userAsked: Boolean = false) {
+        if (scanning) { if (userAsked) refresher.isRefreshing = true; return }
+        scanning = true
+        if (userAsked) refresher.isRefreshing = true
         app.io.execute {
-            val added = runCatching { Intake(this, app.library, app.settings).scanFolder() }.getOrDefault(0)
-            if (added > 0) main.post { if (!isDestroyed) refresh() }
+            val changed = runCatching { Intake(this, app.library, app.settings).scanDevice() }.getOrDefault(false)
+            main.post {
+                scanning = false
+                if (isDestroyed) return@post
+                refresher.isRefreshing = false
+                if (changed || userAsked) refresh()
+            }
         }
     }
 
-    /** One-time explanation, then Android's own folder picker opened at WhatsApp's documents folder. */
-    private fun maybeAskForWhatsAppFolder() {
+    /** One-time explanation, then Android's own "access to all files" switch for this app. */
+    private fun maybeAskForAllFiles() {
         val settings = app.settings
-        if (settings.whatsAppPromptDismissed || WhatsAppFolder.grantedTree(this, settings) != null) return
+        if (settings.allFilesPromptDismissed || AllFiles.granted(this)) return
         AlertDialog.Builder(this)
-            .setTitle(R.string.wa_title)
-            .setMessage(R.string.wa_body)
-            .setPositiveButton(R.string.wa_choose) { _, _ ->
-                settings.whatsAppPromptDismissed = true
-                runCatching { pickFolder.launch(WhatsAppFolder.pickerIntent()) }
-                    .onFailure { Toast.makeText(this, R.string.wa_failed, Toast.LENGTH_LONG).show() }
+            .setTitle(R.string.all_files_title)
+            .setMessage(R.string.all_files_body)
+            .setPositiveButton(R.string.all_files_allow) { _, _ ->
+                settings.allFilesPromptDismissed = true
+                AllFiles.request(this, REQUEST_FILES)
             }
-            .setNegativeButton(R.string.wa_later) { _, _ -> settings.whatsAppPromptDismissed = true }
+            .setNegativeButton(R.string.wa_later) { _, _ -> settings.allFilesPromptDismissed = true }
             .setCancelable(false)
             .show()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_FILES) scanAndRefresh(userAsked = true)
     }
 
     companion object {
         /** Set when coming back from a document, so the list is shown instead of reopening it. */
         const val EXTRA_STAY = "stay"
+        private const val REQUEST_FILES = 7
     }
 }

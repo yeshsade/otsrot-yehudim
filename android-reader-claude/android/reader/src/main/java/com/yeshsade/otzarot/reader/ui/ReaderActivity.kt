@@ -316,8 +316,17 @@ class ReaderActivity : AppCompatActivity() {
     /** Runs on the io thread. Writes the capture into the document's real file and verifies it. */
     private fun write(target: Doc, file: File): Boolean {
         try {
-            val ok = Files.writeVerified(this, Uri.parse(target.uri), file)
-            if (ok) Identity.of(file)?.let { id -> app.library.update(target.id) { it.copy(identity = id) } }
+            val uri = Uri.parse(target.uri)
+            // A file found on the device: remember what the original was before the first marks change it,
+            // so the same original arriving again (e.g. from WhatsApp) opens this entry.
+            val current = app.library.get(target.id) ?: target
+            if (current.originIdentity.isEmpty()) {
+                Identity.of(this, uri)?.let { origin ->
+                    app.library.update(target.id) { it.copy(originIdentity = origin, identity = it.identity.ifEmpty { origin }) }
+                }
+            }
+            val ok = Files.writeVerified(this, uri, file)
+            if (ok) Identity.of(file)?.let { id -> app.library.update(target.id) { it.copy(identity = id, size = file.length()) } }
             return ok
         } finally {
             file.delete()

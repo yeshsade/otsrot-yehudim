@@ -39,6 +39,7 @@ class LeanProbe : Instrumentation() {
 
     override fun onStart() {
         if (mode == "shots") { shots(); return }
+        if (mode == "files") { files(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -170,6 +171,85 @@ class LeanProbe : Instrumentation() {
             finish(Activity.RESULT_OK, result)
         } catch (e: Throwable) {
             result.putString("stream", "FAILED: ${e.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /**
+     * Access to all files (granted beforehand with: appops set <pkg> MANAGE_EXTERNAL_STORAGE allow).
+     * Expects test PDFs pushed to WhatsApp's documents folder and to Download.
+     */
+    private fun files() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            app.settings.allFilesPromptDismissed = true
+            check(com.yeshsade.otzarot.reader.data.AllFiles.granted(targetContext)) { "all-files access not granted" }
+            record("Access to all files is on")
+
+            val root = android.os.Environment.getExternalStorageDirectory()
+            val wa = File(root, "Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Documents/wa-booklet.pdf")
+            val dl = File(root, "Download/download-book.pdf")
+            check(wa.isFile && dl.isFile) { "test files missing" }
+            val waBefore = wa.readBytes()
+            val copyDir = File(root, "Documents/" + com.yeshsade.otzarot.reader.data.Files.COPY_FOLDER)
+            val copiesBefore = copyDir.listFiles()?.size ?: 0
+
+            val list = startActivitySync(Intent(targetContext, LibraryActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                .putExtra(LibraryActivity.EXTRA_STAY, true)) as LibraryActivity
+            waitFor("device scan", 120_000) { app.library.all().map { it.name }.containsAll(listOf("wa-booklet", "download-book")) }
+            record("PDFs from the whole device appear by themselves (WhatsApp folder and Download)")
+
+            // A new file arrives while the list is open; pull to refresh finds it.
+            val late = File(root, "Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Documents/arrived-later.pdf")
+            dl.copyTo(late, overwrite = true)
+            late.appendText("\n% different edition\n")
+            runOnMainSync {
+                val refresh = LibraryActivity::class.java.getDeclaredMethod("scanAndRefresh", Boolean::class.javaPrimitiveType).apply { isAccessible = true }
+                refresh.invoke(list, true)
+            }
+            waitFor("refresh", 120_000) { app.library.all().any { it.name == "arrived-later" } }
+            record("Pull to refresh finds a file that arrived after the list was opened")
+
+            // WhatsApp hands over a read-only link to a file that is on the device: the same entry opens, no copy.
+            val countBefore = app.library.all().size
+            val opened = openShared(ReadOnlyPdfProvider.uri("wa-booklet-share.pdf"))
+            waitLoaded(opened)
+            check(app.library.all().size == countBefore) { "list grew to ${app.library.all().map { it.name }}" }
+            check(app.library.byUri(Uri.fromFile(wa).toString()) != null)
+            runOnMainSync { opened.finish() }
+            waitForIdleSync()
+            record("A read-only share of a file that is on the device opens its entry — no duplicate, no copy")
+
+            // Marking the WhatsApp file writes into that file itself — no copy.
+            val doc = app.library.all().first { it.name == "wa-booklet" }
+            check(Uri.parse(doc.uri).scheme == "file")
+            val monitor = addMonitor(ReaderActivity::class.java.name, null, false)
+            runOnMainSync { ReaderActivity.open(list, doc) }
+            val reader = waitForMonitorWithTimeout(monitor, 60_000) as ReaderActivity
+            removeMonitor(monitor)
+            waitLoaded(reader)
+            tapUnchecked(reader, null)
+            waitFor("save in place", 90_000) { checkedIn(doc.uri) == 1 }
+            check(!wa.readBytes().contentEquals(waBefore))
+            val copies = (copyDir.listFiles()?.size ?: 0) - copiesBefore
+            check(copies == 0) { "$copies copies made" }
+            record("A mark is saved into WhatsApp's own file — no copy, no double space")
+
+            runOnMainSync { reader.finish(); list.finish() }
+
+            // Sorting
+            val sorted = LibraryActivity.Sort.NAME.apply(app.library.all()).map { it.name }
+            check(sorted == sorted.sortedWith(java.text.Collator.getInstance())) { sorted.toString() }
+            val bySize = LibraryActivity.Sort.SIZE.apply(app.library.all()).map { it.size }
+            check(bySize == bySize.sortedDescending())
+            record("Sorting by name and by size works")
+
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (e: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${e.stackTraceToString()}")
             finish(Activity.RESULT_CANCELED, result)
         }
     }

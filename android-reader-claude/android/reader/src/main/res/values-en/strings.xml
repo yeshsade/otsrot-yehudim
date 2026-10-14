@@ -31,4 +31,14 @@
     <string name="tool_bookmark">Bookmark</string>
     <string name="open_failed">The file can’t be opened.</string>
     <string name="save_failed">The mark wasn’t saved to the file. It stays on screen; we’ll retry with the next mark.</string>
+    <string name="all_files_title">All PDFs on this device — automatically</string>
+    <string name="all_files_body">So that every PDF on this device, including what arrives in WhatsApp, appears here by itself and your marks are saved in the file itself without an extra copy: tap “Turn on”, then switch on the toggle on the next screen.</string>
+    <string name="all_files_allow">Turn on</string>
+    <string name="library_sort_prefix">Sort:</string>
+    <string name="sort_title">Sort the list</string>
+    <string name="sort_received">Newest first, by date received</string>
+    <string name="sort_name">By name (A–Z)</string>
+    <string name="sort_size">By size (largest first)</string>
+    <string name="sort_last_read">By last read</string>
+    <string name="sort_pages">By number of pages</string>
 </resources>
