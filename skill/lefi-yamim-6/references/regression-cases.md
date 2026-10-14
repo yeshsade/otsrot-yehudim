@@ -1,5 +1,22 @@
 # Regression cases
 
+## Vayera 843 — actual output and rotated controls
+
+- Previous-week pages: Gemara 157, Mishnah Berurah 158, Likutei Moharan 105,
+  Likutei Halakhot 159. Monday Gemara source 6-11 uses `duplicate_amud=b`.
+- Tehillim current-week range 97-104 excludes previous-week Likutei Moharan 105.
+- Zohar source 83-96 partitions into seven consecutive two-page pairs.
+- The initial widget output had 18 real widget/continuation-link intersections
+  on rotated pages, despite its old audit reporting none. Link rectangles from
+  `get_links()` are in rotated view coordinates; convert by `derotation_matrix`
+  before comparing with unrotated widget rectangles, both during placement
+  and in the final audit. Never change navigation to accommodate a checkbox.
+- Require original white weekday headings to agree with the actual final day
+  groups, all 158 learning source pages present, only intro page 1 and blank
+  page 160 omitted, and reciprocal links on all four previous-week pages.
+- Final audit must fail on an omitted learning page, unexplained duplication,
+  stale source/map review, altered navigation, or a widget/link intersection.
+
 ## Sukkot 838
 
 - No weekly parsha.

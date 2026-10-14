@@ -326,6 +326,10 @@ def page_link_rects(page):
     for link in page.get_links():
         rect = link.get('from')
         if rect is not None:
+            # Links are reported in the rotated page view, while widget.rect
+            # and planned PDF rectangles use unrotated PDF coordinates.
+            if page.rotation:
+                rect = rect * page.derotation_matrix
             rects.append(rect)
     return rects
 
@@ -614,7 +618,7 @@ def invalid_internal_links(doc, fitz):
 def widget_link_intersections(doc):
     failures = []
     for page_number, page in enumerate(doc, 1):
-        links = [link.get('from') for link in page.get_links() if link.get('from') is not None]
+        links = page_link_rects(page)
         for widget in page.widgets() or []:
             if any(widget.rect.intersects(rect) for rect in links):
                 failures.append((page_number, widget.field_name))

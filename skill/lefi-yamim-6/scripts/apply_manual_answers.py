@@ -37,6 +37,7 @@ def load_days_engine():
         sys.path.insert(0, scripts_dir)
     spec = importlib.util.spec_from_file_location("lefi_yamim_6_days_engine", DAYS_ENGINE)
     module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
 
@@ -49,11 +50,14 @@ def checked_page(value, total, label, allow_none=False):
     return value
 
 
-def normalized_ranges(base, overrides, total):
+def normalized_ranges(base, overrides, total, absent=()):
     result = {name: list(bounds) for name, bounds in base.items()}
     for name, bounds in (overrides or {}).items():
         if name not in TOPICS:
             raise ValueError(f"Unsupported topic range: {name}")
+        if name in absent and bounds is None:
+            result[name] = [1, 0]
+            continue
         if not isinstance(bounds, list) or len(bounds) != 2:
             raise ValueError(f"Range for {name} must be [start, end]")
         start = checked_page(bounds[0], total, f"{name} start")
@@ -64,7 +68,14 @@ def normalized_ranges(base, overrides, total):
     missing = [name for name in TOPICS if name not in result]
     if missing:
         raise ValueError("Missing topic ranges: " + ", ".join(missing))
-    ordered = sorted((start, end, name) for name, (start, end) in result.items())
+    for name in absent:
+        if name not in {'פרשת השבוע', 'השלמות'}:
+            raise ValueError('Unsupported absent topic')
+        result[name] = [1, 0]
+    for name, (start, end) in result.items():
+        if name not in absent and not 1 <= start <= end <= total:
+            raise ValueError(f'Invalid range for {name}')
+    ordered = sorted((start, end, name) for name, (start, end) in result.items() if name not in absent)
     for (_s1, e1, n1), (s2, _e2, n2) in zip(ordered, ordered[1:]):
         if s2 <= e1:
             raise ValueError(f"Current-week topic ranges overlap: {n1} and {n2}")
@@ -75,13 +86,17 @@ def apply_days(base, answers):
     out = json.loads(json.dumps(base, ensure_ascii=False))
     total = int(out["total_original_pages"])
     cfg = out.setdefault("lefi_yamim_6", {})
-    for source, target in {"number": "booklet_number", "parsha": "parsha_name", "date_label": "date_label"}.items():
+    for source, target in {"number": "booklet_number", "booklet_number": "booklet_number", "parsha": "parsha_name", "parsha_name": "parsha_name", "date_label": "date_label"}.items():
         if source in answers.get("booklet", {}):
             cfg[target] = str(answers["booklet"][source])
     if not str(cfg.get("booklet_number", "")).isdigit():
         raise ValueError("Booklet number must use Arabic digits")
 
-    ranges = normalized_ranges(out["topic_ranges"], answers.get("topic_ranges"), total)
+    absent = set(answers.get('absent_topics', []))
+    if answers.get('no_parsha_this_week') is True:
+        absent.add('פרשת השבוע')
+    ranges = normalized_ranges(out["topic_ranges"], answers.get("topic_ranges"), total, absent)
+    out['absent_topics'] = sorted(absent)
     previous = answers.get("previous_week_pages", {})
     if set(previous) != PREVIOUS_WEEK_TOPICS:
         raise ValueError("previous_week_pages must contain exactly Mishnah Berurah, Likutei Moharan, and Likutei Halakhot")
@@ -108,7 +123,24 @@ def apply_days(base, answers):
     for run in daf.get("day_runs", []):
         if run.get("day") in old_duplicates:
             run["duplicate_amud"] = old_duplicates[run["day"]]
-    daf["previous_week_gemara_page"] = checked_page(answers.get("previous_week_gemara_page"), total, "Previous-week Gemara page", allow_none=True)
+    if 'previous_week_gemara_page' not in answers:
+        raise ValueError('The previous-week Gemara answer is still missing; do not interpret omission as none')
+    daf["previous_week_gemara_page"] = checked_page(answers["previous_week_gemara_page"], total, "Previous-week Gemara page", allow_none=True)
+    short_days = answers.get('daf_yomi_short_days', {})
+    if set(short_days) - {run['day'] for run in daf.get('day_runs', [])}:
+        raise ValueError('Unknown weekday in the short Daf Yomi answers')
+    for run in daf.get('day_runs', []):
+        exception = short_days.get(run['day'])
+        if exception is not None:
+            if exception.get('source_pages') != run['source_pages'] or not exception.get('reason'):
+                raise ValueError('A short Daf Yomi day needs its exact source pages and a recorded reason')
+            run['expected_page_count'] = run['page_count']
+            run['status'] = 'ok'
+            run['short_day_reason'] = exception['reason']
+    context = {p for p in checked_previous.values() if p is not None}
+    if daf['previous_week_gemara_page'] is not None:
+        context.add(daf['previous_week_gemara_page'])
+    out['day_pages'] = {day: [p for p in pages if p not in context] for day, pages in out['day_pages'].items()}
     out["daf_yomi"] = daf
     out["previous_week_pages"] = checked_previous
     out.setdefault("manual_user_answers", {}).update({
@@ -120,18 +152,31 @@ def apply_days(base, answers):
     if "no_parsha_this_week" in answers:
         out["manual_user_answers"]["no_parsha_this_week"] = answers["no_parsha_this_week"] is True
     out["manual_answers_applied_by_script"] = True
+    contract = importlib.import_module('16060510_source_contract')
+    out['source_sha256'] = contract.fingerprint(out['input_pdf'])
+    out['source_map_validation'] = contract.validate(out, engine, require_review=False)
+    # Never inherit a review flag from an older analysis after recomputation.
+    out['manual_user_answers']['source_map_confirmed_by_user'] = answers.get('source_map_confirmed_by_user') is True
+    out.pop('source_review_report', None)
+    if answers.get('source_review_report'):
+        out['source_review_report'] = str(Path(answers['source_review_report']).resolve())
     return out
 
 
 def apply_topics(base, answers, total):
     out = json.loads(json.dumps(base, ensure_ascii=False))
     starts = answers.get("topic_starts_original")
-    if not isinstance(starts, dict) or set(starts) != set(TOPICS):
-        raise ValueError("topic_starts_original must contain exactly the 15 supported topics")
-    checked = {name: checked_page(starts[name], total, f"TOC start for {name}") for name in TOPICS}
-    if [checked[name] for name in TOPICS] != sorted(checked.values()):
-        raise ValueError("The 15 topic starts must be in source-page order")
+    absent = set(answers.get('absent_topics', []))
+    if answers.get('no_parsha_this_week') is True:
+        absent.add('פרשת השבוע')
+    active = [name for name in TOPICS if name not in absent]
+    if not isinstance(starts, dict) or set(starts) != set(active):
+        raise ValueError('Provide exactly the active topics; absent topics must not get fallback starts')
+    checked = {name: checked_page(starts[name], total, f"TOC start for {name}") for name in active}
+    if [checked[name] for name in active] != sorted(checked.values()):
+        raise ValueError('Active topic starts must be in source-page order')
     out["topic_starts_original"] = checked
+    out['absent_topics'] = sorted(absent)
     out["topic_starts_applied_by_script"] = True
     return out
 
@@ -151,6 +196,9 @@ def main():
         raise ValueError("Provide both --topics-analysis and --topics-output, or neither")
     if args.topics_analysis:
         topics = apply_topics(load_json(args.topics_analysis), answers, int(days["total_original_pages"]))
+        topics['input_pdf'] = days['input_pdf']
+        topics['source_sha256'] = days['source_sha256']
+        topics['source_map_confirmed_by_user'] = days['manual_user_answers']['source_map_confirmed_by_user']
         atomic_json(args.topics_output, topics)
     print(f"DAYS_ANALYSIS={args.days_output}")
     if args.topics_output:

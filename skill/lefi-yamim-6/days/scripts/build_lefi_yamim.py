@@ -23,6 +23,8 @@ PARENT_SCRIPTS_DIR = Path(__file__).resolve().parents[2] / 'scripts'
 if str(PARENT_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(PARENT_SCRIPTS_DIR))
 from generate_edition_label import make_label as make_edition_label
+import importlib
+source_contract = importlib.import_module('16060510_source_contract')
 
 
 DAYS_ORDER = ["יום ראשון", "יום שני", "יום שלישי", "יום רביעי", "יום חמישי", "יום שישי", "שבת קודש"]
@@ -890,8 +892,11 @@ def build_pdf(args):
     input_pdf = resolve_path(args.input, workspace)
     cover_pdf = resolve_path(args.cover, workspace)
     pre_toc_page = resolve_pre_toc_page(args, analysis, workspace)
+    source_contract.validate(analysis, sys.modules[__name__], input_pdf)
     hex_color = detect_circle_hex(str(cover_pdf))
     toc_cfg = toc_config_from_args(args, analysis, input_pdf, cover_pdf)
+    if not all(external_links_from_config(toc_cfg).values()):
+        raise RuntimeError('All three external TOC URLs are required')
     toc_dir = workspace / "__lefi_yamim_6_assets"
     toc_dir.mkdir(parents=True, exist_ok=True)
     days_toc_pdf = Path(args.days_toc) if args.days_toc else toc_dir / "toc-lefi-yamim-6.pdf"
@@ -1006,7 +1011,10 @@ def build_pdf(args):
     out_dir = Path(args.out_dir) if args.out_dir else workspace / "לפי ימים"
     out_dir.mkdir(parents=True, exist_ok=True)
     base_name = clean_delivery_stem(input_pdf)
-    final_out = unique_output_path(out_dir / f"{base_name}_לפי_ימים.pdf")
+    final_out = Path(args.output) if getattr(args, 'output', None) else unique_output_path(out_dir / f"{base_name}_לפי_ימים.pdf")
+    if final_out.exists():
+        raise RuntimeError('Refusing to overwrite an existing output')
+    final_out.parent.mkdir(parents=True, exist_ok=True)
     doc = fitz.open(tmp2_path)
     doc.save(
         str(final_out),
@@ -1278,6 +1286,7 @@ def main():
     p.add_argument("--no-pre-toc-page", action="store_true", help="Skip the pre-TOC page; intended only for internal QA.")
     p.add_argument("--button-img")
     p.add_argument("--out-dir")
+    p.add_argument("--output", help="Explicit new output path, including the requested timestamp prefix.")
     p.add_argument("--parsha-name")
     p.add_argument("--date-label")
     p.add_argument("--whatsapp-url")

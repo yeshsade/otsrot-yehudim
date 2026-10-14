@@ -5,6 +5,12 @@ description: "Build only the לפי ימים half of lefi-yamim-6, including pag
 
 # Days edition engine
 
+The safety and source-review rules in `../SKILL.md` take precedence.
+Build only from a reviewed map and matching source hash. Use `build --output`
+for a fresh timestamp-prefixed path; no installation or delivery is authorized
+by regression testing. Preserve the existing approved cover-label placement;
+do not reposition it based on the rotated cover's thumbnail orientation.
+
 1. Analyze fresh interior and cover PDFs.
 2. Confirm the exact booklet identity. Keep the booklet number in Arabic digits.
 3. Ask and record every required manual answer one question per message, in this order: booklet identity; each unassigned source page; each still-unanswered previous-week topic; previous-week Gemara; one unusual Daf Yomi day at a time.

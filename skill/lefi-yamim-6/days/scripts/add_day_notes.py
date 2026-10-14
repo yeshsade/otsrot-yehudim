@@ -543,12 +543,15 @@ def daf_yomi_run_lookup(analysis):
                 "source_start": pages[0],
                 "source_end": pages[-1],
                 "duplicate_amud": explicit.get(source_range),
+                "short_day_reason": next((r.get('short_day_reason') for r in analysis.get('daf_yomi', {}).get('day_runs', []) if r.get('day') == day_text and r.get('source_pages') == pages), None),
             }
     return lookup
 
 
 def daf_yomi_link_endpoints(day_text, final_pages, run_lookup):
     run = run_lookup.get(day_text, {})
+    if len(final_pages) == 2 and run.get('short_day_reason'):
+        return {'previous_source': final_pages[0], 'next_source': final_pages[-1]}
     if len(final_pages) == EXPECTED_DAF_YOMI_PAGES_PER_DAY:
         return {
             "previous_source": final_pages[1],

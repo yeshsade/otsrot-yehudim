@@ -5,6 +5,11 @@ description: "Build only the לפי נושאים edition from original weekly PD
 
 # Topics edition engine
 
+The safety and source-review rules in `../SKILL.md` take precedence.
+Use exactly the explicitly active topics; 15 links applies only when all 15
+topics exist. Hide absent topic buttons with `--absent-topic` when generating
+the TOC. No installation or delivery is authorized by regression testing.
+
 Use the original interior and cover PDFs, never the days PDF. Keep the booklet number in Arabic digits. Page 2 is the topics TOC; do not insert `הריני מקשר` unless the user explicitly requests it.
 
 1. Derive and visually verify parsha, numeric booklet number, date range, and cover circle color.

@@ -190,6 +190,7 @@ def run(args):
     after_navigation = vb.navigation_signature(result)
     invalid_targets = vb.invalid_internal_links(result, fitz)
     conflicts = vb.widget_link_intersections(result)
+    widget_conflicts = vb.widget_widget_intersections(result)
     after_widgets = vb.widget_count(result)
 
     if before_navigation != after_navigation:
@@ -202,6 +203,9 @@ def run(args):
         result.close()
         raise RuntimeError(f'checkboxes intersect navigation links: {conflicts[:8]}')
 
+    if widget_conflicts:
+        result.close()
+        raise RuntimeError(f'checkboxes intersect each other: {widget_conflicts[:8]}')
     previews = vb.write_previews(result, included_pages, preview_dir)
     page_count = result.page_count
     result.close()
@@ -226,6 +230,7 @@ def run(args):
         'navigation_identical': before_navigation == after_navigation,
         'all_internal_targets_valid': not invalid_targets,
         'no_checkbox_covers_link': not conflicts,
+        'no_checkbox_overlaps': not widget_conflicts,
         'widgets_before': before_widgets,
         'widgets_after': after_widgets,
         'checkboxes_added': added,

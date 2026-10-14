@@ -45,6 +45,7 @@ def main():
     parser.add_argument('--color', required=True)
     parser.add_argument('--output-png', required=True)
     parser.add_argument('--output-pdf', required=True)
+    parser.add_argument('--absent-topic', action='append', default=[])
     args = parser.parse_args()
 
     img = Image.open(args.template).convert('RGB')
@@ -59,6 +60,14 @@ def main():
     title_rgb = tuple(max(0, round(channel * 0.36)) for channel in base_rgb)
     subtitle_rgb = tuple(max(0, round(channel * 0.70)) for channel in base_rgb)
     draw.rectangle((80, 151, 1320, 157), fill=line_rgb)
+    absent=set(args.absent_topic)
+    if absent-{'פרשת השבוע','השלמות'}:
+        raise ValueError('Unsupported absent topic')
+    rectangles={'פרשת השבוע':(33.4,145.8,226.6,178.8),'השלמות':(138.0,436.3,331.3,468.7)}
+    sx,sy=img.width/468,img.height/680.25
+    for topic in absent:
+        x1,y1,x2,y2=rectangles[topic]
+        draw.rounded_rectangle(((x1-7)*sx,(y1-7)*sy,(x2+7)*sx,(y2+7)*sy),radius=12*sx,fill=background)
 
     def hebrew_font(size):
         for candidate in (r'C:\Windows\Fonts\Guttman Hatzvi-Bold.TTF', r'C:\Windows\Fonts\davidbd.ttf', r'C:\Windows\Fonts\arialbd.ttf'):

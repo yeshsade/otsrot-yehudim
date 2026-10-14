@@ -447,7 +447,7 @@ def canvas_rect(x1, y1, x2, y2):
     return (x1 / SCALE, y1 / SCALE, x2 / SCALE, y2 / SCALE)
 
 
-def toc_rect_specs():
+def toc_rect_specs(no_parsha=False):
     btn_w, btn_h = 398, 78
     rx = CANVAS_W - 156 - btn_w
     lx = 156
@@ -466,6 +466,9 @@ def toc_rect_specs():
     special_y = shabbos_y + btn_h + 44
     specs["parsha"] = (rx, special_y, rx + btn_w, special_y + btn_h)
     specs["tikun"] = (lx, special_y, lx + btn_w, special_y + btn_h)
+    if no_parsha:
+        specs.pop('parsha')
+        specs['tikun'] = ((CANVAS_W-btn_w)//2, special_y, (CANVAS_W+btn_w)//2, special_y+btn_h)
     footer_top = special_y + btn_h + 48 + 405 + 40
     left = 92
     right = CANVAS_W - 92
@@ -484,8 +487,8 @@ def toc_rect_specs():
     return specs
 
 
-def toc_button_rects(fitz):
-    return {key: fitz.Rect(*canvas_rect(*spec)) for key, spec in toc_rect_specs().items()}
+def toc_button_rects(fitz, no_parsha=False):
+    return {key: fitz.Rect(*canvas_rect(*spec)) for key, spec in toc_rect_specs(no_parsha).items()}
 
 
 def external_links_from_config(config):
@@ -507,7 +510,7 @@ def external_links_from_config(config):
 
 
 def insert_toc_links(fitz, toc_page, internal_targets, external_links=None):
-    rects = toc_button_rects(fitz)
+    rects = toc_button_rects(fitz, no_parsha='parsha' not in internal_targets)
     for key, target in internal_targets.items():
         if key not in rects or not target:
             continue
