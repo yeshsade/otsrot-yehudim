@@ -1,0 +1,6 @@
+interface:
+  display_name: "לפי ימים V Check Test"
+  short_description: "בדיקת תיבות V לחוברות לפי ימים"
+  default_prompt: "Use $lefi-yamim-vcheck-test to build a test לפי ימים PDF with persistent V checkboxes and QA previews."
+policy:
+  allow_implicit_invocation: true
