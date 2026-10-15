@@ -51,6 +51,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "chrome") { chromeChecks(); return }
         if (mode == "settingsshots") { settingsShots(); return }
         if (mode == "look") { look(); return }
+        if (mode == "perf") { perf(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -499,9 +500,9 @@ class LeanProbe : Instrumentation() {
             record("After the set time the frame, the handle and the phone's bars hide together; the page does not move; the thin line shows battery and time")
 
             tapPage(reader)
-            onMainChecked { check(header.visibility == View.VISIBLE && info.visibility != View.VISIBLE) }
+            waitFor("frame back", 10_000) { var ok = false; runOnMainSync { ok = header.visibility == View.VISIBLE && header.alpha > .99f && info.visibility != View.VISIBLE }; ok }
             tapPage(reader)
-            onMainChecked { check(header.visibility != View.VISIBLE) }
+            waitFor("frame gone", 10_000) { var ok = false; runOnMainSync { ok = header.visibility != View.VISIBLE }; ok }
             record("A tap on the page shows the frame, another tap hides it")
 
             // the page handle: holding less than the set time does nothing; holding longer moves through the document
@@ -534,7 +535,7 @@ class LeanProbe : Instrumentation() {
             SystemClock.sleep(5000)
             onMainChecked { check(field<View>(reader, "header").visibility == View.VISIBLE) { "tap mode hid by itself" } }
             tapPage(reader)
-            onMainChecked { check(field<View>(reader, "header").visibility != View.VISIBLE) }
+            waitFor("tap hides", 10_000) { var ok = false; runOnMainSync { ok = field<View>(reader, "header").visibility != View.VISIBLE }; ok }
             record("In 'shows and hides with a tap' the frame stays until tapped")
 
             // "always shown": the top bar sits above the page, a tap does not hide it
@@ -593,7 +594,7 @@ class LeanProbe : Instrumentation() {
             }
             SystemClock.sleep(500); waitForIdleSync()
             onMainChecked { snapshot(settingsScreen, "settings-new-rows.png") }
-            for (key in listOf("frame", "info", "scrub_hold")) {
+            for (key in listOf("frame", "handle")) {
                 onMainChecked { settingsScreen.window.decorView.findViewWithTag<View>("setting_$key").performClick() }
                 SystemClock.sleep(1200); waitForIdleSync()
                 onMainChecked {
@@ -603,7 +604,7 @@ class LeanProbe : Instrumentation() {
                 SystemClock.sleep(500); waitForIdleSync()
             }
             onMainChecked { settingsScreen.finish() }
-            record("The settings screen shows the new rows (frame, thin line, handle side and hold time)")
+            record("The settings screen shows the new layout: frame (with the thin line) and the page handle (position, when shown, hold time)")
 
             val lib = startActivitySync(Intent(targetContext, LibraryActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK).putExtra(LibraryActivity.EXTRA_STAY, true)) as LibraryActivity
@@ -651,6 +652,51 @@ class LeanProbe : Instrumentation() {
             onMainChecked { snapshot(reader, "look-hidden.png"); reader.finish() }
             app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.AUTO
             result.putString("stream", "Look done.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /**
+     * Times moving between screens: list -> document (until the page count is known and the main thread is idle)
+     * and document -> list (until the list is idle). Needs -e file <big pdf> already in the list.
+     */
+    private fun perf() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            app.settings.whatsAppPromptDismissed = true; app.settings.allFilesPromptDismissed = true
+            val path = fileArg ?: error("needs -e file")
+            val target = com.yeshsade.otzarot.reader.data.Intake(targetContext, app.library, app.settings).open(Uri.fromFile(File(path)))!!
+            val listMonitor = addMonitor(LibraryActivity::class.java.name, null, false)
+            var list = startActivitySync(Intent(targetContext, LibraryActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK).putExtra(LibraryActivity.EXTRA_STAY, true)) as LibraryActivity
+            waitForIdleSync(); SystemClock.sleep(8000); waitForIdleSync()
+            val opens = mutableListOf<Long>(); val backs = mutableListOf<Long>()
+            repeat(4) {
+                val rm = addMonitor(ReaderActivity::class.java.name, null, false)
+                val t0 = SystemClock.uptimeMillis()
+                runOnMainSync { ReaderActivity.open(list, target) }
+                val reader = waitForMonitorWithTimeout(rm, 60_000) as ReaderActivity
+                removeMonitor(rm)
+                waitFor("pages", 120_000) { var ok = false; runOnMainSync { ok = pdfView(reader).getPageCount() > 0 }; ok }
+                waitForIdleSync()
+                opens += SystemClock.uptimeMillis() - t0
+                SystemClock.sleep(3000)
+                val t1 = SystemClock.uptimeMillis()
+                runOnMainSync { reader.onBackPressedDispatcher.onBackPressed() }
+                // what the reader sees: the list is in front and has drawn (has the window's focus)
+                waitFor("list back", 60_000) { var ok = false; runOnMainSync { ok = list.hasWindowFocus() }; ok }
+                backs += SystemClock.uptimeMillis() - t1
+                waitForIdleSync()
+                SystemClock.sleep(3000)
+            }
+            removeMonitor(listMonitor)
+            val docs = app.library.all().size
+            result.putString("stream", "PERF docs=$docs open(ms)=$opens back(ms)=$backs median open=${opens.sorted()[opens.size / 2]} back=${backs.sorted()[backs.size / 2]}\n")
+            runOnMainSync { list.finish() }
             finish(Activity.RESULT_OK, result)
         } catch (error: Throwable) {
             result.putString("stream", "FAILED: ${error.stackTraceToString()}")

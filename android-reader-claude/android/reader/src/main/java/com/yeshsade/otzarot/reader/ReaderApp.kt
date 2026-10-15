@@ -28,6 +28,14 @@ class ReaderApp : Application() {
     lateinit var windowPolicy: WindowPolicy
     /** One background thread for file work, so saves never overlap. */
     val io: ExecutorService = Executors.newSingleThreadExecutor()
+    /** Saving documents and preparing a document for display, in order, apart from scans of the device. */
+    val saves: ExecutorService = Executors.newSingleThreadExecutor()
+    /** Work that must not wait behind saves and scans: covers. */
+    val quick: ExecutorService = Executors.newFixedThreadPool(2)
+    /** Small covers already decoded (doc id → bitmap), so returning to the list does not decode them again. */
+    val covers = object : android.util.LruCache<String, android.graphics.Bitmap>(16 * 1024 * 1024) {
+        override fun sizeOf(key: String, value: android.graphics.Bitmap) = value.byteCount
+    }
 
     override fun onCreate() {
         super.onCreate()

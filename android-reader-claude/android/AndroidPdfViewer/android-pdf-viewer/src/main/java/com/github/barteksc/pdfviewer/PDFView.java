@@ -1118,6 +1118,17 @@ public class PDFView extends RelativeLayout {
             decodingAsyncTask.cancel(true);
         }
 
+        // Detached first, so the steps below (text selection) do not wait on the engine either.
+        if (pdfFile != null) {
+            // Closing a big document waits for the page being drawn and closes every open page: do it off the
+            // screen's thread, so leaving the reading screen is not held up. Nothing here uses this PdfFile again.
+            final PdfFile closing = pdfFile;
+            pdfFile = null;
+            Thread closer = new Thread(closing::dispose, "pdf-close");
+            closer.setDaemon(true);
+            closer.start();
+        }
+
         // Clear caches
         cacheManager.recycle();
 
@@ -1132,11 +1143,6 @@ public class PDFView extends RelativeLayout {
             stampPlacementManager.recycle();
         }
         selectedHighlightAnnotation = null;
-
-        if (pdfFile != null) {
-            pdfFile.dispose();
-            pdfFile = null;
-        }
 
         scrollHandle = null;
         isScrollHandleInit = false;

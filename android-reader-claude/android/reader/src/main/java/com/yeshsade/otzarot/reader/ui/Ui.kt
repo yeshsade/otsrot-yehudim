@@ -31,9 +31,9 @@ class Ui(private val context: Context) {
     else
         Palette(c("#F1F0F8"), Color.WHITE, c("#342C69"), c("#252438"), c("#646279"), c("#57479F"), c("#E0DCEB"), c("#EEEAF9"), Color.WHITE, c("#57479F"), Color.WHITE)
 
-    val font: Typeface = Typeface.createFromAsset(context.assets, "fonts/NotoSansHebrew-Regular.ttf")
-    val medium: Typeface = Typeface.createFromAsset(context.assets, "fonts/NotoSansHebrew-Medium.ttf")
-    val heading: Typeface = Typeface.createFromAsset(context.assets, "fonts/NotoSansHebrew-SemiBold.ttf")
+    val font: Typeface = Fonts.regular(context)
+    val medium: Typeface = Fonts.medium(context)
+    val heading: Typeface = Fonts.heading(context)
 
     fun dp(v: Int) = dp(v.toFloat())
     fun dp(v: Float) = (v * context.resources.displayMetrics.density + .5f).toInt()
@@ -103,4 +103,23 @@ class Ui(private val context: Context) {
     companion object {
         fun c(value: String) = Color.parseColor(value)
     }
+}
+
+/** The Hebrew fonts, loaded once for the whole app (loading them for every screen slowed moving between screens). */
+object Fonts {
+    @Volatile private var loaded: Array<Typeface>? = null
+
+    private fun all(context: Context): Array<Typeface> = loaded ?: synchronized(this) {
+        loaded ?: context.applicationContext.assets.let { a ->
+            arrayOf(
+                Typeface.createFromAsset(a, "fonts/NotoSansHebrew-Regular.ttf"),
+                Typeface.createFromAsset(a, "fonts/NotoSansHebrew-Medium.ttf"),
+                Typeface.createFromAsset(a, "fonts/NotoSansHebrew-SemiBold.ttf"),
+            )
+        }.also { loaded = it }
+    }
+
+    fun regular(context: Context) = all(context)[0]
+    fun medium(context: Context) = all(context)[1]
+    fun heading(context: Context) = all(context)[2]
 }

@@ -30,8 +30,12 @@ import com.yeshsade.otzarot.reader.data.Settings
 class Chrome(
     private val window: Window,
     private val root: View,
-    /** Everything that shows and hides with the frame. */
-    private val parts: List<View>,
+    /** Slides up when hiding. */
+    private val top: View,
+    /** Slides down when hiding. */
+    private val bottom: View,
+    /** Fade out when hiding (the page handle, unless it stays on screen). */
+    private val faders: List<View>,
     private val info: InfoLine,
     private val settings: Settings,
 ) {
@@ -49,10 +53,15 @@ class Chrome(
     /** The frame starts shown, then follows the mode. */
     fun start() = show()
 
+    /** All parts that come and go (for tests). */
+    val parts get() = listOf(top, bottom) + faders
+
     fun show() {
         shown = true
-        parts.forEach { it.visibility = View.VISIBLE }
-        info.visibility = View.GONE
+        // smooth, a quarter of a second (owner's decision): bars slide back in and the handle fades in
+        top.animateIn(); bottom.animateIn(); faders.forEach { it.animateIn() }
+        info.animate().cancel()
+        info.animate().alpha(0f).setDuration(DURATION).withEndAction { if (shown) info.visibility = View.GONE }.start()
         bars.show(WindowInsetsCompat.Type.systemBars())
         schedule()
     }
@@ -61,10 +70,31 @@ class Chrome(
         main.removeCallbacks(hideLater)
         if (!FramePolicy.canHide(mode)) return
         shown = false
-        parts.forEach { it.visibility = View.INVISIBLE }
-        info.visibility = if (info.hasContent) View.VISIBLE else View.GONE
-        info.refresh()
+        top.animateOut(translateY = -(top.height.toFloat()))
+        bottom.animateOut(translateY = bottom.height.toFloat() + ((bottom.layoutParams as? android.view.ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0))
+        faders.forEach { it.animateOut(translateY = 0f) }
+        if (info.hasContent) {
+            info.refresh()
+            info.alpha = 0f
+            info.visibility = View.VISIBLE
+            info.animate().cancel()
+            info.animate().alpha(1f).setDuration(DURATION).start()
+        } else info.visibility = View.GONE
         bars.hide(WindowInsetsCompat.Type.systemBars())
+    }
+
+    private fun View.animateIn() {
+        animate().cancel()
+        visibility = View.VISIBLE
+        animate().translationY(0f).alpha(1f).setDuration(DURATION)
+            .setInterpolator(android.view.animation.DecelerateInterpolator()).start()
+    }
+
+    private fun View.animateOut(translateY: Float) {
+        animate().cancel()
+        animate().translationY(translateY).alpha(0f).setDuration(DURATION)
+            .setInterpolator(android.view.animation.AccelerateInterpolator())
+            .withEndAction { if (!shown) visibility = View.INVISIBLE }.start()
     }
 
     /** A tap on the page. */
@@ -79,6 +109,8 @@ class Chrome(
     fun hold() = main.removeCallbacks(hideLater)
 
     fun stop() = main.removeCallbacks(hideLater)
+
+    private companion object { const val DURATION = 250L }
 
     private fun schedule() {
         main.removeCallbacks(hideLater)

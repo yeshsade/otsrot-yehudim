@@ -44,20 +44,22 @@
   <item type="id" name="otzr_seconds_n" />
   <item type="id" name="otzr_minute_one" />
   <item type="id" name="otzr_info_label" />
-  <item type="id" name="otzr_info_desc" />
   <item type="id" name="otzr_info_page" />
   <item type="id" name="otzr_info_battery" />
   <item type="id" name="otzr_info_clock" />
-  <item type="id" name="otzr_info_none" />
-  <item type="id" name="otzr_scrub_side_label" />
-  <item type="id" name="otzr_scrub_side_desc" />
   <item type="id" name="otzr_scrub_right" />
   <item type="id" name="otzr_scrub_left" />
-  <item type="id" name="otzr_scrub_hold_label" />
-  <item type="id" name="otzr_scrub_hold_desc" />
-  <item type="id" name="otzr_hold_now" />
-  <item type="id" name="otzr_hold_half" />
-  <item type="id" name="otzr_hold_one" />
-  <item type="id" name="otzr_hold_one_half" />
-  <item type="id" name="otzr_hold_n" />
+  <item type="id" name="otzr_group_paging" />
+  <item type="id" name="otzr_frame_desc_tap" />
+  <item type="id" name="otzr_handle_label" />
+  <item type="id" name="otzr_handle_desc" />
+  <item type="id" name="otzr_handle_place_title" />
+  <item type="id" name="otzr_handle_place_value" />
+  <item type="id" name="otzr_handle_show_title" />
+  <item type="id" name="otzr_handle_show_always" />
+  <item type="id" name="otzr_handle_show_frame" />
+  <item type="id" name="otzr_hold_title" />
+  <item type="id" name="otzr_hold_desc" />
+  <item type="id" name="otzr_hold_value" />
+  <item type="id" name="otzr_seconds_word" />
 </resources>

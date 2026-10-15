@@ -17,7 +17,6 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,7 +36,9 @@ import java.io.File
 /** List of documents with small covers, newest received first. */
 class LibraryActivity : AppCompatActivity() {
     private lateinit var ui: Ui
-    private lateinit var list: LinearLayout
+    private lateinit var list: androidx.recyclerview.widget.RecyclerView
+    private lateinit var empty: TextView
+    private val adapter = DocAdapter()
     private lateinit var refresher: SwipeRefreshLayout
     private lateinit var sortLabel: TextView
     @Volatile private var scanning = false
@@ -97,12 +98,28 @@ class LibraryActivity : AppCompatActivity() {
             setOnClickListener { chooseSort() }
         }
         root.addView(sortLabel)
-        list = ui.column().apply { setPadding(ui.dp(14), ui.dp(6), ui.dp(14), ui.dp(12)) }
+        // Only the cards on screen are built (a long list of every PDF on the device stays quick to show).
+        list = androidx.recyclerview.widget.RecyclerView(this).apply {
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@LibraryActivity)
+            adapter = this@LibraryActivity.adapter
+            setPadding(ui.dp(14), ui.dp(6), ui.dp(14), ui.dp(12))
+            clipToPadding = false
+            itemAnimator = null
+            tag = "doc_list"
+        }
+        empty = ui.label(getString(R.string.library_empty), 15f, ui.colors.muted).apply {
+            gravity = Gravity.CENTER; setPadding(ui.dp(24), ui.dp(48), ui.dp(24), ui.dp(48)); visibility = View.GONE
+        }
+        val stack = android.widget.FrameLayout(this).apply {
+            addView(list, android.widget.FrameLayout.LayoutParams(-1, -1))
+            addView(empty, android.widget.FrameLayout.LayoutParams(-1, -2))
+        }
         refresher = SwipeRefreshLayout(this).apply {
             setColorSchemeColors(ui.colors.accent)
             setProgressBackgroundColorSchemeColor(ui.colors.card)
             setOnRefreshListener { scanAndRefresh(userAsked = true) }
-            addView(ScrollView(this@LibraryActivity).apply { addView(list); clipToPadding = false; isFillViewport = true })
+            setOnChildScrollUpCallback { _, _ -> list.canScrollVertically(-1) }
+            addView(stack)
         }
         root.addView(refresher, LinearLayout.LayoutParams(-1, 0, 1f))
 
@@ -122,28 +139,56 @@ class LibraryActivity : AppCompatActivity() {
         ui.install(this, root, header)
     }
 
+    /** The day the list was last drawn: after midnight "today"/"yesterday" labels must be redrawn. */
+    private var shownDay: java.time.LocalDate? = null
+
     private fun refresh() {
-        list.removeAllViews()
         val sort = Sort.of(app.settings.sort)
-        sortLabel.text = getString(R.string.library_sort_prefix) + " " + getString(sort.label) + "  ▾"
         val docs = sort.apply(app.library.all())
-        if (docs.isEmpty()) {
-            list.addView(ui.label(getString(R.string.library_empty), 15f, ui.colors.muted).apply {
-                gravity = Gravity.CENTER; setPadding(ui.dp(24), ui.dp(48), ui.dp(24), ui.dp(48))
-            })
-            return
-        }
-        docs.forEach { list.addView(card(it)) }
+        sortLabel.text = getString(R.string.library_sort_prefix) + " " + getString(sort.label) + "  ▾"
+        empty.visibility = if (docs.isEmpty()) View.VISIBLE else View.GONE
+        val today = java.time.LocalDate.now()
+        val newDay = shownDay != null && shownDay != today
+        shownDay = today
+        // Only cards whose document changed are redrawn (coming back from reading usually changes one).
+        adapter.submitList(docs) { if (newDay) adapter.notifyDataSetChanged() }
     }
 
-    private fun card(doc: Doc): View {
+    private inner class DocAdapter : androidx.recyclerview.widget.ListAdapter<Doc, DocHolder>(
+        object : androidx.recyclerview.widget.DiffUtil.ItemCallback<Doc>() {
+            override fun areItemsTheSame(a: Doc, b: Doc) = a.id == b.id
+            override fun areContentsTheSame(a: Doc, b: Doc) = a == b
+        }) {
+        override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int) = DocHolder(card())
+        override fun onBindViewHolder(holder: DocHolder, position: Int) = holder.bind(getItem(position))
+    }
+
+    private inner class DocHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+        private val card = (view as LinearLayout).getChildAt(0) as LinearLayout
+        private val cover = card.getChildAt(0) as ImageView
+        private val texts = card.getChildAt(1) as LinearLayout
+        private val more = card.getChildAt(2) as ImageButton
+
+        fun bind(doc: Doc) {
+            card.tag = "doc_" + doc.id
+            card.setOnClickListener { ReaderActivity.open(this@LibraryActivity, doc) }
+            more.setOnClickListener { confirmRemove(doc) }
+            (texts.getChildAt(0) as TextView).text = doc.name
+            (texts.getChildAt(1) as TextView).text =
+                if (doc.pages > 0) getString(R.string.library_pages, receivedLabel(doc.receivedAt), doc.pages) else receivedLabel(doc.receivedAt)
+            (texts.getChildAt(2) as TextView).text =
+                if (doc.lastOpened > 0) getString(R.string.library_continue, doc.page + 1) else getString(R.string.library_unread)
+            loadCover(doc, cover)
+        }
+    }
+
+    /** One empty card; [DocHolder.bind] fills it. */
+    private fun card(): View {
         val card = ui.row().apply {
             background = ui.rounded(ui.colors.card, 20f, border = ui.colors.border)
             setPadding(ui.dp(14), ui.dp(14), ui.dp(6), ui.dp(14))
             minimumHeight = ui.dp(104)
             isClickable = true
-            setOnClickListener { ReaderActivity.open(this@LibraryActivity, doc) }
-            tag = "doc_" + doc.id
         }
         val cover = ImageView(this).apply {
             scaleType = ImageView.ScaleType.CENTER_CROP
@@ -151,14 +196,11 @@ class LibraryActivity : AppCompatActivity() {
             contentDescription = null
         }
         card.addView(cover, LinearLayout.LayoutParams(ui.dp(52), ui.dp(72)).apply { marginEnd = ui.dp(14) })
-        loadCover(doc, cover)
 
         val text = ui.column()
-        text.addView(ui.label(doc.name, 17f, ui.colors.ink, true).apply { maxLines = 2; ellipsize = TextUtils.TruncateAt.END })
-        val details = if (doc.pages > 0) getString(R.string.library_pages, receivedLabel(doc.receivedAt), doc.pages) else receivedLabel(doc.receivedAt)
-        text.addView(ui.label(details, 13f, ui.colors.muted).apply { setPadding(0, ui.dp(4), 0, 0) })
-        val progress = if (doc.lastOpened > 0) getString(R.string.library_continue, doc.page + 1) else getString(R.string.library_unread)
-        text.addView(ui.label(progress, 13f, ui.colors.accent).apply { setPadding(0, ui.dp(2), 0, 0) })
+        text.addView(ui.label("", 17f, ui.colors.ink, true).apply { maxLines = 2; ellipsize = TextUtils.TruncateAt.END })
+        text.addView(ui.label("", 13f, ui.colors.muted).apply { setPadding(0, ui.dp(4), 0, 0) })
+        text.addView(ui.label("", 13f, ui.colors.accent).apply { setPadding(0, ui.dp(2), 0, 0) })
         card.addView(text, LinearLayout.LayoutParams(0, -2, 1f))
 
         card.addView(ImageButton(this).apply {
@@ -166,11 +208,11 @@ class LibraryActivity : AppCompatActivity() {
             imageTintList = ColorStateList.valueOf(ui.colors.muted)
             background = null
             contentDescription = getString(R.string.library_remove)
-            setOnClickListener { confirmRemove(doc) }
         }, LinearLayout.LayoutParams(ui.dp(48), ui.dp(48)))
 
         return LinearLayout(this).apply {
             setPadding(0, 0, 0, ui.dp(10))
+            layoutParams = androidx.recyclerview.widget.RecyclerView.LayoutParams(-1, -2)
             addView(card, LinearLayout.LayoutParams(-1, -2))
         }
     }
@@ -227,9 +269,19 @@ class LibraryActivity : AppCompatActivity() {
     }
 
     private fun loadCover(doc: Doc, view: ImageView) {
+        view.tag = doc.id
+        app.covers.get(doc.id)?.let { view.setImageBitmap(it); return }
+        view.setImageDrawable(null)
         val file = File(File(cacheDir, "covers").apply { mkdirs() }, doc.id + ".png")
-        if (file.exists()) { view.setImageBitmap(BitmapFactory.decodeFile(file.path)); return }
-        app.io.execute {
+        // decoding and drawing covers never runs on the screen's thread, and never waits behind saves or scans
+        app.quick.execute {
+            if (file.exists()) {
+                BitmapFactory.decodeFile(file.path)?.let { bitmap ->
+                    app.covers.put(doc.id, bitmap)
+                    main.post { if (view.tag == doc.id && !isDestroyed) view.setImageBitmap(bitmap) }
+                    return@execute
+                }
+            }
             val bitmap = runCatching {
                 contentResolver.openFileDescriptor(Uri.parse(doc.uri), "r")!!.use { fd ->
                     val core = PdfiumCore(this)
@@ -250,7 +302,8 @@ class LibraryActivity : AppCompatActivity() {
                 }
             }.getOrNull() ?: return@execute
             runCatching { file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 90, it) } }
-            main.post { if (view.isAttachedToWindow) view.setImageBitmap(bitmap) }
+            app.covers.put(doc.id, bitmap)
+            main.post { if (view.tag == doc.id && !isDestroyed) view.setImageBitmap(bitmap) }
         }
     }
 

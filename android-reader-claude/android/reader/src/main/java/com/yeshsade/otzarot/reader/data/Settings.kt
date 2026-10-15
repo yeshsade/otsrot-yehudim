@@ -73,6 +73,10 @@ class Settings(context: Context) {
     var scrubberHoldMillis: Int
         get() = ScrubberPolicy.clampHold(prefs.getInt(SCRUB_HOLD, ScrubberPolicy.DEFAULT_HOLD_MS))
         set(v) = prefs.edit().putInt(SCRUB_HOLD, ScrubberPolicy.clampHold(v)).apply()
+    /** The page handle stays on screen even while the frame is hidden (default: no, it comes and goes with the frame). */
+    var scrubberAlways: Boolean
+        get() = prefs.getBoolean(SCRUB_ALWAYS, false)
+        set(v) = prefs.edit().putBoolean(SCRUB_ALWAYS, v).apply()
     var allFilesPromptDismissed: Boolean
         get() = prefs.getBoolean(ALL_FILES_DISMISSED, false)
         set(v) = prefs.edit().putBoolean(ALL_FILES_DISMISSED, v).apply()
@@ -102,6 +106,7 @@ class Settings(context: Context) {
         const val INFO_CLOCK = "info_clock"
         const val SCRUB_SIDE = "scrubber_side"
         const val SCRUB_HOLD = "scrubber_hold_ms"
+        const val SCRUB_ALWAYS = "scrubber_always"
         const val BM_HORIZONTAL = "bookmark_horizontal"
     }
 }

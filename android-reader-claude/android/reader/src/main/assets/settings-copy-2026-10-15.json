@@ -1,0 +1,147 @@
+{
+ "version": "2026-10-15",
+ "status": "approved",
+ "note": "Hebrew approved by the owner on 2026-10-15, one text at a time; it adds to and overrides settings-copy.json (v4). English: Claude's translation — the owner does not review English.",
+ "entries": [
+  {
+   "id": "group_display",
+   "he": "מסך ותצוגה",
+   "en": "Screen and display"
+  },
+  {
+   "id": "theme_label",
+   "he": "תצוגת יום ולילה",
+   "en": "Day and night view"
+  },
+  {
+   "id": "group_paging",
+   "he": "דפדוף",
+   "en": "Page turning"
+  },
+  {
+   "id": "frame_label",
+   "he": "הסתרת מסגרת באופן אוטומטי",
+   "en": "Hide the frame automatically"
+  },
+  {
+   "id": "frame_desc",
+   "he": "הסתרת הפס העליון, הסרגל התחתון ושורת הטלפון, בזמן קריאה.",
+   "en": "Hides the top bar, the toolbar and the phone's bars while reading."
+  },
+  {
+   "id": "frame_desc_tap",
+   "he": "נגיעה בדף מציגה אותם שוב.",
+   "en": "Tap the page to show them again."
+  },
+  {
+   "id": "frame_auto",
+   "he": "נעלמת לבד אחרי %s",
+   "en": "Hides by itself after %s"
+  },
+  {
+   "id": "frame_tap",
+   "he": "מופיעה ונעלמת בנגיעה",
+   "en": "Shows and hides with a tap"
+  },
+  {
+   "id": "frame_always",
+   "he": "תמיד מופיעה",
+   "en": "Always shown"
+  },
+  {
+   "id": "seconds_n",
+   "he": "%d שניות",
+   "en": "%d seconds"
+  },
+  {
+   "id": "minute_one",
+   "he": "דקה",
+   "en": "1 minute"
+  },
+  {
+   "id": "info_label",
+   "he": "כשהמסגרת מוסתרת, למעלה יופיעו:",
+   "en": "While the frame is hidden, show at the top:"
+  },
+  {
+   "id": "info_page",
+   "he": "מספר העמוד",
+   "en": "Page number"
+  },
+  {
+   "id": "info_battery",
+   "he": "סוללה",
+   "en": "Battery"
+  },
+  {
+   "id": "info_clock",
+   "he": "שעה",
+   "en": "Time"
+  },
+  {
+   "id": "handle_label",
+   "he": "ידית הדפדוף",
+   "en": "Page handle"
+  },
+  {
+   "id": "handle_desc",
+   "he": "ידית לדילוג בין עמודים",
+   "en": "A handle for jumping between pages"
+  },
+  {
+   "id": "handle_place_title",
+   "he": "מיקום ידית הדפדוף",
+   "en": "Page handle position"
+  },
+  {
+   "id": "handle_place_value",
+   "he": "מיקום: %s",
+   "en": "Position: %s"
+  },
+  {
+   "id": "scrub_right",
+   "he": "ימין",
+   "en": "Right"
+  },
+  {
+   "id": "scrub_left",
+   "he": "שמאל",
+   "en": "Left"
+  },
+  {
+   "id": "handle_show_title",
+   "he": "מתי מופיעה",
+   "en": "When it is shown"
+  },
+  {
+   "id": "handle_show_always",
+   "he": "מוצגת גם ללא מסגרת",
+   "en": "Shown even without the frame"
+  },
+  {
+   "id": "handle_show_frame",
+   "he": "מוצגת בזמן הצגת המסגרת",
+   "en": "Shown while the frame is shown"
+  },
+  {
+   "id": "hold_title",
+   "he": "זמן לחיצה",
+   "en": "Hold time"
+  },
+  {
+   "id": "hold_desc",
+   "he": "בחר כמה זמן ללחוץ על הידית כדי להתחיל לדפדף. (מניעת דפדוף בשוגג)",
+   "en": "Choose how long to press the handle before it starts turning pages. (Prevents turning pages by accident.)"
+  },
+  {
+   "id": "hold_value",
+   "he": "זמן לחיצה: %s שניות",
+   "en": "Hold time: %s seconds"
+  },
+  {
+   "id": "seconds_word",
+   "he": "שניות",
+   "en": "seconds"
+  }
+ ]
+}

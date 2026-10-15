@@ -115,7 +115,7 @@ class ReaderActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    private fun layoutSettings() = app.settings.run { "$frameMode|$scrubberSide|$scrubberHoldMillis|$scroll" }
+    private fun layoutSettings() = app.settings.run { "$frameMode|$scrubberSide|$scrubberHoldMillis|$scrubberAlways|$scroll" }
 
     override fun onStop() {
         if (saveState.dirty) saveNow()
@@ -129,7 +129,7 @@ class ReaderActivity : AppCompatActivity() {
             if (saveState.generation != capturedGeneration && pageCount > 0) {
                 val target = doc
                 val file = captureLocked()
-                if (target != null && file != null) app.io.execute { write(target, file) }
+                if (target != null && file != null) app.saves.execute { write(target, file) }
             }
             destroyed = true
         }
@@ -161,7 +161,7 @@ class ReaderActivity : AppCompatActivity() {
         val body = FrameLayout(this)
         pdfView = PDFView(this, null).apply { setBackgroundColor(ui.colors.canvas) }
         body.addView(pdfView, FrameLayout.LayoutParams(-1, -1))
-        bookmarks = Bookmarks(this, pdfView, ui, settings, app.io) { step ->
+        bookmarks = Bookmarks(this, pdfView, ui, settings, app.quick) { step ->
             undo.push(step)
             marked()
         }
@@ -193,7 +193,8 @@ class ReaderActivity : AppCompatActivity() {
         root.addView(body, LinearLayout.LayoutParams(-1, 0, 1f))
 
         if (hides) installFloating(root, header, toolbar) else ui.install(this, root, header)
-        chrome = Chrome(window, root, listOf(header, toolbar, scrubber), infoLine, settings)
+        chrome = Chrome(window, root, top = header, bottom = toolbar,
+            faders = if (settings.scrubberAlways) emptyList() else listOf(scrubber), info = infoLine, settings = settings)
         chrome.start()
     }
 
@@ -312,14 +313,11 @@ class ReaderActivity : AppCompatActivity() {
         bookmarks.clear()
         titleView.text = target.name
         subtitle.text = " "
-        app.io.execute {
+        // On the saves' thread: a save of this document still running from a moment ago finishes first (so the
+        // copy has its marks), but opening never waits behind scans of the device.
+        app.saves.execute {
             val file = File(cacheDir, "open").apply { mkdirs() }.let { File(it, target.id + ".pdf") }
-            val ok = runCatching {
-                contentResolver.openInputStream(Uri.parse(target.uri))!!.use { input ->
-                    file.outputStream().use { input.copyTo(it) }
-                }
-                true
-            }.getOrDefault(false)
+            val ok = runCatching { prepareSnapshot(Uri.parse(target.uri), file); true }.getOrDefault(false)
             main.post {
                 if (isFinishing || isDestroyed) return@post
                 if (!ok) {
@@ -330,6 +328,22 @@ class ReaderActivity : AppCompatActivity() {
                 display(target, file)
             }
         }
+    }
+
+    /**
+     * The private copy the screen shows. A file on the device that has not changed since the last copy (same
+     * size and time) is not copied again — copying a big booklet on every opening is what made opening slow.
+     */
+    private fun prepareSnapshot(source: Uri, file: File) {
+        val stamp = File(file.path + ".stamp")
+        val real = if (source.scheme == "file") File(source.path ?: "") else null
+        val now = real?.takeIf { it.isFile }?.let { "${it.length()}:${it.lastModified()}" }
+        if (now != null && file.isFile && runCatching { stamp.readText() }.getOrNull() == now) return
+        stamp.delete()
+        val partial = File(file.path + ".part")
+        contentResolver.openInputStream(source)!!.use { input -> partial.outputStream().use { input.copyTo(it) } }
+        if (!partial.renameTo(file)) { file.delete(); check(partial.renameTo(file)) }
+        if (now != null) stamp.writeText(now)
     }
 
     private fun display(target: Doc, file: File) {
@@ -418,7 +432,7 @@ class ReaderActivity : AppCompatActivity() {
         main.removeCallbacks(saveRunnable)
         val target = doc ?: return
         saveState.begin() ?: return
-        app.io.execute {
+        app.saves.execute {
             val file = synchronized(captureLock) { if (destroyed) null else captureLocked() }
             val ok = file != null && write(target, file)
             main.post {
