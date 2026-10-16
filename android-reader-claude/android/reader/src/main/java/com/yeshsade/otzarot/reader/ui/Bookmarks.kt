@@ -28,6 +28,7 @@ import com.shockwave.pdfium.PdfDocument
 import com.yeshsade.otzarot.reader.R
 import com.yeshsade.otzarot.reader.data.Bookmark
 import com.yeshsade.otzarot.reader.data.BookmarkLabel
+import com.yeshsade.otzarot.reader.data.DropIn
 import com.yeshsade.otzarot.reader.data.Settings
 import com.yeshsade.otzarot.reader.data.UndoStack
 import java.util.concurrent.Executor
@@ -85,6 +86,7 @@ class Bookmarks(
         loaded = false
         loadGeneration++
         byPage.clear(); scanned.clear(); scanning.clear(); removedIds.clear(); listFound.clear()
+        arriving = null
         pdfView.invalidate()
     }
 
@@ -133,15 +135,37 @@ class Bookmarks(
 
     // ---------- drawing ----------
 
+    /** The ribbon just added, while it drops into place ([DropIn]). */
+    private var arriving: String? = null
+    private var arrivedAt = 0L
+    private val dropHeight = ui.dp(72).toFloat()
+
+    /** 0..1 through the drop of the ribbon just added; null when no ribbon is arriving (for tests). */
+    val arrivalProgress: Float?
+        get() = arriving?.let { ((android.os.SystemClock.uptimeMillis() - arrivedAt).toFloat() / DropIn.MILLIS).coerceAtMost(1f) }
+
+    private fun arrive(b: Bookmark) {
+        arriving = b.id
+        arrivedAt = android.os.SystemClock.uptimeMillis()
+        pdfView.invalidate()
+    }
+
     fun draw(canvas: Canvas) {
         readVisible()
         val range = pdfView.visiblePageRange ?: return
+        val t = arrivalProgress
+        if (t != null && t >= 1f) arriving = null
         for (page in range[0]..range[1]) {
             byPage[page]?.forEach { b ->
                 if (b.id == dragging?.id) return@forEach
-                viewBox(b)?.let { drawRibbon(canvas, b, it, lifted = false) }
+                val box = viewBox(b) ?: return@forEach
+                if (t != null && b.id == arriving) {
+                    box.offset(0f, -dropHeight * DropIn.lift(t))
+                    drawRibbon(canvas, b, box, lifted = false, opacity = DropIn.opacity(t))
+                } else drawRibbon(canvas, b, box, lifted = false)
             }
         }
+        if (arriving != null) pdfView.postInvalidateOnAnimation()
         val b = dragging ?: return
         val box = RectF(dragBox ?: return).apply { offset(dragDx, dragDy) }
         drawRibbon(canvas, b, box, lifted = true)
@@ -150,14 +174,15 @@ class Bookmarks(
     private fun viewBox(b: Bookmark): RectF? =
         b.frameRect().let { pdfView.frameRectToView(b.page, RectF(it[0], it[1], it[2], it[3])) }
 
-    private fun drawRibbon(canvas: Canvas, b: Bookmark, box: RectF, lifted: Boolean) {
+    private fun drawRibbon(canvas: Canvas, b: Bookmark, box: RectF, lifted: Boolean, opacity: Float = 1f) {
         if (lifted) {
             val lift = ui.dp(3).toFloat()
             outline(b.horizontal, RectF(box).apply { offset(lift, lift) })
             canvas.drawPath(path, shadow)
         }
         outline(b.horizontal, box)
-        paint.color = b.color
+        paint.color = if (opacity >= 1f) b.color
+            else ((((b.color ushr 24) * opacity).toInt() and 0xFF) shl 24) or (b.color and 0xFFFFFF)
         canvas.drawPath(path, paint)
     }
 
@@ -229,7 +254,7 @@ class Bookmarks(
         val b = keptOn(Bookmark(Bookmark.newId(), at.page, at.x, at.y,
             settings.bookmarkHorizontal, settings.bookmarkThickness, settings.bookmarkColor))
         val write = {
-            if (change(null, b)) done(b)
+            if (change(null, b)) { arrive(b); done(b) }
             else { android.util.Log.w(TAG, "add: engine refused $b"); done(null) }
         }
         ensureRead(b.page)

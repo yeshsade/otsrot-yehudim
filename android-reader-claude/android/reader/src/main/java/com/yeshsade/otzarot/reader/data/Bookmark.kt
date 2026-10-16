@@ -135,6 +135,33 @@ data class Bookmark(
 }
 
 /**
+ * How a new ribbon arrives (owner's choice 2026-10-16: "falls and bounces"): it drops from above into its
+ * place, speeding up, then makes one small hop. Half a second. Pure logic; unit-tested.
+ */
+object DropIn {
+    const val MILLIS = 500L
+    /** Part of the time spent falling; the rest is the hop. */
+    private const val FALL = .7f
+    /** Height of the hop, as a part of the fall. */
+    const val HOP = .12f
+
+    /** How far above its place the ribbon is at time [t] (0..1), as a part of the fall height: 1 = top, 0 = in place. */
+    fun lift(t: Float): Float {
+        val x = t.coerceIn(0f, 1f)
+        return if (x < FALL) {
+            val p = x / FALL
+            1f - p * p
+        } else {
+            val p = (x - FALL) / (1f - FALL)
+            HOP * 4f * p * (1f - p)
+        }
+    }
+
+    /** Fades in during the first quarter of the fall. */
+    fun opacity(t: Float): Float = (t / .25f).coerceIn(0f, 1f)
+}
+
+/**
  * Label for a bookmark row in the list: the booklet's own "topic, day" when the booklet carries that map
  * (later), else the nearest chapter of the PDF's built-in table of contents at or before the page, else
  * "page N". [chapters] is page → title, any order.

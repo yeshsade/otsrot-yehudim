@@ -286,11 +286,20 @@ class LeanProbe : Instrumentation() {
             val before = 0
 
             var added: Bookmark? = null
+            var arriving: Float? = null
             runOnMainSync {
                 added = ReaderActivity::class.java.getDeclaredMethod("addBookmark").apply { isAccessible = true }
                     .invoke(reader).let { controller.all().lastOrNull() }
+                // read at once: the emulator is slow enough for the half-second drop to end before the next step
+                arriving = controller.arrivalProgress
             }
             val b = added ?: error("no bookmark added")
+            // it drops into its place (owner's choice: "falls and bounces"), then stays there
+            check(arriving != null && arriving!! < 1f) { "the new ribbon did not drop in ($arriving)" }
+            SystemClock.sleep(com.yeshsade.otzarot.reader.data.DropIn.MILLIS + 400); waitForIdleSync()
+            runOnMainSync { arriving = controller.arrivalProgress }
+            check(arriving == null) { "still dropping after the drop time ($arriving)" }
+            record("A new ribbon drops into its place with one small hop, in half a second, then stays put")
             check(controller.all().size == before + 1)
             check(b.color == app.settings.bookmarkColor)
             waitFor("bookmark saved", 90_000) { bookmarksIn(doc.uri).size == before + 1 }

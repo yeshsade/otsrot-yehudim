@@ -245,4 +245,17 @@ class LogicTest {
         assertEquals("document.pdf", Files.sanitize("..."))
         assertEquals("חוברת וירא.pdf", Files.sanitize("חוברת וירא.PDF"))
     }
+
+    @Test fun newBookmarkFallsIntoPlaceThenHopsOnce() {
+        assertEquals(1f, DropIn.lift(0f), 1e-4f)          // starts above its place
+        assertEquals(0f, DropIn.lift(1f), 1e-4f)          // ends exactly in place
+        assertEquals(0f, DropIn.lift(.7f), 1e-4f)         // lands, then the hop
+        var last = 2f
+        for (i in 0..70) { val v = DropIn.lift(i / 100f); assertTrue(v <= last); last = v }  // only falls at first
+        val hop = (71..100).maxOf { DropIn.lift(it / 100f) }
+        assertTrue(hop > 0f && hop <= DropIn.HOP + 1e-4f)  // one small hop, never back up high
+        assertEquals(0f, DropIn.opacity(0f), 1e-4f)
+        assertEquals(1f, DropIn.opacity(.25f), 1e-4f)
+        assertEquals(1f, DropIn.lift(-1f), 1e-4f)         // out-of-range times are safe
+    }
 }
