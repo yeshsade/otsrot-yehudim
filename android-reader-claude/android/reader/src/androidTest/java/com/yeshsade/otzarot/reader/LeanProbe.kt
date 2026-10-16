@@ -552,6 +552,25 @@ class LeanProbe : Instrumentation() {
             }
             record("In 'always shown' the frame never hides and the page starts below the top bar")
 
+            // a real tap on a booklet button (link) on the contents page moves to where it points
+            onMainChecked { pdfView(reader).jumpTo(minOf(2, pdfView(reader).pageCount - 1)) }
+            SystemClock.sleep(3000); waitForIdleSync()
+            var target: FloatArray? = null; var linkFrom = -1
+            onMainChecked {
+                val pv = pdfView(reader); linkFrom = pv.currentPage
+                loop@ for (iy in 1..39) for (ix in 1..19) {
+                    val x = pv.width * ix / 20f; val y = pv.height * iy / 40f
+                    val link = pv.findLinkAt(x, y) ?: continue
+                    if (link.link.destPageIdx == null || link.link.destPageIdx == linkFrom || pv.findFormFieldAt(x, y) != null) continue
+                    val pl = IntArray(2); pv.getLocationInWindow(pl); target = floatArrayOf(x + pl[0], y + pl[1]); break@loop
+                }
+            }
+            val at = target ?: error("no button found on the contents page")
+            touch(reader, MotionEvent.ACTION_DOWN, at[0], at[1]); SystemClock.sleep(60)
+            touch(reader, MotionEvent.ACTION_UP, at[0], at[1])
+            waitFor("button moved the page", 15_000) { var p = linkFrom; onMainChecked { p = pdfView(reader).currentPage }; p != linkFrom }
+            record("A tap on a button in the booklet (contents) moves to its page")
+
             // side-to-side reading: the handle runs along the bottom
             onMainChecked { reader.finish() }; waitFor("closed", 30_000) { reader.isDestroyed }
             s.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP; s.scroll = "horizontal"; s.scrubberHoldMillis = 0

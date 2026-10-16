@@ -386,8 +386,12 @@ class ReaderActivity : AppCompatActivity() {
     // ---------- marking ----------
 
     private fun tap(event: MotionEvent): Boolean {
-        // a tap on the page shows or hides the frame; a tap on a check box only marks it
-        val field = pdfView.findFormFieldAt(event.x, event.y) ?: run { chrome.toggle(); return true }
+        // a tap on a booklet button (link) follows it; a tap on a check box only marks it;
+        // any other tap on the page shows or hides the frame
+        val field = pdfView.findFormFieldAt(event.x, event.y) ?: run {
+            if (pdfView.findLinkAt(event.x, event.y) != null) { chrome.used(); return false }
+            chrome.toggle(); return true
+        }
         if (field.readOnly) return false
         val checked = when (field.type) {
             PdfDocument.FormField.TYPE_CHECKBOX -> !field.checked
