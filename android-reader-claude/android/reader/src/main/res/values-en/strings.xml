@@ -11,7 +11,16 @@
     <string name="library_unread">Not read yet</string>
     <string name="library_empty">No documents yet. Open a PDF from WhatsApp or with the button below.</string>
     <string name="library_remove">Remove from list</string>
-    <string name="library_remove_confirm">Remove “%1$s” from the list? The original file in WhatsApp is not deleted.</string>
+    <string name="library_remove_confirm">Remove “%1$s” from the list?</string>
+    <string name="library_remove_note">The file itself stays on the device.</string>
+    <string name="library_delete">Delete from device</string>
+    <string name="library_delete_confirm">Delete “%1$s” from the device?</string>
+    <string name="library_delete_note">The file and the marks in it will be deleted for good.</string>
+    <string name="library_delete_copy_confirm">Delete “%1$s”?</string>
+    <string name="library_delete_copy_note">The app’s copy and the marks in it will be deleted for good. The file in WhatsApp stays.</string>
+    <string name="action_delete">Delete</string>
+    <string name="library_delete_failed">The file couldn’t be deleted. It stays in the list.</string>
+    <string name="library_more">Options</string>
     <string name="library_settings">Settings</string>
     <string name="library_night">Night mode</string>
     <string name="library_day">Day mode</string>

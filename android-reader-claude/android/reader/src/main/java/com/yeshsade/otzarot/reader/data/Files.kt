@@ -12,7 +12,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
-/** File access helpers. Nothing here deletes an original file. */
+/** File access helpers. Only [deleteDocument] deletes a file, and only when the reader asked for it. */
 object Files {
     /** Visible folder for working copies (Documents/<this>). Temporary name until the product is named. */
     const val COPY_FOLDER = "קורא PDF"
@@ -96,6 +96,24 @@ object Files {
         runCatching {
             if (uri.scheme == "file") File(uri.path!!).delete() else context.contentResolver.delete(uri, null, null)
         }
+    }
+
+    /**
+     * "Delete from device" (owner, 2026-10-16): deletes the document's file — the file itself, or for a
+     * read-only original (WhatsApp without access to all files) the app's working copy, never WhatsApp's file.
+     * Returns true only when the file is really gone.
+     */
+    fun deleteDocument(context: Context, doc: Doc): Boolean {
+        val uri = Uri.parse(doc.uri)
+        val gone = runCatching {
+            when {
+                uri.scheme == "file" -> File(uri.path!!).let { it.delete() || !it.exists() }
+                doc.kind == Doc.Kind.COPY -> context.contentResolver.delete(uri, null, null) > 0
+                else -> android.provider.DocumentsContract.deleteDocument(context.contentResolver, uri)
+            }
+        }.getOrDefault(false)
+        // a content link that cannot be read is not proof that the file is gone (the permission may be lost)
+        return gone || (uri.scheme == "file" && !File(uri.path ?: "").exists())
     }
 
     fun sanitize(name: String): String {

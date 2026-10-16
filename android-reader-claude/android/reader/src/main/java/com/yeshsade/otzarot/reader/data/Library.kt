@@ -108,4 +108,44 @@ class Library(private val file: File) {
         list.removeAll { it.id == id }
         persist(list)
     }
+
+    // ---------- removed by the reader ----------
+    // "Remove from the list" must stay: the scan of the device must not bring the file back (owner, 2026-10-16).
+    // Opening the file again on purpose (from WhatsApp, or "Open PDF") brings it back, with its marks.
+
+    private val hiddenFile = File(file.parentFile, "hidden.json")
+    private var hiddenCache: MutableSet<String>? = null
+
+    private fun hiddenSet(): MutableSet<String> {
+        hiddenCache?.let { return it }
+        val set = LinkedHashSet<String>()
+        if (hiddenFile.exists()) runCatching {
+            val arr = JSONArray(hiddenFile.readText())
+            for (i in 0 until arr.length()) set += arr.getString(i)
+        }
+        hiddenCache = set
+        return set
+    }
+
+    private fun persistHidden(set: Set<String>) {
+        val tmp = File(hiddenFile.parentFile, hiddenFile.name + ".tmp")
+        tmp.writeText(JSONArray().apply { set.forEach { put(it) } }.toString())
+        if (!tmp.renameTo(hiddenFile)) { hiddenFile.delete(); tmp.renameTo(hiddenFile) }
+    }
+
+    /** Takes the document off the list and keeps scans from adding its file again. */
+    fun removeByReader(id: String) = synchronized(lock) {
+        val doc = load().firstOrNull { it.id == id } ?: return@synchronized
+        remove(id)
+        val set = hiddenSet()
+        if (set.add(doc.uri)) persistHidden(set)
+    }
+
+    fun isHidden(uri: String): Boolean = synchronized(lock) { uri in hiddenSet() }
+    fun hidden(): List<String> = synchronized(lock) { hiddenSet().toList() }
+
+    fun unhide(uri: String) = synchronized(lock) {
+        val set = hiddenSet()
+        if (set.remove(uri)) persistHidden(set)
+    }
 }

@@ -23,12 +23,16 @@ object IntakePlan {
 class Intake(private val context: Context, private val library: Library, private val settings: Settings) {
 
     fun open(uri: Uri): Doc? {
+        // opening a file on purpose brings it back to the list if the reader had removed it
+        library.unhide(uri.toString())
         library.byUri(uri.toString())?.let { if (readable(Uri.parse(it.uri))) return it }
         val identity = Identity.of(context, uri) ?: return null
         val size = sizeOf(uri)
         val name = Files.displayName(context, uri)
         var known = library.byIdentity(identity)?.takeIf { readable(Uri.parse(it.uri)) }
         if (known == null && AllFiles.granted(context)) {
+            // e.g. WhatsApp hands over a link to a file on the device that the reader had removed: bring that file back
+            unhideSameContent(identity, size)
             // e.g. WhatsApp hands over a read-only link to a file that is on the device: find that file.
             scanDevice()
             known = sameContentOnDevice(identity, size)
@@ -61,7 +65,7 @@ class Intake(private val context: Context, private val library: Library, private
         val found = DeviceScan.all(context)
         for (item in found) {
             val fileUri = Uri.fromFile(item.file).toString()
-            if (library.byUri(fileUri) != null) continue
+            if (library.byUri(fileUri) != null || library.isHidden(fileUri)) continue
             // A booklet added earlier through the WhatsApp-folder permission: point it at the real file instead of adding twice.
             val earlier = library.all().firstOrNull {
                 it.kind == Doc.Kind.SOURCE && it.uri.startsWith("content://com.android.externalstorage.documents") &&
@@ -85,6 +89,15 @@ class Intake(private val context: Context, private val library: Library, private
             }
         }
         return changed
+    }
+
+    private fun unhideSameContent(identity: String, size: Long) {
+        for (hidden in library.hidden()) {
+            val u = Uri.parse(hidden)
+            if (u.scheme != "file") continue
+            val f = File(u.path ?: continue)
+            if (f.isFile && (size <= 0 || f.length() == size) && Identity.of(f) == identity) library.unhide(hidden)
+        }
     }
 
     private fun alreadyListedByContent(item: DeviceScan.Found): Boolean {
@@ -112,7 +125,7 @@ class Intake(private val context: Context, private val library: Library, private
         val tree = WhatsAppFolder.grantedTree(context, settings) ?: return 0
         var added = 0
         for (entry in WhatsAppFolder.list(context, tree)) {
-            if (library.byUri(entry.uri.toString()) != null) continue
+            if (library.byUri(entry.uri.toString()) != null || library.isHidden(entry.uri.toString())) continue
             val identity = Identity.of(context, entry.uri) ?: continue
             if (library.byIdentity(identity) != null) continue
             add(entry.uri, entry.name, identity, Doc.Kind.SOURCE, null, receivedAt = entry.modified.takeIf { it > 0 }, size = entry.size)

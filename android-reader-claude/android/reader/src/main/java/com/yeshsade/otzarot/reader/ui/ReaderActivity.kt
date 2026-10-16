@@ -17,7 +17,6 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -292,8 +291,9 @@ class ReaderActivity : AppCompatActivity() {
             main.post {
                 if (isFinishing || isDestroyed) return@post
                 if (opened == null) {
-                    Toast.makeText(this, R.string.open_failed, Toast.LENGTH_LONG).show()
-                    finish()
+                    // the notice is part of this screen: close the screen after it has been read
+                    Messages.notice(this, getString(R.string.open_failed))
+                    main.postDelayed({ if (!isDestroyed) finish() }, 3000)
                 } else show(opened)
             }
         }
@@ -321,7 +321,7 @@ class ReaderActivity : AppCompatActivity() {
             main.post {
                 if (isFinishing || isDestroyed) return@post
                 if (!ok) {
-                    Toast.makeText(this, R.string.open_failed, Toast.LENGTH_LONG).show()
+                    Messages.notice(this, getString(R.string.open_failed))
                     return@post
                 }
                 snapshot = file
@@ -372,7 +372,7 @@ class ReaderActivity : AppCompatActivity() {
                 showPage(page)
                 app.io.execute { app.library.update(target.id) { it.copy(page = page) } }
             }
-            .onError { Toast.makeText(this, R.string.open_failed, Toast.LENGTH_LONG).show() }
+            .onError { Messages.notice(this, getString(R.string.open_failed)) }
             .load()
     }
 
@@ -418,7 +418,7 @@ class ReaderActivity : AppCompatActivity() {
             if (added == null || isDestroyed) return@add
             if (!app.settings.prefs.getBoolean(HINT_SHOWN, false)) {
                 app.settings.prefs.edit().putBoolean(HINT_SHOWN, true).apply()
-                Toast.makeText(this, R.string.bm_added_hint, Toast.LENGTH_LONG).show()
+                Messages.notice(this, getString(R.string.bm_added_hint), long = true)
             }
         }
     }
@@ -443,7 +443,7 @@ class ReaderActivity : AppCompatActivity() {
                 val again = saveState.finish(ok)
                 if (!ok && !failureShown && !isDestroyed) {
                     failureShown = true
-                    Toast.makeText(this, R.string.save_failed, Toast.LENGTH_LONG).show()
+                    Messages.notice(this, getString(R.string.save_failed), long = true)
                 }
                 if (ok && again && !isDestroyed) main.postDelayed(saveRunnable, RETRY_DELAY_MS)
             }

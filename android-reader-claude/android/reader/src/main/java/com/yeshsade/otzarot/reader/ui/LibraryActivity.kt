@@ -18,9 +18,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.shockwave.pdfium.PdfiumCore
@@ -48,7 +46,7 @@ class LibraryActivity : AppCompatActivity() {
     private val pickFolder = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val tree = result.data?.data
         if (tree != null && WhatsAppFolder.accept(this, app.settings, tree)) scanAndRefresh()
-        else if (tree != null) Toast.makeText(this, R.string.wa_failed, Toast.LENGTH_LONG).show()
+        else if (tree != null) Messages.notice(this, getString(R.string.wa_failed), long = true)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -172,7 +170,7 @@ class LibraryActivity : AppCompatActivity() {
         fun bind(doc: Doc) {
             card.tag = "doc_" + doc.id
             card.setOnClickListener { ReaderActivity.open(this@LibraryActivity, doc) }
-            more.setOnClickListener { confirmRemove(doc) }
+            more.setOnClickListener { showMenu(doc) }
             (texts.getChildAt(0) as TextView).text = doc.name
             (texts.getChildAt(1) as TextView).text =
                 if (doc.pages > 0) getString(R.string.library_pages, receivedLabel(doc.receivedAt), doc.pages) else receivedLabel(doc.receivedAt)
@@ -207,7 +205,7 @@ class LibraryActivity : AppCompatActivity() {
             setImageResource(R.drawable.ic_more)
             imageTintList = ColorStateList.valueOf(ui.colors.muted)
             background = null
-            contentDescription = getString(R.string.library_remove)
+            contentDescription = getString(R.string.library_more)
         }, LinearLayout.LayoutParams(ui.dp(48), ui.dp(48)))
 
         return LinearLayout(this).apply {
@@ -241,14 +239,10 @@ class LibraryActivity : AppCompatActivity() {
     private fun chooseSort() {
         val options = Sort.entries
         val current = options.indexOf(Sort.of(app.settings.sort))
-        AlertDialog.Builder(this)
-            .setTitle(R.string.sort_title)
-            .setSingleChoiceItems(options.map { getString(it.label) }.toTypedArray(), current) { dialog, which ->
-                app.settings.sort = options[which].key
-                dialog.dismiss()
-                refresh()
-            }
-            .show()
+        lastDialog = Messages.choose(this, ui, getString(R.string.sort_title), options.map { getString(it.label) }, current) { which ->
+            app.settings.sort = options[which].key
+            refresh()
+        }
     }
 
     private fun receivedLabel(time: Long): String = when {
@@ -257,15 +251,57 @@ class LibraryActivity : AppCompatActivity() {
         else -> DateUtils.formatDateTime(this, time, DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_ABBREV_MONTH)
     }
 
-    /** Removes from the list only. The file itself (WhatsApp's or the working copy) is not deleted. */
+    /** The ⋮ next to a document: remove from the list, or delete from the device (owner, 2026-10-16). */
+    private fun showMenu(doc: Doc): android.app.Dialog = Messages.menu(this, ui, doc.name, listOf(
+        Messages.Item(getString(R.string.library_remove), R.drawable.ic_list_remove, tag = "menu_remove") { confirmRemove(doc) },
+        Messages.Item(getString(R.string.library_delete), R.drawable.ic_delete, danger = true, tag = "menu_delete") { confirmDelete(doc) },
+    )).also { lastDialog = it }
+
+    /** The last menu or question shown (for tests and screenshots). */
+    var lastDialog: android.app.Dialog? = null
+        private set
+    var lastAsk: Messages.Ask? = null
+        private set
+
+    /** Removes from the list only, and keeps scans from bringing it back. The file itself is not deleted. */
     private fun confirmRemove(doc: Doc) {
-        AlertDialog.Builder(this)
-            .setMessage(getString(R.string.library_remove_confirm, doc.name))
-            .setPositiveButton(R.string.action_remove) { _, _ ->
-                app.io.execute { app.library.remove(doc.id); main.post { refresh() } }
+        lastAsk = Messages.ask(this, ui, getString(R.string.library_remove_confirm, isolated(doc.name)), getString(R.string.library_remove_note),
+            yes = getString(R.string.action_remove), no = getString(R.string.action_cancel)) {
+            app.io.execute { app.library.removeByReader(doc.id); forget(doc); main.post { refresh() } }
+        }
+        lastDialog = lastAsk!!.dialog
+    }
+
+    /** Deletes the file (or, for a read-only WhatsApp original, the app's copy) and the marks in it, after asking. */
+    private fun confirmDelete(doc: Doc) {
+        val copy = doc.kind == Doc.Kind.COPY
+        lastAsk = Messages.ask(this, ui,
+            getString(if (copy) R.string.library_delete_copy_confirm else R.string.library_delete_confirm, isolated(doc.name)),
+            getString(if (copy) R.string.library_delete_copy_note else R.string.library_delete_note),
+            yes = getString(R.string.action_delete), no = getString(R.string.action_cancel), danger = true) {
+            app.saves.execute {
+                // on the saves' thread: a save of this document still running finishes first
+                val deleted = com.yeshsade.otzarot.reader.data.Files.deleteDocument(this, doc)
+                if (deleted) { app.library.remove(doc.id); forget(doc) }
+                main.post {
+                    if (isDestroyed) return@post
+                    if (!deleted) Messages.notice(this, getString(R.string.library_delete_failed), long = true)
+                    refresh()
+                }
             }
-            .setNegativeButton(R.string.action_cancel, null)
-            .show()
+        }
+        lastDialog = lastAsk!!.dialog
+    }
+
+    /** A file name inside a sentence: kept in one piece, so an English name does not scramble the Hebrew around it. */
+    private fun isolated(name: String) = androidx.core.text.BidiFormatter.getInstance().unicodeWrap(name)
+
+    /** The app's own copies for showing a document: its display copy and its cover. */
+    private fun forget(doc: Doc) {
+        app.covers.remove(doc.id)
+        File(File(cacheDir, "covers"), doc.id + ".png").delete()
+        File(File(cacheDir, "open"), doc.id + ".pdf").delete()
+        File(File(cacheDir, "open"), doc.id + ".pdf.stamp").delete()
     }
 
     private fun loadCover(doc: Doc, view: ImageView) {
@@ -311,7 +347,7 @@ class LibraryActivity : AppCompatActivity() {
         app.io.execute {
             val doc = runCatching { Intake(this, app.library, app.settings).open(uri) }.getOrNull()
             main.post {
-                if (doc == null) Toast.makeText(this, R.string.open_failed, Toast.LENGTH_LONG).show()
+                if (doc == null) Messages.notice(this, getString(R.string.open_failed))
                 else { refresh(); ReaderActivity.open(this, doc) }
             }
         }
@@ -341,24 +377,15 @@ class LibraryActivity : AppCompatActivity() {
     }
 
     /** The explanation before Android's "access to all files" screen (wording approved 2026-10-14). */
-    private fun allFilesDialog(): AlertDialog {
+    private fun allFilesDialog(): android.app.Dialog {
         val settings = app.settings
-        val subtitle = getString(R.string.all_files_subtitle)
-        val message = android.text.SpannableStringBuilder(subtitle).apply {
-            setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, subtitle.length, 0)
-            append("\n\n")
-            append(getString(R.string.all_files_body))
-        }
-        return AlertDialog.Builder(this)
-            .setTitle(R.string.all_files_title)
-            .setMessage(message)
-            .setPositiveButton(R.string.all_files_allow) { _, _ ->
-                settings.allFilesPromptDismissed = true
-                AllFiles.request(this, REQUEST_FILES)
-            }
-            .setNegativeButton(R.string.wa_later) { _, _ -> settings.allFilesPromptDismissed = true }
-            .setCancelable(false)
-            .show()
+        return Messages.ask(this, ui, getString(R.string.all_files_title), getString(R.string.all_files_body),
+            boldLine = getString(R.string.all_files_subtitle),
+            yes = getString(R.string.all_files_allow), no = getString(R.string.wa_later), cancelable = false,
+            onNo = { settings.allFilesPromptDismissed = true }) {
+            settings.allFilesPromptDismissed = true
+            AllFiles.request(this, REQUEST_FILES)
+        }.dialog
     }
 
     @Deprecated("Deprecated in Java")

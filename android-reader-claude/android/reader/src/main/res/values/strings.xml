@@ -12,7 +12,18 @@
     <string name="library_unread">עדיין לא נקרא</string>
     <string name="library_empty">אין עדיין מסמכים. אפשר לפתוח PDF מוואטסאפ או בכפתור למטה.</string>
     <string name="library_remove">הסרה מהרשימה</string>
-    <string name="library_remove_confirm">להסיר את „%1$s” מהרשימה? הקובץ המקורי בוואטסאפ לא יימחק.</string>
+    <!-- Remove / delete: approved by the owner 2026-10-16 -->
+    <string name="library_remove_confirm">להסיר את „%1$s” מהרשימה?</string>
+    <string name="library_remove_note">הקובץ עצמו לא יימחק מהמכשיר.</string>
+    <string name="library_delete">מחיקה מהמכשיר</string>
+    <string name="library_delete_confirm">למחוק את „%1$s” מהמכשיר?</string>
+    <string name="library_delete_note">הקובץ והסימונים שבו יימחקו לתמיד.</string>
+    <string name="library_delete_copy_confirm">למחוק את „%1$s”?</string>
+    <string name="library_delete_copy_note">העותק שבאפליקציה והסימונים שבו יימחקו לתמיד. הקובץ בוואטסאפ יישאר.</string>
+    <string name="action_delete">מחיקה</string>
+    <!-- DRAFT: awaiting the owner's approval -->
+    <string name="library_delete_failed">לא הצלחנו למחוק את הקובץ. הוא נשאר ברשימה.</string>
+    <string name="library_more">אפשרויות</string>
     <string name="library_settings">הגדרות</string>
     <string name="library_night">מצב לילה</string>
     <string name="library_day">מצב יום</string>

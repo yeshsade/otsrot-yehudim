@@ -52,6 +52,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "settingsshots") { settingsShots(); return }
         if (mode == "look") { look(); return }
         if (mode == "perf") { perf(); return }
+        if (mode == "manage") { manage(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -366,14 +367,14 @@ class LeanProbe : Instrumentation() {
             runOnMainSync { reopened.add { added3 += it }; reopened.add { added3 += it } }
             check(added3.size == 2 && added3.all { it != null })
             runOnMainSync { reopened.add { added3 += it } }
-            var asked: androidx.appcompat.app.AlertDialog? = null
-            runOnMainSync { asked = reopened.lastQuestion; check(asked?.isShowing == true) { "no question for a third ribbon" } }
-            runOnMainSync { snapshotView(asked!!.window!!.decorView, "bm-third.png"); asked!!.getButton(android.content.DialogInterface.BUTTON_NEGATIVE).performClick() }
+            var asked: com.yeshsade.otzarot.reader.ui.Messages.Ask? = null
+            runOnMainSync { asked = reopened.lastQuestion; check(asked?.dialog?.isShowing == true) { "no question for a third ribbon" } }
+            runOnMainSync { snapshotView(asked!!.dialog.window!!.decorView, "bm-third.png"); asked!!.no!!.performClick() }
             waitForIdleSync()
             check(added3.size == 3 && added3[2] == null)
             runOnMainSync { check(reopened.all().size == 2) }
             runOnMainSync { reopened.add { added3 += it } }
-            runOnMainSync { reopened.lastQuestion!!.getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick() }
+            runOnMainSync { reopened.lastQuestion!!.yes.performClick() }
             waitForIdleSync()
             runOnMainSync { check(reopened.all().size == 3) { "yes did not add" } }
             waitFor("three saved", 90_000) { bookmarksIn(doc.uri).size == 3 }
@@ -460,6 +461,138 @@ class LeanProbe : Instrumentation() {
         bitmap.eraseColor(android.graphics.Color.GRAY)
         view.draw(Canvas(bitmap))
         writePng(bitmap, name)
+    }
+
+    /**
+     * The ⋮ menu on the list (owner, 2026-10-16): "remove from the list" stays removed even when the device is
+     * scanned again, opening the file again brings it back; "delete from the device" deletes the file, or only
+     * the app's copy for a read-only WhatsApp share. Needs access to all files. Also shoots the designed messages.
+     */
+    private fun manage() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            val s = app.settings
+            s.allFilesPromptDismissed = true; s.whatsAppPromptDismissed = true; s.language = "he"
+            onMainChecked { androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags("he")) }
+            check(com.yeshsade.otzarot.reader.data.AllFiles.granted(targetContext)) { "all-files access not granted" }
+            val dir = File(android.os.Environment.getExternalStorageDirectory(), "Download")
+            val keep = File(dir, "probe-remove.pdf"); val gone = File(dir, "probe-delete.pdf")
+            // a clean start: an earlier run may have left these files removed from the list
+            listOf(keep, gone).forEach { app.library.unhide(Uri.fromFile(it).toString()) }
+            for ((f, tag) in listOf(keep to "remove", gone to "delete")) {
+                context.assets.open("synthetic-checkbox-source.pdf").use { input -> f.outputStream().use { input.copyTo(it); it.write("\n% probe $tag\n".toByteArray()) } }
+            }
+            // files written straight to the disk reach Android's media index only after a media scan (a download does this itself)
+            val indexed = java.util.concurrent.CountDownLatch(2)
+            android.media.MediaScannerConnection.scanFile(targetContext, arrayOf(keep.path, gone.path), arrayOf("application/pdf", "application/pdf")) { _, _ -> indexed.countDown() }
+            indexed.await(60, java.util.concurrent.TimeUnit.SECONDS)
+            val list = startActivitySync(Intent(targetContext, LibraryActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                .putExtra(LibraryActivity.EXTRA_STAY, true)) as LibraryActivity
+            waitFor("device scan", 120_000) { app.library.all().map { it.name }.containsAll(listOf("probe-remove", "probe-delete")) }
+            fun menu(doc: com.yeshsade.otzarot.reader.data.Doc): android.app.Dialog {
+                var d: android.app.Dialog? = null
+                onMainChecked { d = LibraryActivity::class.java.getDeclaredMethod("showMenu", com.yeshsade.otzarot.reader.data.Doc::class.java).apply { isAccessible = true }.invoke(list, doc) as android.app.Dialog }
+                waitForIdleSync(); SystemClock.sleep(400)
+                return d!!
+            }
+            fun choose(d: android.app.Dialog, tag: String, shot: String?): com.yeshsade.otzarot.reader.ui.Messages.Ask {
+                onMainChecked { shot?.let { snapshotView(d.window!!.decorView, it) }; d.window!!.decorView.findViewWithTag<View>(tag).performClick() }
+                waitForIdleSync(); SystemClock.sleep(400)
+                var ask: com.yeshsade.otzarot.reader.ui.Messages.Ask? = null
+                onMainChecked { ask = list.lastAsk; check(ask!!.dialog.isShowing) { "no question after $tag" } }
+                return ask!!
+            }
+            fun scanAgain() {
+                onMainChecked { LibraryActivity::class.java.getDeclaredMethod("scanAndRefresh", Boolean::class.javaPrimitiveType).apply { isAccessible = true }.invoke(list, true) }
+                waitFor("scan done", 120_000) { var busy = true; onMainChecked { busy = field<Boolean>(list, "scanning") }; !busy }
+            }
+
+            // remove from the list: it stays removed after another scan of the device; the file stays
+            val r = app.library.all().first { it.name == "probe-remove" }
+            val removeAsk = choose(menu(r), "menu_remove", "menu.png")
+            onMainChecked { snapshotView(removeAsk.dialog.window!!.decorView, "ask-remove.png"); removeAsk.yes.performClick() }
+            waitFor("removed", 30_000) { app.library.get(r.id) == null }
+            scanAgain(); scanAgain()
+            check(app.library.all().none { it.name == "probe-remove" }) { "the scan brought the removed file back" }
+            check(keep.isFile) { "removing deleted the file" }
+            record("Remove from the list: the file stays on the device, and scanning the device again does not bring it back")
+
+            // opening it again on purpose brings it back
+            val back = com.yeshsade.otzarot.reader.data.Intake(targetContext, app.library, app.settings).open(Uri.fromFile(keep))
+            check(back != null && app.library.all().any { it.name == "probe-remove" }) { "opening the file again did not bring it back" }
+            record("Opening a removed file again brings it back to the list")
+
+            // delete from the device: the file is gone, and so is the entry
+            val g = app.library.all().first { it.name == "probe-delete" }
+            val deleteAsk = choose(menu(g), "menu_delete", null)
+            onMainChecked { snapshotView(deleteAsk.dialog.window!!.decorView, "ask-delete.png"); deleteAsk.yes.performClick() }
+            waitFor("deleted", 30_000) { !gone.exists() && app.library.get(g.id) == null }
+            scanAgain()
+            check(app.library.all().none { it.name == "probe-delete" })
+            record("Delete from the device: after the question, the file and its entry are gone")
+
+            // a read-only share (like WhatsApp without access to all files): only the app's copy is deleted
+            val reader = openShared(ReadOnlyPdfProvider.uri("manage-share.pdf"))
+            waitLoaded(reader)
+            // the share may open an earlier entry of the same booklet (another mode marked it): take whatever opened
+            var shown: com.yeshsade.otzarot.reader.data.Doc? = null
+            onMainChecked { shown = field<com.yeshsade.otzarot.reader.data.Doc?>(reader, "doc") }
+            onMainChecked { reader.finish() }; waitFor("closed", 30_000) { reader.isDestroyed }
+            val c = app.library.get(shown!!.id)!!
+            check(c.kind == com.yeshsade.otzarot.reader.data.Doc.Kind.COPY) { "expected a working copy, got ${c.kind}" }
+            refreshList(list)
+            val copyAsk = choose(menu(c), "menu_delete", null)
+            var text = ""
+            onMainChecked {
+                text = allText(copyAsk.dialog.window!!.decorView)
+                snapshotView(copyAsk.dialog.window!!.decorView, "ask-delete-copy.png"); copyAsk.yes.performClick()
+            }
+            check(text.contains("וואטסאפ")) { "the question does not say WhatsApp's file stays: $text" }
+            waitFor("copy deleted", 30_000) { app.library.get(c.id) == null }
+            val original = targetContext.contentResolver.openInputStream(ReadOnlyPdfProvider.uri("manage-share.pdf"))!!.use { it.readBytes().size }
+            check(original > 0) { "the shared original is gone" }
+            record("Deleting a read-only share deletes only the app's copy; the question says WhatsApp's file stays")
+
+            // the other designed messages, for the owner to see
+            onMainChecked {
+                val sort = LibraryActivity::class.java.getDeclaredMethod("chooseSort").apply { isAccessible = true }
+                sort.invoke(list)
+            }
+            waitForIdleSync(); SystemClock.sleep(400)
+            onMainChecked { val d = list.lastDialog!!; snapshotView(d.window!!.decorView, "choose-sort.png"); d.dismiss() }
+            onMainChecked {
+                val hint = list.resources.getIdentifier("bm_added_hint", "string", list.packageName)
+                com.yeshsade.otzarot.reader.ui.Messages.notice(list, list.getString(hint), long = true)
+            }
+            waitForIdleSync(); SystemClock.sleep(600)
+            onMainChecked { snapshot(list, "notice.png") }
+            var all: android.app.Dialog? = null
+            onMainChecked { all = LibraryActivity::class.java.getDeclaredMethod("allFilesDialog").apply { isAccessible = true }.invoke(list) as android.app.Dialog }
+            waitForIdleSync(); SystemClock.sleep(400)
+            onMainChecked { snapshotView(all!!.window!!.decorView, "ask-all-files.png"); all!!.dismiss() }
+            record("Every message uses the designed card or bubble")
+            keep.delete()
+            onMainChecked { list.finish() }
+
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    private fun refreshList(list: LibraryActivity) {
+        onMainChecked { LibraryActivity::class.java.getDeclaredMethod("refresh").apply { isAccessible = true }.invoke(list) }
+        waitForIdleSync()
+    }
+
+    private fun allText(view: View): String = when (view) {
+        is android.widget.TextView -> view.text.toString()
+        is android.view.ViewGroup -> (0 until view.childCount).joinToString(" ") { allText(view.getChildAt(it)) }
+        else -> ""
     }
 
     /**

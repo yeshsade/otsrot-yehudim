@@ -19,7 +19,6 @@ import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.LinearLayout
-import androidx.appcompat.app.AlertDialog
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
@@ -259,16 +258,13 @@ class Bookmarks(
         }
         ensureRead(b.page)
         if ((byPage[b.page]?.size ?: 0) < MAX_WITHOUT_ASKING) { write(); return }
-        lastQuestion = AlertDialog.Builder(context)
-            .setMessage(R.string.bm_third_question)
-            .setPositiveButton(R.string.bm_third_yes) { _, _ -> write() }
-            .setNegativeButton(R.string.bm_third_no) { _, _ -> done(null) }
-            .setOnCancelListener { done(null) }
-            .show()
+        lastQuestion = Messages.ask(context, ui, title = null, body = context.getString(R.string.bm_third_question),
+            yes = context.getString(R.string.bm_third_yes), no = context.getString(R.string.bm_third_no),
+            onNo = { done(null) }) { write() }
     }
 
     /** The last "more than 2 on this page?" question shown (for tests and screenshots). */
-    var lastQuestion: AlertDialog? = null
+    var lastQuestion: Messages.Ask? = null
         private set
 
     /** Writes a change into the document; [before] null = add, [after] null = remove. */
