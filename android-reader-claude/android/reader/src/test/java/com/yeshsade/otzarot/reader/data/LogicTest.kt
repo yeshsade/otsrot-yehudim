@@ -258,4 +258,55 @@ class LogicTest {
         assertEquals(1f, DropIn.opacity(.25f), 1e-4f)
         assertEquals(1f, DropIn.lift(-1f), 1e-4f)         // out-of-range times are safe
     }
+
+    @Test fun everySortHasItsOppositeAndSizeIsHiddenByDefault() {
+        val a = doc("a", 1).copy(name = "ב", size = 10, pages = 3, lastOpened = 5)
+        val b = doc("b", 2).copy(name = "א", size = 30, pages = 1, lastOpened = 0)
+        val c = doc("c", 3).copy(name = "ג", size = 20, pages = 2, lastOpened = 9)
+        val docs = listOf(a, b, c)
+        fun ids(o: SortOrder) = o.apply(docs).map { it.id }
+        assertEquals(listOf("c", "b", "a"), ids(SortOrder(SortOrder.By.RECEIVED)))           // newest first
+        assertEquals(listOf("a", "b", "c"), ids(SortOrder(SortOrder.By.RECEIVED, true)))     // oldest first
+        assertEquals(listOf("b", "a", "c"), ids(SortOrder(SortOrder.By.NAME)))               // א–ת
+        assertEquals(listOf("c", "a", "b"), ids(SortOrder(SortOrder.By.NAME, true)))         // ת–א
+        assertEquals(listOf("b", "c", "a"), ids(SortOrder(SortOrder.By.SIZE)))               // largest first
+        assertEquals(listOf("a", "c", "b"), ids(SortOrder(SortOrder.By.PAGES)))              // most pages first
+        assertEquals(listOf("b", "c", "a"), ids(SortOrder(SortOrder.By.PAGES, true)))
+        assertEquals(listOf("c", "a", "b"), ids(SortOrder(SortOrder.By.LAST_READ)))
+        assertFalse(SortOrder.By.SIZE in SortOrder.offered(showSize = false))
+        assertTrue(SortOrder.By.SIZE in SortOrder.offered(showSize = true))
+        // size was chosen, then switched off in the settings: back to newest first
+        assertEquals(SortOrder.DEFAULT, SortOrder.restore("size", true, showSize = false))
+        assertEquals(SortOrder(SortOrder.By.NAME, true), SortOrder.restore("name", true, showSize = false))
+    }
+
+    private fun mapJson(extra: String = "", schema: String = ProgressMap.SCHEMA) = """
+        {"schema":"$schema","topics":[{"id":"mishnah","label_he":"משנה","order":4},{"id":"gemara","label_he":"גמרא","order":1}],
+         "days":[{"id":"sunday","label_he":"יום ראשון","order":1},{"id":"monday","label_he":"יום שני","order":2}],
+         "checks":[
+          {"field":"m1","topic_id":"mishnah","day_id":"monday","order":1,"final_page":3},
+          {"field":"m2","topic_id":"mishnah","day_id":"sunday","order":2,"final_page":1},
+          {"field":"g1","topic_id":"gemara","day_id":"sunday","order":1,"pages":[1,2]},
+          {"field":"old","topic_id":"mishnah","day_id":"sunday","week_offset":-1,"order":1,"final_page":9}$extra]}
+    """
+
+    @Test fun progressMapReadsTopicsDaysAndBoxesAndLeavesOutLastWeek() {
+        val map = (ProgressMap.parse(mapJson()) as ProgressMap.Result.Ok).map
+        assertEquals(listOf("g1", "m2", "m1"), map.checks.let { map.checksOf() }.map { it.field })   // by day, then topic order
+        assertEquals(listOf("m2"), map.checksOf(topicId = "mishnah", dayId = "sunday").map { it.field })
+        assertEquals(listOf(0, 1), map.checks.first { it.field == "g1" }.pages)   // one gemara box on two booklet pages
+        assertNull(map.checks.firstOrNull { it.field == "old" })                    // השלמות are not shown
+    }
+
+    @Test fun aProgressMapThatCannotBeTrustedIsRefusedAsAWhole() {
+        assertTrue(ProgressMap.parse(mapJson(schema = "otzarot.progress-map/2")) is ProgressMap.Result.Refused)
+        assertTrue(ProgressMap.parse(mapJson(""",{"field":"x","topic_id":"nope","day_id":"sunday","order":1,"final_page":1}""")) is ProgressMap.Result.Refused)
+        assertTrue(ProgressMap.parse(mapJson(""",{"field":"m1","topic_id":"mishnah","day_id":"sunday","order":3,"final_page":1}""")) is ProgressMap.Result.Refused)
+        assertTrue(ProgressMap.parse("not json") is ProgressMap.Result.Refused)
+        val map = (ProgressMap.parse(mapJson()) as ProgressMap.Result.Ok).map
+        val onPages = mapOf(0 to setOf("m2", "g1"), 1 to setOf("g1"), 2 to setOf("m1"))
+        assertTrue(ProgressMap.verify(map) { onPages[it].orEmpty() } is ProgressMap.Result.Ok)
+        // a box named in the map but missing from the PDF: refused, never a partial marking
+        assertTrue(ProgressMap.verify(map) { (onPages - 1)[it].orEmpty() } is ProgressMap.Result.Refused)
+    }
 }

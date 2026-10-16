@@ -141,9 +141,9 @@ class LibraryActivity : AppCompatActivity() {
     private var shownDay: java.time.LocalDate? = null
 
     private fun refresh() {
-        val sort = Sort.of(app.settings.sort)
-        val docs = sort.apply(app.library.all())
-        sortLabel.text = getString(R.string.library_sort_prefix) + " " + getString(sort.label) + "  ▾"
+        val order = app.settings.sortOrder
+        val docs = order.apply(app.library.all(), java.text.Collator.getInstance())
+        sortLabel.text = getString(R.string.library_sort_prefix) + " " + SortTexts.short(this, order) + "  ▾"
         empty.visibility = if (docs.isEmpty()) View.VISIBLE else View.GONE
         val today = java.time.LocalDate.now()
         val newDay = shownDay != null && shownDay != today
@@ -215,34 +215,52 @@ class LibraryActivity : AppCompatActivity() {
         }
     }
 
-    /** Ways to order the list. Default: newest received first (owner's requirement); the choice is remembered. */
-    enum class Sort(val key: String, val label: Int) {
-        RECEIVED("received", R.string.sort_received),
-        NAME("name", R.string.sort_name),
-        SIZE("size", R.string.sort_size),
-        LAST_READ("last_read", R.string.sort_last_read),
-        PAGES("pages", R.string.sort_pages);
-
-        fun apply(docs: List<Doc>): List<Doc> = when (this) {
-            RECEIVED -> docs.sortedByDescending { it.receivedAt }
-            NAME -> docs.sortedWith(compareBy(java.text.Collator.getInstance()) { it.name })
-            SIZE -> docs.sortedByDescending { it.size }
-            LAST_READ -> docs.sortedWith(compareByDescending<Doc> { it.lastOpened }.thenByDescending { it.receivedAt })
-            PAGES -> docs.sortedByDescending { it.pages }
+    /**
+     * "מיון לפי" (owner, 2026-10-16): what to sort by, then which way; the list follows each tap at once,
+     * and the window closes with "סגירה".
+     */
+    private fun chooseSort() {
+        val dialog = android.app.Dialog(this)
+        val sheet = Messages.sheet(ui)
+        fun fill() {
+            sheet.removeAllViews()
+            val settings = app.settings
+            val order = settings.sortOrder
+            val kinds = Messages.group(ui)
+            kinds.addView(Messages.header(ui, getString(R.string.sort_title), null, null))
+            com.yeshsade.otzarot.reader.data.SortOrder.offered(settings.sortBySize).forEach { by ->
+                kinds.addView(Messages.divider(ui))
+                kinds.addView(choiceRow(SortTexts.name(this, by), by == order.by, "sort_${by.key}") {
+                    settings.sort = by.key; settings.sortReversed = false; refresh(); fill()
+                })
+            }
+            sheet.addView(kinds)
+            val ways = Messages.group(ui)
+            ways.addView(Messages.header(ui, null, null, getString(R.string.sort_direction)))
+            listOf(false, true).forEach { reversed ->
+                ways.addView(Messages.divider(ui))
+                ways.addView(choiceRow(SortTexts.direction(this, order.by, reversed), order.reversed == reversed, "dir_$reversed") {
+                    settings.sortReversed = reversed; refresh(); fill()
+                })
+            }
+            sheet.addView(ways, Messages.gap(ui))
+            sheet.addView(Messages.cancel(ui, getString(R.string.action_close)) { dialog.dismiss() }.apply { tag = "sort_close" }, Messages.gap(ui))
         }
-
-        companion object {
-            fun of(key: String) = entries.firstOrNull { it.key == key } ?: RECEIVED
-        }
+        fill()
+        Messages.show(dialog, sheet, ui, cancelable = true)
+        lastDialog = dialog
     }
 
-    private fun chooseSort() {
-        val options = Sort.entries
-        val current = options.indexOf(Sort.of(app.settings.sort))
-        lastDialog = Messages.choose(this, ui, getString(R.string.sort_title), options.map { getString(it.label) }, current) { which ->
-            app.settings.sort = options[which].key
-            refresh()
-        }
+    /** A row in the sort window: the chosen one in colour, with a check mark. */
+    private fun choiceRow(label: String, chosen: Boolean, tag: String, onTap: () -> Unit) = ui.row().apply {
+        minimumHeight = ui.dp(52)
+        setPadding(ui.dp(20), 0, ui.dp(20), 0)
+        isClickable = true
+        this.tag = tag
+        contentDescription = label
+        addView(ui.label(label, 16f, if (chosen) ui.colors.accent else ui.colors.ink, bold = chosen), LinearLayout.LayoutParams(0, -2, 1f))
+        addView(ui.label(if (chosen) "✓" else "", 18f, ui.colors.accent, bold = true))
+        setOnClickListener { onTap() }
     }
 
     private fun receivedLabel(time: Long): String = when {
@@ -253,9 +271,9 @@ class LibraryActivity : AppCompatActivity() {
 
     /** The ⋮ next to a document: remove from the list, or delete from the device (owner, 2026-10-16). */
     private fun showMenu(doc: Doc): android.app.Dialog = Messages.menu(this, ui, doc.name, listOf(
-        Messages.Item(getString(R.string.library_remove), R.drawable.ic_list_remove, tag = "menu_remove") { confirmRemove(doc) },
-        Messages.Item(getString(R.string.library_delete), R.drawable.ic_delete, danger = true, tag = "menu_delete") { confirmDelete(doc) },
-    )).also { lastDialog = it }
+        Messages.Item(getString(R.string.library_remove), tag = "menu_remove") { confirmRemove(doc) },
+        Messages.Item(getString(R.string.library_delete), danger = true, tag = "menu_delete") { confirmDelete(doc) },
+    ), cancel = getString(R.string.action_cancel)).also { lastDialog = it }
 
     /** The last menu or question shown (for tests and screenshots). */
     var lastDialog: android.app.Dialog? = null

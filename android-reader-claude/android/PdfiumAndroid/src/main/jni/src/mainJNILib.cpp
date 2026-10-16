@@ -24,6 +24,7 @@ using namespace android;
 #include <fpdf_searchex.h>
 #include <fpdf_annot.h>
 #include <fpdf_formfill.h>
+#include <fpdf_attachment.h>
 #include <fpdf_edit.h>
 #include <fpdf_save.h>
 #include <fpdf_progressive.h>
@@ -2489,6 +2490,94 @@ JNI_FUNC(jboolean, PdfiumCore, nativeSetFormFieldChecked)(JNI_ARGS,
              FPDFAnnot_GetFormFieldFlags(formHandle, annot));
     }
     FPDFPage_CloseAnnot(annot);
+    return result;
+}
+
+// ---------- Otzarot progress map (stage 2): the hidden map file inside the PDF, and the check boxes ----------
+
+/** The bytes of a file attached inside the PDF (EmbeddedFiles), found by its name; null when there is none. */
+JNI_FUNC(jbyteArray, PdfiumCore, nativeGetAttachment)(JNI_ARGS, jlong docPtr, jstring name) {
+    DocumentFile *doc = reinterpret_cast<DocumentFile*>(docPtr);
+    if (doc == NULL || doc->pdfDocument == NULL || name == NULL) {
+        return NULL;
+    }
+    std::vector<FPDF_WCHAR> wanted = jstringToWide(env, name);
+    int count = FPDFDoc_GetAttachmentCount(doc->pdfDocument);
+    for (int i = 0; i < count; i++) {
+        FPDF_ATTACHMENT attachment = FPDFDoc_GetAttachment(doc->pdfDocument, i);
+        if (attachment == NULL) {
+            continue;
+        }
+        unsigned long nameBytes = FPDFAttachment_GetName(attachment, NULL, 0);
+        if (nameBytes <= sizeof(FPDF_WCHAR)) {
+            continue;
+        }
+        std::vector<FPDF_WCHAR> found(nameBytes / sizeof(FPDF_WCHAR));
+        FPDFAttachment_GetName(attachment, found.data(), nameBytes);
+        while (!found.empty() && found.back() == 0) {
+            found.pop_back();
+        }
+        if (found != wanted) {
+            continue;
+        }
+        unsigned long length = 0;
+        if (!FPDFAttachment_GetFile(attachment, NULL, 0, &length)) {
+            return NULL;
+        }
+        std::vector<char> data(length > 0 ? length : 1);
+        unsigned long copied = 0;
+        if (length > 0 && !FPDFAttachment_GetFile(attachment, data.data(), length, &copied)) {
+            return NULL;
+        }
+        jbyteArray result = env->NewByteArray(static_cast<jsize>(copied));
+        if (result != NULL && copied > 0) {
+            env->SetByteArrayRegion(result, 0, static_cast<jsize>(copied), reinterpret_cast<const jbyte*>(data.data()));
+        }
+        return result;
+    }
+    return NULL;
+}
+
+/** "annotIndex\tchecked(0|1)\tfield name" for every check box and radio button on the page. */
+JNI_FUNC(jobjectArray, PdfiumCore, nativeGetCheckFields)(JNI_ARGS, jlong docPtr, jlong pagePtr) {
+    DocumentFile *doc = reinterpret_cast<DocumentFile*>(docPtr);
+    FPDF_PAGE page = reinterpret_cast<FPDF_PAGE>(pagePtr);
+    jclass stringClass = env->FindClass("java/lang/String");
+    std::vector<std::vector<jchar> > rows;
+    FPDF_FORMHANDLE formHandle = page != NULL ? ensureFormHandleForPage(doc, page) : NULL;
+    if (formHandle != NULL) {
+        int annotCount = FPDFPage_GetAnnotCount(page);
+        for (int i = 0; i < annotCount; i++) {
+            FPDF_ANNOTATION annot = FPDFPage_GetAnnot(page, i);
+            if (annot == NULL) {
+                continue;
+            }
+            if (FPDFAnnot_GetSubtype(annot) == FPDF_ANNOT_WIDGET) {
+                int type = FPDFAnnot_GetFormFieldType(formHandle, annot);
+                if (type == FPDF_FORMFIELD_CHECKBOX || type == FPDF_FORMFIELD_RADIOBUTTON) {
+                    std::vector<jchar> row;
+                    char head[32];
+                    snprintf(head, sizeof(head), "%d\t%d\t", i, FPDFAnnot_IsChecked(formHandle, annot) ? 1 : 0);
+                    for (char* c = head; *c; c++) {
+                        row.push_back(static_cast<jchar>(*c));
+                    }
+                    std::vector<FPDF_WCHAR> fieldName = getFormFieldWideString(&FPDFAnnot_GetFormFieldName, formHandle, annot);
+                    for (size_t k = 0; k < fieldName.size(); k++) {
+                        row.push_back(static_cast<jchar>(fieldName[k]));
+                    }
+                    rows.push_back(row);
+                }
+            }
+            FPDFPage_CloseAnnot(annot);
+        }
+    }
+    jobjectArray result = env->NewObjectArray(rows.size(), stringClass, NULL);
+    for (jsize i = 0; i < static_cast<jsize>(rows.size()); i++) {
+        jstring value = env->NewString(rows[i].data(), rows[i].size());
+        env->SetObjectArrayElement(result, i, value);
+        env->DeleteLocalRef(value);
+    }
+    env->DeleteLocalRef(stringClass);
     return result;
 }
 

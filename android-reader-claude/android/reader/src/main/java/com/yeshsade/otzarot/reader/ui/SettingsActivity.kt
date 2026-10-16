@@ -64,7 +64,12 @@ class SettingsActivity : AppCompatActivity() {
         val added = JSONObject(assets.open("settings-copy-2026-10-15.json").bufferedReader().use { it.readText() })
         require(added.getString("status") == "approved")
         val extra = added.getJSONArray("entries")
-        wording = ((0 until entries.length()).map { entries.getJSONObject(it) } + (0 until extra.length()).map { extra.getJSONObject(it) })
+        // and the wording approved on 2026-10-16
+        val third = JSONObject(assets.open("settings-copy-2026-10-16.json").bufferedReader().use { it.readText() })
+        require(third.getString("status") == "approved")
+        val more = third.getJSONArray("entries")
+        wording = ((0 until entries.length()).map { entries.getJSONObject(it) } + (0 until extra.length()).map { extra.getJSONObject(it) } +
+            (0 until more.length()).map { more.getJSONObject(it) })
             .associateBy { it.getString("id") }
         font = Fonts.regular(this)
         mediumFont = Fonts.medium(this)
@@ -103,6 +108,7 @@ class SettingsActivity : AppCompatActivity() {
         ),
         R.id.otzr_group_app to listOf(
             Setting("language", R.id.otzr_language_label, R.id.otzr_language_desc, listOf(Choice("he", R.id.otzr_language_he), Choice("en", R.id.otzr_language_en))),
+            Setting("sortsize", R.id.otzr_sortsize_label, R.id.otzr_sortsize_desc, listOf(Choice("off", R.id.otzr_sortsize_off), Choice("on", R.id.otzr_sortsize_on))),
         ),
     )
 
@@ -115,6 +121,7 @@ class SettingsActivity : AppCompatActivity() {
         "theme" -> if (settings.night) "night" else "day"
         "language" -> settings.language ?: if (resources.configuration.localesLanguage() in setOf("he", "iw")) "he" else "en"
         "frame" -> settings.frameMode
+        "sortsize" -> if (settings.sortBySize) "on" else "off"
         else -> error("Unknown setting")
     }
 
@@ -133,6 +140,7 @@ class SettingsActivity : AppCompatActivity() {
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(value))
             }
             "frame" -> settings.frameMode = value
+            "sortsize" -> settings.sortBySize = value == "on"
         }
         scrollPosition = scroll.scrollY
         sheet?.dismiss()

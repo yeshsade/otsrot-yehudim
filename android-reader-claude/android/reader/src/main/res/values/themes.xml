@@ -5,4 +5,9 @@
         <item name="colorAccent">#57479F</item>
         <item name="android:windowBackground">@color/canvas</item>
     </style>
+    <!-- Messages slide up from the bottom (owner's choice "ג", 2026-10-16) -->
+    <style name="OtzrSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/otzr_sheet_in</item>
+        <item name="android:windowExitAnimation">@anim/otzr_sheet_out</item>
+    </style>
 </resources>

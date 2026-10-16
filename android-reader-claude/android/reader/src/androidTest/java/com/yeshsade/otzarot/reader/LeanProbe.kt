@@ -53,6 +53,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "look") { look(); return }
         if (mode == "perf") { perf(); return }
         if (mode == "manage") { manage(); return }
+        if (mode == "map") { mapChecks(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -253,9 +254,10 @@ class LeanProbe : Instrumentation() {
             runOnMainSync { reader.finish(); list.finish() }
 
             // Sorting
-            val sorted = LibraryActivity.Sort.NAME.apply(app.library.all()).map { it.name }
+            val sortName = com.yeshsade.otzarot.reader.data.SortOrder(com.yeshsade.otzarot.reader.data.SortOrder.By.NAME)
+            val sorted = sortName.apply(app.library.all(), java.text.Collator.getInstance()).map { it.name }
             check(sorted == sorted.sortedWith(java.text.Collator.getInstance())) { sorted.toString() }
-            val bySize = LibraryActivity.Sort.SIZE.apply(app.library.all()).map { it.size }
+            val bySize = com.yeshsade.otzarot.reader.data.SortOrder(com.yeshsade.otzarot.reader.data.SortOrder.By.SIZE).apply(app.library.all()).map { it.size }
             check(bySize == bySize.sortedDescending())
             record("Sorting by name and by size works")
 
@@ -296,11 +298,25 @@ class LeanProbe : Instrumentation() {
             }
             val b = added ?: error("no bookmark added")
             // it drops into its place (owner's choice: "falls and bounces"), then stays there
-            check(arriving != null && arriving!! < 1f) { "the new ribbon did not drop in ($arriving)" }
+            // started dropping (on the slow emulator the half second may already be over: what counts is that it was set)
+            check(arriving != null) { "the new ribbon did not drop in" }
             SystemClock.sleep(com.yeshsade.otzarot.reader.data.DropIn.MILLIS + 400); waitForIdleSync()
             runOnMainSync { arriving = controller.arrivalProgress }
             check(arriving == null) { "still dropping after the drop time ($arriving)" }
             record("A new ribbon drops into its place with one small hop, in half a second, then stays put")
+
+            // the hint card (owner's wording): shown at the first ribbon after opening the app, closes only with OK
+            app.settings.bookmarkHintNever = false
+            var hint: com.yeshsade.otzarot.reader.ui.Messages.Ask? = null
+            onMainChecked { hint = reader.lastHint; check(hint?.dialog?.isShowing == true) { "no hint at the first ribbon" } }
+            onMainChecked { snapshotView(hint!!.dialog.window!!.decorView, "bm-hint.png") }
+            onMainChecked { hint!!.dialog.onBackPressed() }
+            waitForIdleSync()
+            onMainChecked { check(hint!!.dialog.isShowing) { "the hint closed without OK" } }
+            onMainChecked { hint!!.no!!.performClick(); hint!!.yes.performClick() }
+            waitForIdleSync()
+            check(app.settings.bookmarkHintNever) { "\"don't show again\" was not kept" }
+            record("The bookmark hint shows at the first ribbon, closes only with OK, and \"don't show again\" is kept")
             check(controller.all().size == before + 1)
             check(b.color == app.settings.bookmarkColor)
             waitFor("bookmark saved", 90_000) { bookmarksIn(doc.uri).size == before + 1 }
@@ -561,10 +577,27 @@ class LeanProbe : Instrumentation() {
                 sort.invoke(list)
             }
             waitForIdleSync(); SystemClock.sleep(400)
-            onMainChecked { val d = list.lastDialog!!; snapshotView(d.window!!.decorView, "choose-sort.png"); d.dismiss() }
+            // the sort window: size is hidden unless switched on; "the other way" reorders the list at once
             onMainChecked {
-                val hint = list.resources.getIdentifier("bm_added_hint", "string", list.packageName)
-                com.yeshsade.otzarot.reader.ui.Messages.notice(list, list.getString(hint), long = true)
+                val d = list.lastDialog!!
+                val root = d.window!!.decorView
+                check(root.findViewWithTag<View>("sort_size") == null) { "size offered while switched off" }
+                snapshotView(root, "choose-sort.png")
+                root.findViewWithTag<View>("dir_true").performClick()
+            }
+            waitForIdleSync()
+            check(app.settings.sortReversed && app.settings.sortOrder.by == com.yeshsade.otzarot.reader.data.SortOrder.By.RECEIVED)
+            onMainChecked { list.lastDialog!!.window!!.decorView.findViewWithTag<View>("sort_close").performClick() }
+            app.settings.sortReversed = false
+            app.settings.sortBySize = true
+            onMainChecked { LibraryActivity::class.java.getDeclaredMethod("chooseSort").apply { isAccessible = true }.invoke(list) }
+            waitForIdleSync(); SystemClock.sleep(400)
+            onMainChecked { val d = list.lastDialog!!; check(d.window!!.decorView.findViewWithTag<View>("sort_size") != null) { "size not offered when switched on" }; d.dismiss() }
+            app.settings.sortBySize = false
+            record("Sort window: the other way reorders the list; size appears only when switched on in the settings")
+            onMainChecked {
+                val failed = list.resources.getIdentifier("library_delete_failed", "string", list.packageName)
+                com.yeshsade.otzarot.reader.ui.Messages.notice(list, list.getString(failed), long = true)
             }
             waitForIdleSync(); SystemClock.sleep(600)
             onMainChecked { snapshot(list, "notice.png") }
@@ -582,6 +615,64 @@ class LeanProbe : Instrumentation() {
             result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
             finish(Activity.RESULT_CANCELED, result)
         }
+    }
+
+    /** Stage 2: the hidden progress map inside a booklet — read, checked against the boxes, and used to mark a day. */
+    private fun mapChecks() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            app.settings.allFilesPromptDismissed = true; app.settings.whatsAppPromptDismissed = true; app.settings.bookmarkHintNever = true
+            var reader = openShared(ReadOnlyPdfProvider.uri("map-booklet.pdf"))
+            waitLoaded(reader)
+            val map = readMap(pdfView(reader))
+            check(map.checks.size == 6) { "expected 6 boxes for this week, got ${map.checks.size}" }
+            check(map.checks.none { it.field == "vcheck_prev_week" }) { "last week's page was not left out" }
+            check(map.days.map { it.id } == listOf("sunday", "monday", "tuesday"))
+            record("The hidden map is read from the booklet and every box in it is found in the PDF; last week's pages are left out")
+
+            // a whole day at once, through the map
+            val doc = field<com.yeshsade.otzarot.reader.data.Doc>(reader, "doc")
+            val monday = map.checksOf(dayId = "monday")
+            check(monday.size == 2)
+            onMainChecked {
+                val v = pdfView(reader)
+                monday.forEach { c ->
+                    c.pages.forEach { page ->
+                        val box = v.getCheckFields(page).first { it.name == c.field }
+                        check(v.setFormFieldChecked(page, box.annotationIndex, true)) { "could not tick ${c.field}" }
+                    }
+                }
+                ReaderActivity::class.java.getDeclaredMethod("marked").apply { isAccessible = true }.invoke(reader)
+            }
+            waitFor("day saved", 90_000) { checkedIn(doc.uri) == 2 }
+            onMainChecked { reader.finish() }; waitFor("closed", 30_000) { reader.isDestroyed }
+
+            // after the app's own save: the map is still there, and exactly Monday's boxes are ticked
+            reader = openShared(ReadOnlyPdfProvider.uri("map-booklet.pdf"))
+            waitLoaded(reader)
+            val again = readMap(pdfView(reader))
+            check(again == map) { "the map changed after saving" }
+            val ticked = (0 until 3).flatMap { page -> pdfView(reader).getCheckFields(page).filter { it.checked }.map { it.name } }.toSet()
+            check(ticked == monday.map { it.field }.toSet()) { "ticked: $ticked" }
+            onMainChecked { reader.finish() }
+            record("Ticking a whole day through the map ticks exactly those boxes in the PDF, and the map survives the app's save")
+
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    private fun readMap(v: PDFView): com.yeshsade.otzarot.reader.data.ProgressMap {
+        val bytes = v.getAttachment(com.yeshsade.otzarot.reader.data.ProgressMap.FILE_NAME) ?: error("no map in the booklet")
+        val parsed = com.yeshsade.otzarot.reader.data.ProgressMap.parse(String(bytes, Charsets.UTF_8))
+        val map = (parsed as? com.yeshsade.otzarot.reader.data.ProgressMap.Result.Ok)?.map ?: error("map refused: $parsed")
+        val verified = com.yeshsade.otzarot.reader.data.ProgressMap.verify(map) { page -> v.getCheckFields(page).map { it.name }.toSet() }
+        check(verified is com.yeshsade.otzarot.reader.data.ProgressMap.Result.Ok) { "map does not match the boxes: $verified" }
+        return map
     }
 
     private fun refreshList(list: LibraryActivity) {

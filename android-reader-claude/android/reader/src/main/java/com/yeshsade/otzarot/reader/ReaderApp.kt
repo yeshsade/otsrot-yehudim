@@ -45,7 +45,24 @@ class ReaderApp : Application() {
         settings.language?.let { AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(it)) }
         windowPolicy = WindowPolicy(settings)
         registerActivityLifecycleCallbacks(windowPolicy)
+        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
+            private var started = 0
+            override fun onActivityStarted(a: Activity) { started++ }
+            // the app left the screen: the next time it is opened is a new "opening" (bookmark hint)
+            override fun onActivityStopped(a: Activity) { if (--started <= 0) { started = 0; bookmarkHintShown = false } }
+            override fun onActivityCreated(a: Activity, s: Bundle?) = Unit
+            override fun onActivityResumed(a: Activity) = Unit
+            override fun onActivityPaused(a: Activity) = Unit
+            override fun onActivitySaveInstanceState(a: Activity, s: Bundle) = Unit
+            override fun onActivityDestroyed(a: Activity) = Unit
+        })
     }
+
+    /**
+     * The bookmark hint was shown since the app was opened (owner, 2026-10-16: shown again only after the app is
+     * opened again, until "don't show again"). A rotation or moving between the app's screens is not a new opening.
+     */
+    var bookmarkHintShown = false
 
     companion object {
         fun applyTheme(settings: Settings) = AppCompatDelegate.setDefaultNightMode(

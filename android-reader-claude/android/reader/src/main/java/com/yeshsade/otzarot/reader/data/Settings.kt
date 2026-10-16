@@ -39,6 +39,19 @@ class Settings(context: Context) {
     var sort: String
         get() = prefs.getString(SORT, "received")!!
         set(v) = prefs.edit().putString(SORT, v).apply()
+    /** The other way of the chosen order (e.g. oldest first, ת–א). */
+    var sortReversed: Boolean
+        get() = prefs.getBoolean(SORT_REVERSED, false)
+        set(v) = prefs.edit().putBoolean(SORT_REVERSED, v).apply()
+    /** "Size" in the sort window — hidden unless switched on in the settings (owner, 2026-10-16). */
+    var sortBySize: Boolean
+        get() = prefs.getBoolean(SORT_SIZE, false)
+        set(v) = prefs.edit().putBoolean(SORT_SIZE, v).apply()
+    val sortOrder get() = SortOrder.restore(sort, sortReversed, sortBySize)
+    /** The bookmark hint card: never again, once the reader ticked "don't show again". */
+    var bookmarkHintNever: Boolean
+        get() = prefs.getBoolean(BM_HINT_NEVER, false)
+        set(v) = prefs.edit().putBoolean(BM_HINT_NEVER, v).apply()
     /** Bookmark choices: the last one made becomes the next default (owner's decision). */
     var bookmarkColor: Int
         get() = prefs.getInt(BM_COLOR, Bookmark.DEFAULT_COLOR)
@@ -108,6 +121,9 @@ class Settings(context: Context) {
         const val SCRUB_HOLD = "scrubber_hold_ms"
         const val SCRUB_ALWAYS = "scrubber_always"
         const val BM_HORIZONTAL = "bookmark_horizontal"
+        const val SORT_REVERSED = "sort_reversed"
+        const val SORT_SIZE = "sort_by_size"
+        const val BM_HINT_NEVER = "bookmark_hint_never"
     }
 }
 

@@ -160,6 +160,10 @@ public class PdfiumCore {
 
     private native String[] nativeGetAppBookmarks(long pagePtr);
 
+    private native byte[] nativeGetAttachment(long docPtr, String name);
+
+    private native String[] nativeGetCheckFields(long docPtr, long pagePtr);
+
     private native boolean nativeRemoveAppBookmark(long pagePtr, String name);
 
     private native String[] nativeGetPageFonts(long pagePtr);
@@ -962,6 +966,46 @@ public class PdfiumCore {
     }
 
     /** Rows "name\tleft\tbottom\tright\ttop"; opens (and closes again) the page if needed. */
+    /** The bytes of a file attached inside the PDF (for example the progress map), or null. */
+    public byte[] getAttachment(PdfDocument doc, String name) {
+        synchronized (lock) {
+            if (doc.closed) {
+                return null;
+            }
+            return nativeGetAttachment(doc.mNativeDocPtr, name);
+        }
+    }
+
+    /** "annotIndex\tchecked\tname" rows for the check boxes on a page (opens and closes the page if needed). */
+    public List<String> getCheckFields(PdfDocument doc, int pageIndex) {
+        synchronized (lock) {
+            List<String> result = new ArrayList<>();
+            if (doc.closed) {
+                return result;
+            }
+            boolean wasOpen = doc.mNativePagesPtr.get(pageIndex) != null;
+            long pagePtr = openPage(doc, pageIndex);
+            if (pagePtr == 0L) {
+                return result;
+            }
+            try {
+                String[] rows = nativeGetCheckFields(doc.mNativeDocPtr, pagePtr);
+                if (rows != null) {
+                    for (String row : rows) {
+                        if (row != null) {
+                            result.add(row);
+                        }
+                    }
+                }
+            } finally {
+                if (!wasOpen) {
+                    closePage(doc, pageIndex);
+                }
+            }
+            return result;
+        }
+    }
+
     public List<String> getAppBookmarks(PdfDocument doc, int pageIndex) {
         synchronized (lock) {
             List<String> result = new ArrayList<>();

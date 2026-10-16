@@ -1,0 +1,11 @@
+{
+  "version": "2026-10-16",
+  "status": "approved",
+  "note": "Approved by the owner one by one on 2026-10-16 (Hebrew). English is Claude's translation.",
+  "entries": [
+    {"id": "sortsize_label", "he": "מיון לפי גודל", "en": "Sort by size"},
+    {"id": "sortsize_desc", "he": "הוספת „גודל” לחלון „מיון לפי”.", "en": "Adds “Size” to the “Sort by” window."},
+    {"id": "sortsize_off", "he": "לא להציג", "en": "Don’t show"},
+    {"id": "sortsize_on", "he": "להציג", "en": "Show"}
+  ]
+}

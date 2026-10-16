@@ -412,13 +412,24 @@ class ReaderActivity : AppCompatActivity() {
         marked()
     }
 
+    /** The last bookmark hint shown (for tests and screenshots). */
+    var lastHint: Messages.Ask? = null
+        private set
+
     private fun addBookmark() {
         if (pageCount == 0) return
         bookmarks.add { added ->
             if (added == null || isDestroyed) return@add
-            if (!app.settings.prefs.getBoolean(HINT_SHOWN, false)) {
-                app.settings.prefs.edit().putBoolean(HINT_SHOWN, true).apply()
-                Messages.notice(this, getString(R.string.bm_added_hint), long = true)
+            val settings = app.settings
+            if (!settings.bookmarkHintNever && !app.bookmarkHintShown) {
+                app.bookmarkHintShown = true
+                chrome.hold()
+                lastHint = Messages.info(this, ui, getString(R.string.bm_hint_title), getString(R.string.bm_hint_heading),
+                    listOf(getString(R.string.bm_hint_drag), getString(R.string.bm_hint_menu), getString(R.string.bm_hint_list)),
+                    never = getString(R.string.bm_hint_never), ok = getString(R.string.action_ok)) { never ->
+                    if (never) settings.bookmarkHintNever = true
+                    chrome.used()
+                }
             }
         }
     }
@@ -503,7 +514,6 @@ class ReaderActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_DOC = "doc"
         private const val STATE_DOC = "doc"
-        private const val HINT_SHOWN = "bookmark_hint_shown"
         private const val SAVE_DELAY_MS = 1500L
         private const val RETRY_DELAY_MS = 300L
 

@@ -1357,6 +1357,37 @@ class PdfFile {
         return result;
     }
 
+    /** A file attached inside the PDF (the Otzarot progress map), or null. */
+    public byte[] getAttachment(String name) {
+        if (disposed || pdfDocument == null) {
+            return null;
+        }
+        return pdfiumCore.getAttachment(pdfDocument, name);
+    }
+
+    /** The check boxes on a page, by name — without keeping the page open. */
+    public List<com.github.barteksc.pdfviewer.model.CheckField> getCheckFields(int pageIndex) {
+        List<com.github.barteksc.pdfviewer.model.CheckField> fields = new ArrayList<>();
+        if (disposed || pdfDocument == null) {
+            return fields;
+        }
+        int docPage = documentPage(pageIndex);
+        if (docPage < 0) {
+            return fields;
+        }
+        for (String row : pdfiumCore.getCheckFields(pdfDocument, docPage)) {
+            String[] parts = row.split("\t", 3);
+            if (parts.length < 3) {
+                continue;
+            }
+            try {
+                fields.add(new com.github.barteksc.pdfviewer.model.CheckField(pageIndex, Integer.parseInt(parts[0]), "1".equals(parts[1]), parts[2]));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return fields;
+    }
+
     /** Names of the page's bookmarks, without loading the page's geometry or keeping the page open. */
     public List<String> getAppBookmarkNames(int pageIndex) {
         List<String> names = new ArrayList<>();

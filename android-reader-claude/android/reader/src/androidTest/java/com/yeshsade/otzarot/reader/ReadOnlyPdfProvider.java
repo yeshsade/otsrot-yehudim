@@ -32,7 +32,9 @@ public class ReadOnlyPdfProvider extends ContentProvider {
     private File file(String name) throws FileNotFoundException {
         File target = new File(getContext().getFilesDir(), name);
         if (!target.exists()) {
-            try (InputStream in = getContext().getAssets().open("synthetic-checkbox-source.pdf");
+            // "map-…" is the booklet with a hidden progress map (stage 2); everything else is the plain test booklet
+            String asset = name.startsWith("map-") ? "map-booklet.pdf" : "synthetic-checkbox-source.pdf";
+            try (InputStream in = getContext().getAssets().open(asset);
                  OutputStream out = new FileOutputStream(target)) {
                 byte[] buffer = new byte[8192];
                 int n;

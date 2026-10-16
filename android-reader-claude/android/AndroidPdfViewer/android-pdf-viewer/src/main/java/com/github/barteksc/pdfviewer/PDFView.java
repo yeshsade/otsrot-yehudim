@@ -1594,6 +1594,34 @@ public class PDFView extends RelativeLayout {
         }
     }
 
+    /** A file attached inside the PDF (the Otzarot progress map), or null. Safe from a background thread. */
+    public byte[] getAttachment(String name) {
+        PdfFile file = pdfFile;
+        if (file == null) {
+            return null;
+        }
+        try {
+            return file.getAttachment(name);
+        } catch (Throwable throwable) {
+            Log.e(TAG, "getAttachment failed", throwable);
+            return null;
+        }
+    }
+
+    /** The check boxes on a page, by name. Safe from a background thread. */
+    public java.util.List<com.github.barteksc.pdfviewer.model.CheckField> getCheckFields(int page) {
+        PdfFile file = pdfFile;
+        if (file == null || page < 0 || page >= file.getPagesCount()) {
+            return new java.util.ArrayList<>();
+        }
+        try {
+            return file.getCheckFields(page);
+        } catch (Throwable throwable) {
+            Log.e(TAG, "getCheckFields failed", throwable);
+            return new java.util.ArrayList<>();
+        }
+    }
+
     /** Whether the engine already has the page open (reading its bookmarks is then cheap). */
     public boolean isPageOpen(int page) {
         PdfFile file = pdfFile;

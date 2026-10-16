@@ -3,7 +3,6 @@
 <resources>
     <string name="app_name">קורא PDF</string>
     <string name="library_title">מסמכים</string>
-    <string name="library_sort">מהחדש לישן לפי קבלה</string>
     <string name="library_open_pdf">פתיחת PDF</string>
     <string name="library_today">היום</string>
     <string name="library_yesterday">אתמול</string>
@@ -47,13 +46,13 @@
     <string name="tool_bookmark">סימנייה</string>
     <string name="open_failed">לא ניתן לפתוח את הקובץ.</string>
     <string name="save_failed">הסימון לא נשמר בקובץ. הוא נשאר על המסך; ננסה שוב בסימון הבא.</string>
-    <string name="library_sort_prefix">סידור:</string>
-    <string name="sort_title">סידור הרשימה</string>
-    <string name="sort_received">מהחדש לישן לפי קבלה</string>
-    <string name="sort_name">לפי שם (א–ת)</string>
-    <string name="sort_size">לפי גודל (מהגדול)</string>
-    <string name="sort_last_read">לפי קריאה אחרונה</string>
-    <string name="sort_pages">לפי מספר עמודים</string>
+    <string name="library_sort_prefix">מיון:</string>
+    <string name="sort_title">מיון לפי</string>
+    <string name="sort_received">תאריך קבלה</string>
+    <string name="sort_name">שם</string>
+    <string name="sort_size">גודל</string>
+    <string name="sort_last_read">קריאה אחרונה</string>
+    <string name="sort_pages">מספר עמודים</string>
     <!-- Bookmarks: approved by the owner 2026-10-14 (English: draft) -->
     <string name="bm_color">צבע</string>
     <string name="bm_opacity">שקיפות</string>
@@ -68,8 +67,26 @@
     <!-- DRAFT: awaiting the owner's approval -->
     <string name="bm_list_searching">מחפש סימניות בשאר העמודים… %1$d מתוך %2$d</string>
     <string name="bm_page">עמוד %1$d</string>
-    <string name="bm_added_hint">נוספה סימנייה. אפשר לגרור אותה באצבע; לחיצה ארוכה עליה פותחת אפשרויות. לחיצה ארוכה על „סימנייה” למטה מציגה את כל הסימניות.</string>
     <string name="bm_third_question">בטוח שתרצה יותר מ־2 סימניות על עמוד זה?</string>
     <string name="bm_third_yes">כן, להוסיף</string>
     <string name="bm_third_no">לא</string>
+    <!-- Sort window (approved by the owner 2026-10-16) -->
+    <string name="sort_direction">כיוון:</string>
+    <string name="dir_newest">מהחדש לישן</string>
+    <string name="dir_oldest">מהישן לחדש</string>
+    <string name="dir_az">א–ת</string>
+    <string name="dir_za">ת–א</string>
+    <string name="dir_big">מהגדול לקטן</string>
+    <string name="dir_small">מהקטן לגדול</string>
+    <string name="dir_many">מהרב למעט</string>
+    <string name="dir_few">מהמעט לרב</string>
+    <string name="action_close">סגירה</string>
+    <!-- Bookmark hint (the owner's own wording, 2026-10-16) -->
+    <string name="bm_hint_title">נוספה סימנייה</string>
+    <string name="bm_hint_heading">📌 כדאי לדעת</string>
+    <string name="bm_hint_drag">אפשר לגרור את הסימנייה לכל מקום בעמוד, לדיוק מרבי.</string>
+    <string name="bm_hint_menu">לחיצה ארוכה על הסימנייה עצמה פותחת אפשרויות נוספות.</string>
+    <string name="bm_hint_list">לחיצה ארוכה על סמל הסימנייה למטה בסרגל מציגה את כל הסימניות.</string>
+    <string name="bm_hint_never">לא להציג עוד פעם</string>
+    <string name="action_ok">אישור</string>
 </resources>

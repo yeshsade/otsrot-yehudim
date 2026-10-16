@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">PDF Reader</string>
     <string name="library_title">Documents</string>
-    <string name="library_sort">Newest first, by date received</string>
     <string name="library_open_pdf">Open PDF</string>
     <string name="library_today">Today</string>
     <string name="library_yesterday">Yesterday</string>
@@ -45,12 +44,12 @@
     <string name="all_files_body">Tap “Turn on”, then switch on the toggle on the screen that opens. Every PDF on this device will then appear here, and your marks will be saved inside the file itself, with no extra copy.</string>
     <string name="all_files_allow">Turn on</string>
     <string name="library_sort_prefix">Sort:</string>
-    <string name="sort_title">Sort the list</string>
-    <string name="sort_received">Newest first, by date received</string>
-    <string name="sort_name">By name (A–Z)</string>
-    <string name="sort_size">By size (largest first)</string>
-    <string name="sort_last_read">By last read</string>
-    <string name="sort_pages">By number of pages</string>
+    <string name="sort_title">Sort by</string>
+    <string name="sort_received">Date received</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_size">Size</string>
+    <string name="sort_last_read">Last read</string>
+    <string name="sort_pages">Number of pages</string>
     <!-- Bookmarks: approved by the owner 2026-10-14 (English: draft) -->
     <string name="bm_color">Colour</string>
     <string name="bm_opacity">Opacity</string>
@@ -65,8 +64,24 @@
     <!-- DRAFT: awaiting the owner's approval -->
     <string name="bm_list_searching">Looking for bookmarks on the other pages… %1$d of %2$d</string>
     <string name="bm_page">Page %1$d</string>
-    <string name="bm_added_hint">Bookmark added. Drag it with your finger; long-press it for options. Long-press “Bookmark” below to see all bookmarks.</string>
     <string name="bm_third_question">Are you sure you want more than 2 bookmarks on this page?</string>
     <string name="bm_third_yes">Yes, add</string>
     <string name="bm_third_no">No</string>
+    <string name="sort_direction">Order:</string>
+    <string name="dir_newest">Newest first</string>
+    <string name="dir_oldest">Oldest first</string>
+    <string name="dir_az">A–Z</string>
+    <string name="dir_za">Z–A</string>
+    <string name="dir_big">Largest first</string>
+    <string name="dir_small">Smallest first</string>
+    <string name="dir_many">Most pages first</string>
+    <string name="dir_few">Fewest pages first</string>
+    <string name="action_close">Close</string>
+    <string name="bm_hint_title">Bookmark added</string>
+    <string name="bm_hint_heading">📌 Good to know</string>
+    <string name="bm_hint_drag">You can drag the bookmark anywhere on the page, to place it exactly.</string>
+    <string name="bm_hint_menu">Long-press the bookmark itself for more options.</string>
+    <string name="bm_hint_list">Long-press the bookmark icon in the bar below to see all bookmarks.</string>
+    <string name="bm_hint_never">Don’t show again</string>
+    <string name="action_ok">OK</string>
 </resources>
