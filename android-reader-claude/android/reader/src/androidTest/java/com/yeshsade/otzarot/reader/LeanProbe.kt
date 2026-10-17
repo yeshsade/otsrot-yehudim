@@ -107,6 +107,36 @@ class LeanProbe : Instrumentation() {
             check(countChecked(reader) == 3)
             record("A mark made right before rotation is saved and shown after it")
 
+            // A save holds the engine for the whole file (seconds in a big booklet). Hold it here on purpose,
+            // and tap a box meanwhile: the tap must answer at once, and the mark must still reach the file.
+            val (busyField, busyAt) = fields(reader).first { (f, _) -> !f.checked }
+            val engineLock = com.shockwave.pdfium.PdfiumCore::class.java.getDeclaredField("lock").apply { isAccessible = true }.get(null)
+            val held = java.util.concurrent.CountDownLatch(1)
+            val release = java.util.concurrent.CountDownLatch(1)
+            val holder = Thread { synchronized(engineLock) { held.countDown(); release.await(10, java.util.concurrent.TimeUnit.SECONDS) } }
+            holder.start()
+            check(held.await(10, java.util.concurrent.TimeUnit.SECONDS))
+            var tapMillis = 0L
+            var shownAtOnce = false
+            runOnMainSync {
+                val m = ReaderActivity::class.java.getDeclaredMethod("tap", MotionEvent::class.java).apply { isAccessible = true }
+                val now = SystemClock.uptimeMillis()
+                val e = MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, busyAt[0], busyAt[1], 0)
+                val started = SystemClock.elapsedRealtime()
+                check(m.invoke(reader, e) as Boolean)
+                tapMillis = SystemClock.elapsedRealtime() - started
+                e.recycle()
+                shownAtOnce = pdfView(reader).peekFormFieldAt(busyAt[0], busyAt[1])?.checked == true
+            }
+            release.countDown()
+            holder.join(15_000)
+            check(tapMillis < 250) { "a tap during a save took $tapMillis ms" }
+            check(shownAtOnce) { "the box did not show its new state at once (${busyField.pageIndex}:${busyField.annotationIndex})" }
+            waitFor("mark made while the engine was busy is saved", 90_000) { checkedIn(doc.uri) == 4 }
+            record("A tap while the engine is busy saving answers at once ($tapMillis ms), shows the V, and is saved")
+            undoLast(reader)
+            waitFor("undo of the busy-time mark saved", 90_000) { checkedIn(doc.uri) == 3 }
+
             val edition2 = ReadOnlyPdfProvider.uri("booklet-2.pdf")
             reader = openShared(edition2, from = reader)
             waitLoaded(reader)

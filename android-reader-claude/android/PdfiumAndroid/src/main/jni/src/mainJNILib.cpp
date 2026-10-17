@@ -2384,6 +2384,53 @@ JNI_FUNC(jfloatArray, PdfiumCore, nativeGetFormFieldRects)(JNI_ARGS,
     return result;
 }
 
+/**
+ * Everything the reader needs to answer a tap without the engine: for every editable widget on the page,
+ * 8 numbers — annotation index, field type, field flags, checked (0/1), and its rect (left, bottom, right, top).
+ * Read once in the background with the page's other caches, so a tap never waits for a save in progress.
+ */
+JNI_FUNC(jfloatArray, PdfiumCore, nativeGetFormFieldSummary)(JNI_ARGS,
+    jlong docPtr,
+    jlong pagePtr
+) {
+    DocumentFile *doc = reinterpret_cast<DocumentFile*>(docPtr);
+    FPDF_PAGE page = reinterpret_cast<FPDF_PAGE>(pagePtr);
+    FPDF_FORMHANDLE formHandle = ensureFormHandleForPage(doc, page);
+    if (page == NULL || formHandle == NULL) {
+        return env->NewFloatArray(0);
+    }
+
+    std::vector<jfloat> values;
+    int annotCount = FPDFPage_GetAnnotCount(page);
+    for (int i = 0; i < annotCount; i++) {
+        FPDF_ANNOTATION annot = FPDFPage_GetAnnot(page, i);
+        if (annot == NULL) {
+            continue;
+        }
+        FS_RECTF rect;
+        if (FPDFAnnot_GetSubtype(annot) == FPDF_ANNOT_WIDGET
+                && isEditableFormField(formHandle, annot)
+                && FPDFAnnot_GetRect(annot, &rect)) {
+            FS_RECTF bounds = normalizedRect(rect);
+            values.push_back(static_cast<jfloat>(i));
+            values.push_back(static_cast<jfloat>(FPDFAnnot_GetFormFieldType(formHandle, annot)));
+            values.push_back(static_cast<jfloat>(FPDFAnnot_GetFormFieldFlags(formHandle, annot)));
+            values.push_back(FPDFAnnot_IsChecked(formHandle, annot) ? 1.0f : 0.0f);
+            values.push_back(bounds.left);
+            values.push_back(bounds.bottom);
+            values.push_back(bounds.right);
+            values.push_back(bounds.top);
+        }
+        FPDFPage_CloseAnnot(annot);
+    }
+
+    jfloatArray result = env->NewFloatArray(values.size());
+    if (result != NULL && !values.empty()) {
+        env->SetFloatArrayRegion(result, 0, values.size(), values.data());
+    }
+    return result;
+}
+
 static bool isAnnotChecked(FPDF_FORMHANDLE formHandle, FPDF_ANNOTATION annot) {
     return FPDFAnnot_IsChecked(formHandle, annot) != 0;
 }

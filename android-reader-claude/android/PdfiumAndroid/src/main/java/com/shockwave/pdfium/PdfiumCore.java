@@ -178,6 +178,8 @@ public class PdfiumCore {
 
     private native float[] nativeGetFormFieldRects(long docPtr, long pagePtr);
 
+    private native float[] nativeGetFormFieldSummary(long docPtr, long pagePtr);
+
     private native boolean nativeSetFormFieldText(long docPtr, long pagePtr, int annotIndex,
                                                   String text);
 
@@ -1161,6 +1163,18 @@ public class PdfiumCore {
             }
             float[] rects = nativeGetFormFieldRects(doc.mNativeDocPtr, nativePagePtr);
             return rects == null ? new float[0] : rects;
+        }
+    }
+
+    /** Per editable widget, 8 numbers: index, type, flags, checked, left, bottom, right, top. Page must be open. */
+    public float[] getFormFieldSummary(PdfDocument doc, int pageIndex) {
+        synchronized (lock) {
+            Long nativePagePtr = doc.mNativePagesPtr.get(pageIndex);
+            if (nativePagePtr == null) {
+                return new float[0];
+            }
+            float[] values = nativeGetFormFieldSummary(doc.mNativeDocPtr, nativePagePtr);
+            return values == null ? new float[0] : values;
         }
     }
 

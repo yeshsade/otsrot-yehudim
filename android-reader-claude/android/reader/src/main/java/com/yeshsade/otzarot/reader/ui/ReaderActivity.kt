@@ -36,6 +36,8 @@ import com.yeshsade.otzarot.reader.data.Intake
 import com.yeshsade.otzarot.reader.data.SaveState
 import com.yeshsade.otzarot.reader.data.UndoStack
 import java.io.File
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 /**
  * Reading screen. Marks are saved by themselves into the PDF: ~1.5 s after the last tap, and at once
@@ -68,10 +70,17 @@ class ReaderActivity : AppCompatActivity() {
     private var pageCount = 0
     private var failureShown = false
 
+    /**
+     * Every change to the open document, and every capture of it for saving, runs here in order — never on
+     * the main thread. A capture holds the engine for the whole file (seconds for a big booklet), so a tap
+     * on a box is shown at once and applied here when the engine is free; the screen never freezes.
+     */
+    private val docThread = Executors.newSingleThreadExecutor { r -> Thread(r, "otzarot-doc") }
+
     /** Guards capturing the document so the screen can't be torn down in the middle of a capture. */
     private val captureLock = Any()
     private var destroyed = false
-    private var capturedGeneration = 0L
+    @Volatile private var capturedGeneration = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,15 +132,23 @@ class ReaderActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         main.removeCallbacks(saveRunnable)
-        synchronized(captureLock) {
-            // A mark made after the last capture must not be lost when the screen closes.
-            if (saveState.generation != capturedGeneration && pageCount > 0) {
-                val target = doc
-                val file = captureLocked()
-                if (target != null && file != null) app.saves.execute { write(target, file) }
+        // After the marks still waiting for the engine: a mark made after the last capture must not be lost
+        // when the screen closes. (The engine is recycled only after this.)
+        val generation = saveState.generation
+        val pages = pageCount
+        val last = docThread.submit {
+            synchronized(captureLock) {
+                if (generation != capturedGeneration && pages > 0) {
+                    val target = doc
+                    val file = captureLocked(generation)
+                    if (target != null && file != null) app.saves.execute { write(target, file) }
+                }
+                destroyed = true
             }
-            destroyed = true
         }
+        runCatching { last.get(FINAL_CAPTURE_WAIT_S, TimeUnit.SECONDS) }
+        docThread.shutdown()
+        runCatching { docThread.awaitTermination(FINAL_CAPTURE_WAIT_S, TimeUnit.SECONDS) }
         pdfView.recycle()
         super.onDestroy()
     }
@@ -387,8 +404,10 @@ class ReaderActivity : AppCompatActivity() {
 
     private fun tap(event: MotionEvent): Boolean {
         // a tap on a booklet button (link) follows it; a tap on a check box only marks it;
-        // any other tap on the page shows or hides the frame
-        val field = pdfView.findFormFieldAt(event.x, event.y) ?: run {
+        // any other tap on the page shows or hides the frame.
+        // Boxes are found from what the screen already knows, so a tap never waits for a save in progress.
+        val known = pdfView.canPeekFormFieldAt(event.x, event.y)
+        val field = (if (known) pdfView.peekFormFieldAt(event.x, event.y) else pdfView.findFormFieldAt(event.x, event.y)) ?: run {
             if (pdfView.findLinkAt(event.x, event.y) != null) { chrome.used(); return false }
             chrome.toggle(); return true
         }
@@ -398,18 +417,34 @@ class ReaderActivity : AppCompatActivity() {
             PdfDocument.FormField.TYPE_RADIO_BUTTON -> if (field.checked) return true else true
             else -> return false
         }
-        if (!pdfView.setFormFieldChecked(field.pageIndex, field.annotationIndex, checked)) return true
-        undo.push(UndoStack.Mark(field.pageIndex, field.annotationIndex, field.checked))
-        marked()
+        val step = UndoStack.Mark(field.pageIndex, field.annotationIndex, field.checked)
+        undo.push(step)
+        mark(field.pageIndex, field.annotationIndex, checked) { ok -> if (!ok) undo.remove(step) }
         return true
+    }
+
+    /** Shows the box's new state now, and changes the document on [docThread]. */
+    private fun mark(page: Int, annotation: Int, checked: Boolean, done: (Boolean) -> Unit = {}) {
+        pdfView.showPendingCheck(page, annotation, checked)
+        marked()
+        runCatching {
+            docThread.execute {
+                val ok = pdfView.setFormFieldCheckedInBackground(page, annotation, checked)
+                main.post {
+                    if (isDestroyed) return@post
+                    pdfView.formFieldApplied(page, annotation, ok)
+                    done(ok)
+                    undoButton.alpha = if (undo.isEmpty) .45f else 1f
+                }
+            }
+        }
     }
 
     private fun undoLast() {
         when (val step = undo.pop() ?: return) {
-            is UndoStack.Mark -> pdfView.setFormFieldChecked(step.page, step.annotation, step.before)
-            is UndoStack.BookmarkChange -> bookmarks.revert(step)
+            is UndoStack.Mark -> mark(step.page, step.annotation, step.before)
+            is UndoStack.BookmarkChange -> { bookmarks.revert(step); marked() }
         }
-        marked()
     }
 
     /** The last bookmark hint shown (for tests and screenshots). */
@@ -446,9 +481,12 @@ class ReaderActivity : AppCompatActivity() {
     private fun saveNow() {
         main.removeCallbacks(saveRunnable)
         val target = doc ?: return
-        saveState.begin() ?: return
+        val covered = saveState.begin() ?: return
         app.saves.execute {
-            val file = synchronized(captureLock) { if (destroyed) null else captureLocked() }
+            // the capture waits, on the document's thread, for the marks tapped before it
+            val file = runCatching {
+                docThread.submit<File?> { synchronized(captureLock) { if (destroyed) null else captureLocked(covered) } }.get()
+            }.getOrNull()
             val ok = file != null && write(target, file)
             main.post {
                 val again = saveState.finish(ok)
@@ -461,9 +499,11 @@ class ReaderActivity : AppCompatActivity() {
         }
     }
 
-    /** Writes the current document (with marks) to a private temp file. Caller holds [captureLock]. */
-    private fun captureLocked(): File? {
-        val generation = saveState.generation
+    /**
+     * Writes the current document (with marks) to a private temp file. Runs on [docThread], after every mark
+     * up to [generation] (they were queued before it). Caller holds [captureLock].
+     */
+    private fun captureLocked(generation: Long): File? {
         val file = File(cacheDir, "save-${System.nanoTime()}.pdf")
         val ok = runCatching { pdfView.saveAsCopy(file) }.getOrDefault(false)
         if (!ok) { file.delete(); return null }
@@ -516,6 +556,7 @@ class ReaderActivity : AppCompatActivity() {
         private const val STATE_DOC = "doc"
         private const val SAVE_DELAY_MS = 1500L
         private const val RETRY_DELAY_MS = 300L
+        private const val FINAL_CAPTURE_WAIT_S = 20L
 
         fun open(activity: android.app.Activity, doc: Doc) {
             activity.startActivity(Intent(activity, ReaderActivity::class.java).putExtra(EXTRA_DOC, doc.id))

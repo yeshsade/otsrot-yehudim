@@ -85,6 +85,8 @@ class PdfFile {
     private volatile int pinnedRenderPage = -1;
     private final Map<Integer, List<PdfDocument.HighlightAnnotation>> highlightAnnotationCache = new ConcurrentHashMap<>();
     private final Map<Integer, float[]> formFieldRectCache = new ConcurrentHashMap<>();
+    /** Per page, 8 numbers per editable widget (see {@link #peekFormFieldSummary}); filled with the rects. */
+    private final Map<Integer, float[]> formFieldSummaryCache = new ConcurrentHashMap<>();
     private final Map<Integer, Map<String, List<PdfDocument.HighlightAnnotation>>> highlightGroupCache =
             new ConcurrentHashMap<>();
     /** Page with maximum width */
@@ -1529,19 +1531,51 @@ class PdfFile {
         }
         List<PdfDocument.HighlightAnnotation> annotations;
         float[] rects;
+        float[] summary;
         synchronized (lock) {
             if (disposed || pdfDocument == null) {
                 return;
             }
             annotations = pdfiumCore.getHighlightAnnotations(pdfDocument, docPage);
-            rects = pdfiumCore.getFormFieldRects(pdfDocument, docPage);
+            summary = pdfiumCore.getFormFieldSummary(pdfDocument, docPage);
         }
+        rects = rectsOfSummary(summary);
         List<PdfDocument.HighlightAnnotation> snapshot = annotations == null
                 ? Collections.<PdfDocument.HighlightAnnotation>emptyList()
                 : Collections.unmodifiableList(annotations);
         highlightGroupCache.remove(pageIndex);
         highlightAnnotationCache.put(pageIndex, snapshot);
+        formFieldSummaryCache.put(pageIndex, summary);
         formFieldRectCache.put(pageIndex, rects);
+    }
+
+    /** The rects (left, bottom, right, top per widget) inside a form-field summary. */
+    private static float[] rectsOfSummary(float[] summary) {
+        if (summary == null) {
+            return new float[0];
+        }
+        int count = summary.length / FORM_FIELD_SUMMARY_STRIDE;
+        float[] rects = new float[count * 4];
+        for (int i = 0; i < count; i++) {
+            System.arraycopy(summary, i * FORM_FIELD_SUMMARY_STRIDE + 4, rects, i * 4, 4);
+        }
+        return rects;
+    }
+
+    /** Numbers per widget in a form-field summary: index, type, flags, checked, left, bottom, right, top. */
+    public static final int FORM_FIELD_SUMMARY_STRIDE = 8;
+
+    /**
+     * What the engine knows about the page's editable widgets, without touching the engine (null when not
+     * read yet): {@link #FORM_FIELD_SUMMARY_STRIDE} numbers per widget. Safe on the main thread.
+     */
+    public float[] peekFormFieldSummary(int pageIndex) {
+        return formFieldSummaryCache.get(pageIndex);
+    }
+
+    /** True when the page's size and position are known, so view and PDF coordinates convert without the engine. */
+    public boolean hasPageGeometry(int pageIndex) {
+        return pageIndex >= 0 && pageIndex < pageGeometries.length() && pageGeometries.get(pageIndex) != null;
     }
 
     public List<PdfDocument.HighlightAnnotation> peekHighlightAnnotations(int pageIndex) {
@@ -1639,6 +1673,7 @@ class PdfFile {
 
     public void invalidateFormFieldRectCache(int pageIndex) {
         formFieldRectCache.remove(pageIndex);
+        formFieldSummaryCache.remove(pageIndex);
     }
 
     public boolean setHighlightAnnotationColor(int pageIndex, int annotationIndex,
@@ -1722,13 +1757,15 @@ class PdfFile {
         } catch (PageRenderingException e) {
             return new float[0];
         }
-        float[] rects;
+        float[] summary;
         synchronized (lock) {
             if (disposed || pdfDocument == null) {
                 return new float[0];
             }
-            rects = pdfiumCore.getFormFieldRects(pdfDocument, docPage);
+            summary = pdfiumCore.getFormFieldSummary(pdfDocument, docPage);
         }
+        float[] rects = rectsOfSummary(summary);
+        formFieldSummaryCache.put(pageIndex, summary);
         formFieldRectCache.put(pageIndex, rects);
         return rects;
     }
@@ -1909,6 +1946,7 @@ class PdfFile {
                 highlightGroupCache.clear();
                 highlightAnnotationCache.clear();
                 formFieldRectCache.clear();
+                formFieldSummaryCache.clear();
                 pageRowIndexes = new int[0];
                 rowFirstPages.clear();
                 rowOffsets.clear();

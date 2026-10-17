@@ -127,6 +127,22 @@ class CacheManager {
         }
     }
 
+    /** True while some tile of the page still shows its content from before the last change. */
+    public boolean hasStaleParts(int page) {
+        synchronized (passiveActiveLock) {
+            return hasStale(passiveCache, page) || hasStale(activeCache, page);
+        }
+    }
+
+    private static boolean hasStale(Collection<PagePart> parts, int page) {
+        for (PagePart part : parts) {
+            if (part.getPage() == page && part.isStale()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void markPageStale(Collection<PagePart> parts, int page) {
         for (PagePart part : parts) {
             if (part.getPage() == page) {

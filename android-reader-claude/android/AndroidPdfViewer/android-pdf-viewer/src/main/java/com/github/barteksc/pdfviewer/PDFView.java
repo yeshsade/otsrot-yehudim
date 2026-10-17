@@ -1460,6 +1460,7 @@ public class PDFView extends RelativeLayout {
         visiblePages.add(currentPage);
 
         drawFormFieldIndicators(canvas, visiblePages);
+        drawPendingChecks(canvas);
         drawHighlightAnnotationOverlays(canvas, visiblePages);
         drawSelectedHighlightAnnotation(canvas);
 
@@ -3106,6 +3107,206 @@ public class PDFView extends RelativeLayout {
             Log.e(TAG, "removeHighlightAnnotation: failed to remove highlight", throwable);
             return false;
         }
+    }
+
+    // ---------- answering taps on check boxes without waiting for the engine ----------
+
+    /**
+     * A box tapped before the engine applied the change (it may be busy saving the whole file). It is drawn
+     * in its new state at once, and stays drawn until the page itself shows the change.
+     */
+    private static final class PendingCheck {
+        final int page;
+        final boolean checked;
+        final float left, bottom, right, top;
+        volatile long appliedAt;
+
+        PendingCheck(int page, boolean checked, float left, float bottom, float right, float top) {
+            this.page = page;
+            this.checked = checked;
+            this.left = left;
+            this.bottom = bottom;
+            this.right = right;
+            this.top = top;
+        }
+    }
+
+    private final Map<Long, PendingCheck> pendingChecks = new java.util.concurrent.ConcurrentHashMap<>();
+    private Paint pendingBoxPaint;
+    private Paint pendingBorderPaint;
+    private Paint pendingTickPaint;
+    private static final long PENDING_CHECK_GRACE_MS = 1500;
+
+    private static long pendingKey(int page, int annotationIndex) {
+        return ((long) page << 32) | (annotationIndex & 0xffffffffL);
+    }
+
+    /**
+     * True when {@link #peekFormFieldAt} can answer for this point from what is already known (the page's
+     * geometry and its widgets were read), without the engine. Main thread only.
+     */
+    public boolean canPeekFormFieldAt(float viewX, float viewY) {
+        int page = pageAtView(viewX, viewY);
+        return page >= 0 && pdfFile.hasPageGeometry(page) && pdfFile.peekFormFieldSummary(page) != null;
+    }
+
+    /**
+     * The editable box at this point, from what is already known — never touches the engine, so it does not
+     * wait for a save. Its {@code checked} includes taps not applied yet. Null when there is no box there (or
+     * when {@link #canPeekFormFieldAt} is false). Main thread only.
+     */
+    public FormField peekFormFieldAt(float viewX, float viewY) {
+        int page = pageAtView(viewX, viewY);
+        if (page < 0 || !pdfFile.hasPageGeometry(page)) {
+            return null;
+        }
+        float[] summary = pdfFile.peekFormFieldSummary(page);
+        if (summary == null) {
+            return null;
+        }
+        float docX = -getCurrentXOffset() + viewX;
+        float docY = -getCurrentYOffset() + viewY;
+        PointF point = pdfFile.documentToPdf(page, getZoom(), docX, docY);
+        float tolerance = formFieldTouchTolerance(page, docX, docY, point);
+        int stride = PdfFile.FORM_FIELD_SUMMARY_STRIDE;
+        int best = -1;
+        float bestDistance = 0;
+        for (int i = 0; i + stride - 1 < summary.length; i += stride) {
+            float left = summary[i + 4], bottom = summary[i + 5], right = summary[i + 6], top = summary[i + 7];
+            boolean inside = point.x >= left - tolerance && point.x <= right + tolerance
+                    && point.y >= bottom - tolerance && point.y <= top + tolerance;
+            if (!inside) {
+                continue;
+            }
+            float dx = (left + right) / 2 - point.x;
+            float dy = (bottom + top) / 2 - point.y;
+            float distance = dx * dx + dy * dy;
+            if (best < 0 || distance < bestDistance) {
+                best = i;
+                bestDistance = distance;
+            }
+        }
+        if (best < 0) {
+            return null;
+        }
+        int annotationIndex = (int) summary[best];
+        boolean checked = summary[best + 3] != 0f;
+        PendingCheck pending = pendingChecks.get(pendingKey(page, annotationIndex));
+        if (pending != null) {
+            checked = pending.checked;
+        }
+        PdfDocument.FormField field = new PdfDocument.FormField(annotationIndex, (int) summary[best + 1],
+                (int) summary[best + 2], null, null, null, checked);
+        return new FormField(page, field);
+    }
+
+    /** Shows the box in its new state now; call {@link #setFormFieldCheckedInBackground} to really change it. */
+    public void showPendingCheck(int pageIndex, int annotationIndex, boolean checked) {
+        float[] summary = pdfFile == null ? null : pdfFile.peekFormFieldSummary(pageIndex);
+        if (summary == null) {
+            return;
+        }
+        int stride = PdfFile.FORM_FIELD_SUMMARY_STRIDE;
+        for (int i = 0; i + stride - 1 < summary.length; i += stride) {
+            if ((int) summary[i] == annotationIndex) {
+                pendingChecks.put(pendingKey(pageIndex, annotationIndex), new PendingCheck(pageIndex, checked,
+                        summary[i + 4], summary[i + 5], summary[i + 6], summary[i + 7]));
+                invalidate();
+                return;
+            }
+        }
+    }
+
+    /**
+     * Changes a box in the document. Runs on any thread except the main one (it may wait for a save in
+     * progress). Afterwards call {@link #formFieldApplied} on the main thread.
+     */
+    public boolean setFormFieldCheckedInBackground(int pageIndex, int annotationIndex, boolean checked) {
+        PdfFile file = pdfFile;
+        if (file == null) {
+            return false;
+        }
+        try {
+            return file.setFormFieldChecked(pageIndex, annotationIndex, checked);
+        } catch (Throwable throwable) {
+            Log.e(TAG, "setFormFieldCheckedInBackground: failed to update form field", throwable);
+            return false;
+        }
+    }
+
+    /** Main thread: the engine applied (or failed to apply) a change shown with {@link #showPendingCheck}. */
+    public void formFieldApplied(int pageIndex, int annotationIndex, boolean ok) {
+        PendingCheck pending = pendingChecks.get(pendingKey(pageIndex, annotationIndex));
+        if (!ok) {
+            pendingChecks.remove(pendingKey(pageIndex, annotationIndex));
+        } else if (pending != null) {
+            pending.appliedAt = SystemClock.uptimeMillis();
+        }
+        if (ok) {
+            pageContentChanged(pageIndex);
+        }
+        invalidate();
+    }
+
+    private void drawPendingChecks(Canvas canvas) {
+        if (pendingChecks.isEmpty() || pdfFile == null) {
+            return;
+        }
+        if (pendingBoxPaint == null) {
+            pendingBoxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            pendingBoxPaint.setColor(Color.WHITE);
+            pendingBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            pendingBorderPaint.setColor(Color.BLACK);
+            pendingBorderPaint.setStyle(Style.STROKE);
+            pendingTickPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            pendingTickPaint.setColor(Color.BLACK);
+            pendingTickPaint.setStyle(Style.STROKE);
+            pendingTickPaint.setStrokeCap(Paint.Cap.ROUND);
+            pendingTickPaint.setStrokeJoin(Paint.Join.ROUND);
+        }
+        long now = SystemClock.uptimeMillis();
+        boolean waiting = false;
+        java.util.Iterator<PendingCheck> it = pendingChecks.values().iterator();
+        while (it.hasNext()) {
+            PendingCheck pending = it.next();
+            long applied = pending.appliedAt;
+            if (applied > 0 && (!cacheManager.hasStaleParts(pending.page) || now - applied > PENDING_CHECK_GRACE_MS)) {
+                it.remove();
+                continue;
+            }
+            waiting = true;
+            RectF box = pdfFile.pdfRectToDocument(pending.page, zoom, pending.left, pending.bottom, pending.right, pending.top);
+            if (box == null) {
+                continue;
+            }
+            // the booklet's own look: a white square, a thin black border, and a V when ticked
+            float side = Math.min(box.width(), box.height());
+            canvas.drawRect(box, pendingBoxPaint);
+            pendingBorderPaint.setStrokeWidth(Math.max(1f, side * 0.06f));
+            canvas.drawRect(box, pendingBorderPaint);
+            if (pending.checked) {
+                pendingTickPaint.setStrokeWidth(Math.max(1.5f, side * 0.13f));
+                Path tick = new Path();
+                tick.moveTo(box.left + box.width() * 0.2f, box.top + box.height() * 0.52f);
+                tick.lineTo(box.left + box.width() * 0.42f, box.top + box.height() * 0.74f);
+                tick.lineTo(box.left + box.width() * 0.8f, box.top + box.height() * 0.28f);
+                canvas.drawPath(tick, pendingTickPaint);
+            }
+        }
+        if (waiting) {
+            postInvalidateOnAnimation();
+        }
+    }
+
+    private int pageAtView(float viewX, float viewY) {
+        if (pdfFile == null) {
+            return -1;
+        }
+        float docX = -getCurrentXOffset() + viewX;
+        float docY = -getCurrentYOffset() + viewY;
+        int page = pdfFile.getPageAtOffset(isSwipeVertical() ? docY : docX,
+                isSwipeVertical() ? docX : docY, getZoom());
+        return page >= 0 && page < pdfFile.getPagesCount() ? page : -1;
     }
 
     public FormField findFormFieldAt(float viewX, float viewY) {

@@ -49,4 +49,7 @@ class UndoStack(private val limit: Int = 200) {
     }
 
     fun pop(): Step? = marks.removeLastOrNull()
+
+    /** Takes back a step that turned out not to happen (the engine could not apply it). */
+    fun remove(step: Step) { marks.lastIndexOf(step).takeIf { it >= 0 }?.let { marks.removeAt(it) } }
 }
