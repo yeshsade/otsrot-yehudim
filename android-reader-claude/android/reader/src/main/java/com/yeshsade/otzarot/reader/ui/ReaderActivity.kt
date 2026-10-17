@@ -61,6 +61,14 @@ class ReaderActivity : AppCompatActivity() {
     /** The phone's own bars (measured even while hidden), for the page handle's track. */
     private var statusInset = 0
     private var navInset = 0
+    /**
+     * While the frame is hidden the phone's bars are hidden too, so a swipe from the top (to pull down the
+     * notifications) or from the bottom starts on the page. Such a swipe belongs to the phone, not to the
+     * pages: without this the booklet flew back pages every time the notifications were pulled down.
+     */
+    private var edgeTop = 0
+    private var edgeBottom = 0
+    private var edgeSwipe = false
     /** Frame and handle settings this screen was built with; a change rebuilds it. */
     private var builtWith = ""
     private val main = Handler(Looper.getMainLooper())
@@ -238,6 +246,9 @@ class ReaderActivity : AppCompatActivity() {
             (toolbar.layoutParams as FrameLayout.LayoutParams).bottomMargin = ui.dp(14) + bars.bottom
             statusInset = bars.top
             navInset = bars.bottom
+            val gestures = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+            edgeTop = maxOf(bars.top, gestures.top, ui.dp(24))
+            edgeBottom = maxOf(bars.bottom, gestures.bottom, ui.dp(20))
             toolbar.requestLayout()
             (infoLine.layoutParams as FrameLayout.LayoutParams).topMargin = cutout.top
             infoLine.requestLayout()
@@ -251,10 +262,20 @@ class ReaderActivity : AppCompatActivity() {
 
     /** Touching the top bar, the toolbar or the handle keeps the frame up for its full time again. */
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        if (event.actionMasked == MotionEvent.ACTION_DOWN && ::chrome.isInitialized && chrome.shown) {
-            if (inside(header, event) || inside(toolbar, event)) chrome.used()
+        if (event.actionMasked == MotionEvent.ACTION_DOWN && ::chrome.isInitialized) {
+            edgeSwipe = !chrome.shown && FramePolicy.canHide(app.settings.frameMode) && fromPhoneEdge(event)
+            if (chrome.shown && (inside(header, event) || inside(toolbar, event))) chrome.used()
+        }
+        if (edgeSwipe) {
+            if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) edgeSwipe = false
+            return true
         }
         return super.dispatchTouchEvent(event)
+    }
+
+    private fun fromPhoneEdge(event: MotionEvent): Boolean {
+        val height = window.decorView.height
+        return height > 0 && (event.rawY < edgeTop || event.rawY > height - edgeBottom)
     }
 
     private fun inside(view: View, event: MotionEvent): Boolean {

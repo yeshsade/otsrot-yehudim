@@ -821,6 +821,16 @@ class LeanProbe : Instrumentation() {
             record("With the frame hidden, the handle shows itself while the pages move")
             waitFor("the handle fades after the pages stop", 6_000) { var gone = false; onMainChecked { gone = scrubber.visibility != View.VISIBLE || scrubber.alpha == 0f }; gone }
             record("…and fades away a moment after they stop")
+            // pulling down the phone's notifications from the top edge (frame hidden) must not move the pages
+            var edgeBefore = 0f
+            onMainChecked { edgeBefore = v.currentYOffset; check(field<View>(reader, "header").visibility != View.VISIBLE) { "frame is up" } }
+            val midX = v.width / 2f
+            touch(reader, MotionEvent.ACTION_DOWN, midX, 3f)
+            for (i in 1..8) { touch(reader, MotionEvent.ACTION_MOVE, midX, 3f + i * 90f); SystemClock.sleep(12) }
+            touch(reader, MotionEvent.ACTION_UP, midX, 3f + 8 * 90f)
+            SystemClock.sleep(1200); waitForIdleSync()
+            onMainChecked { check(kotlin.math.abs(v.currentYOffset - edgeBefore) < 1f) { "a swipe from the top edge moved the pages (${edgeBefore} -> ${v.currentYOffset})" } }
+            record("Pulling down the phone's notifications from the top does not move the booklet")
             onMainChecked { v.setPositionOffset(0f, false) }
             SystemClock.sleep(2500); waitForIdleSync()
 
