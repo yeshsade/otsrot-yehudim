@@ -39,9 +39,36 @@ class Scrubber(
         fun scrubEnded()
     }
 
-    /** Where the document is, 0..1 (follows the reading while not dragging). */
+    /** Where the document is, 0..1. While the thumb is held it follows the finger only. */
     var fraction = 0f
-        set(v) { field = v.coerceIn(0f, 1f); if (!dragging) invalidate() }
+        private set
+
+    /** The document moved (by reading, or by the engine after a drag): the thumb follows, unless it is held. */
+    fun follow(v: Float) {
+        if (pressed) return
+        fraction = v.coerceIn(0f, 1f)
+        invalidate()
+    }
+
+    /**
+     * Whether the frame is up. While it is down the handle still shows itself whenever the pages move
+     * ("it should always appear while flipping"), and fades away a moment after they stop.
+     */
+    var frameShown: () -> Boolean = { true }
+
+    private val peekOut = Runnable { if (!frameShown() && !pressed) animate().alpha(0f).setDuration(PEEK_FADE_MS).withEndAction { if (!frameShown() && !pressed) visibility = INVISIBLE }.start() }
+
+    /** The pages moved: show the handle for a moment even while the frame is hidden, so it can be grabbed. */
+    fun pagesMoved() {
+        if (frameShown()) return
+        removeCallbacks(peekOut)
+        if (visibility != VISIBLE || alpha < 1f) {
+            animate().cancel()
+            visibility = VISIBLE
+            animate().alpha(1f).setDuration(PEEK_FADE_MS).start()
+        }
+        if (!pressed) postDelayed(peekOut, PEEK_STAY_MS)
+    }
 
     private val thumbLong = ui.dp(56).toFloat()
     private val thumbThick = ui.dp(10).toFloat()
@@ -61,6 +88,17 @@ class Scrubber(
     private var bubble = ""
     private var grabOffset = 0f
     private val startDrag = Runnable { beginDrag() }
+    /**
+     * The thumb is drawn under the finger at once; the document follows once per frame. Moving a big
+     * booklet takes the main thread a while, so moving it on every finger event made the thumb lag behind.
+     */
+    private var moveQueued = false
+    private val moveDocument = Runnable {
+        moveQueued = false
+        if (!dragging) return@Runnable
+        bubble = listener.scrubTo(fraction)
+        invalidate()
+    }
 
     init { tag = "scrubber" }
 
@@ -134,18 +172,20 @@ class Scrubber(
                 if (!pressed) return false
                 if (dragging) {
                     fraction = fractionAt(event.x, event.y)
-                    bubble = listener.scrubTo(fraction)
                     invalidate()
+                    if (!moveQueued) { moveQueued = true; postOnAnimation(moveDocument) }
                 }
                 return true
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 removeCallbacks(startDrag)
+                if (dragging) { removeCallbacks(moveDocument); moveQueued = false; listener.scrubTo(fraction) }
                 if (pressed) listener.scrubEnded()
                 pressed = false
                 dragging = false
                 bubble = ""
                 invalidate()
+                if (!frameShown()) postDelayed(peekOut, PEEK_STAY_MS)
                 return true
             }
         }
@@ -158,6 +198,11 @@ class Scrubber(
         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
         bubble = listener.scrubTo(fraction)
         invalidate()
+    }
+
+    private companion object {
+        const val PEEK_STAY_MS = 1500L
+        const val PEEK_FADE_MS = 200L
     }
 
     /** For tests: the centre of the thumb, in this view's coordinates. */

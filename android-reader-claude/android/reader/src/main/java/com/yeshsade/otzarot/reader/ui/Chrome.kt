@@ -50,6 +50,9 @@ class Chrome(
     var shown = true
         private set
 
+    /** Called after the frame starts showing or hiding. */
+    var changed: () -> Unit = {}
+
     /** The frame starts shown, then follows the mode. */
     fun start() = show()
 
@@ -64,6 +67,7 @@ class Chrome(
         info.animate().alpha(0f).setDuration(DURATION).withEndAction { if (shown) info.visibility = View.GONE }.start()
         bars.show(WindowInsetsCompat.Type.systemBars())
         schedule()
+        changed()
     }
 
     fun hide() {
@@ -81,6 +85,7 @@ class Chrome(
             info.animate().alpha(1f).setDuration(DURATION).start()
         } else info.visibility = View.GONE
         bars.hide(WindowInsetsCompat.Type.systemBars())
+        changed()
     }
 
     private fun View.animateIn() {

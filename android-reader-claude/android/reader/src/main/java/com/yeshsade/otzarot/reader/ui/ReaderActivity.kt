@@ -58,6 +58,9 @@ class ReaderActivity : AppCompatActivity() {
     private lateinit var scrubber: Scrubber
     private lateinit var infoLine: InfoLine
     private lateinit var chrome: Chrome
+    /** The phone's own bars (measured even while hidden), for the page handle's track. */
+    private var statusInset = 0
+    private var navInset = 0
     /** Frame and handle settings this screen was built with; a change rebuilds it. */
     private var builtWith = ""
     private val main = Handler(Looper.getMainLooper())
@@ -188,8 +191,13 @@ class ReaderActivity : AppCompatActivity() {
         this.toolbar = toolbar
         scrubber = Scrubber(this, ui, settings.scrubberSide, horizontal = settings.scrollHorizontal,
             holdMillis = settings.scrubberHoldMillis,
-            topInset = { if (hides) header.height else 0 },
-            bottomInset = { toolbar.height + (toolbar.layoutParams as FrameLayout.LayoutParams).bottomMargin },
+            // the handle runs the whole height the page has: under the top bar only while the bar is up, and
+            // past the toolbar (which sits in the middle, not at the edge) — "it doesn't go down to the end"
+            topInset = { if (hides && (!::chrome.isInitialized || chrome.shown)) header.height else if (hides) statusInset else 0 },
+            bottomInset = {
+                if (settings.scrollHorizontal) toolbar.height + (toolbar.layoutParams as FrameLayout.LayoutParams).bottomMargin
+                else navInset
+            },
             listener = object : Scrubber.Listener {
                 override fun scrubTo(fraction: Float): String {
                     pdfView.setPositionOffset(fraction, false)
@@ -211,6 +219,8 @@ class ReaderActivity : AppCompatActivity() {
         if (hides) installFloating(root, header, toolbar) else ui.install(this, root, header)
         chrome = Chrome(window, root, top = header, bottom = toolbar,
             faders = if (settings.scrubberAlways) emptyList() else listOf(scrubber), info = infoLine, settings = settings)
+        chrome.changed = { scrubber.invalidate() }
+        scrubber.frameShown = { settings.scrubberAlways || chrome.shown }
         chrome.start()
     }
 
@@ -226,6 +236,8 @@ class ReaderActivity : AppCompatActivity() {
             header.setPadding(header.paddingLeft, bars.top + ui.dp(8), header.paddingRight, header.paddingBottom)
             root.setPadding(bars.left, 0, bars.right, 0)
             (toolbar.layoutParams as FrameLayout.LayoutParams).bottomMargin = ui.dp(14) + bars.bottom
+            statusInset = bars.top
+            navInset = bars.bottom
             toolbar.requestLayout()
             (infoLine.layoutParams as FrameLayout.LayoutParams).topMargin = cutout.top
             infoLine.requestLayout()
@@ -417,7 +429,7 @@ class ReaderActivity : AppCompatActivity() {
             .enableDoubleTap(true)
             .spacing(8)
             .onTap { event -> tap(event) }
-            .onPageScroll { _, offset -> scrubber.fraction = offset }
+            .onPageScroll { _, offset -> scrubber.follow(offset); scrubber.pagesMoved() }
             .onLoad { pages ->
                 pageCount = pages
                 showPage(pdfView.currentPage)
@@ -437,7 +449,7 @@ class ReaderActivity : AppCompatActivity() {
         val text = getString(R.string.reader_page, page + 1, pageCount)
         subtitle.text = text
         infoLine.setPage(text)
-        scrubber.fraction = pdfView.positionOffset
+        scrubber.follow(pdfView.positionOffset)
     }
 
     // ---------- marking ----------

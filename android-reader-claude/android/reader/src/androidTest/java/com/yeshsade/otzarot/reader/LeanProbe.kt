@@ -793,11 +793,36 @@ class LeanProbe : Instrumentation() {
             SystemClock.sleep(800)
             for (i in 1..10) { touch(reader, MotionEvent.ACTION_MOVE, x, y0 + (yTo - y0) * i / 10); SystemClock.sleep(30) }
             SystemClock.sleep(300); waitForIdleSync()
-            onMainChecked { snapshot(reader, "chrome-handle.png") }
+            onMainChecked {
+                // the thumb is where the finger is, not where the engine got to a moment ago
+                val tc = scrubber.thumbCentre(); val sl = IntArray(2); scrubber.getLocationInWindow(sl)
+                val off = kotlin.math.abs(tc[1] + sl[1] - yTo)
+                check(off < reader.resources.displayMetrics.density * 3) { "the handle is ${off}px away from the finger" }
+                snapshot(reader, "chrome-handle.png")
+            }
             touch(reader, MotionEvent.ACTION_UP, x, yTo)
             waitForIdleSync(); SystemClock.sleep(500)
             check(pages < 3 || v.currentPage > startPage) { "holding and dragging the handle did not move (page ${v.currentPage})" }
             record("The page handle moves only after being held (0.5 s), then jumps through the document (now page ${v.currentPage + 1} of $pages)")
+            record("While dragging, the handle stays under the finger")
+
+            // the handle reaches the bottom of the screen at the end of the document, and while the frame is
+            // hidden it shows itself whenever the pages move, then fades away
+            waitFor("frame hides again", 15_000) { var h = false; onMainChecked { h = header.visibility != View.VISIBLE }; h }
+            SystemClock.sleep(600)
+            onMainChecked { v.setPositionOffset(1f, false) }
+            SystemClock.sleep(400); waitForIdleSync()
+            onMainChecked {
+                check(scrubber.visibility == View.VISIBLE && scrubber.alpha > 0f) { "the handle did not show while the pages moved" }
+                val end = scrubber.thumbCentre()[1]
+                check(end > scrubber.height * .88f) { "at the end of the document the handle is at ${end} of ${scrubber.height}" }
+            }
+            record("At the end of the document the handle is at the bottom of the screen")
+            record("With the frame hidden, the handle shows itself while the pages move")
+            waitFor("the handle fades after the pages stop", 6_000) { var gone = false; onMainChecked { gone = scrubber.visibility != View.VISIBLE || scrubber.alpha == 0f }; gone }
+            record("…and fades away a moment after they stop")
+            onMainChecked { v.setPositionOffset(0f, false) }
+            SystemClock.sleep(2500); waitForIdleSync()
 
             // "shows and hides with a tap": never hides by itself
             onMainChecked { reader.finish() }; waitFor("closed", 30_000) { reader.isDestroyed }
