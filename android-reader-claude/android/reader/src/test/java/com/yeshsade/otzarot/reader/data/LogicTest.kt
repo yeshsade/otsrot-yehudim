@@ -190,6 +190,14 @@ class LogicTest {
     }
 
     // ----- identity -----
+    @Test fun copyingAndIdentifyingTogetherGivesTheSameIdentityAndBytes() {
+        val bytes = ByteArray(200_000) { (it * 31 % 251).toByte() }
+        val out = java.io.ByteArrayOutputStream()
+        val id = Identity.copyAndIdentify(ByteArrayInputStream(bytes), out)
+        assertEquals(Identity.of(ByteArrayInputStream(bytes)), id)
+        assertTrue(bytes.contentEquals(out.toByteArray()))
+    }
+
     @Test fun identityIsByContentNotName() {
         val a = Identity.of(ByteArrayInputStream("same bytes".toByteArray()))
         val b = Identity.of(ByteArrayInputStream("same bytes".toByteArray()))

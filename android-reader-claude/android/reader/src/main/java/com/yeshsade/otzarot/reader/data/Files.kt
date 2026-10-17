@@ -35,23 +35,26 @@ object Files {
     }
 
     /**
-     * Writes [data] over [target] and verifies the result by content identity.
+     * Writes [data] over [target] and verifies the result by content identity. Returns the identity of what
+     * was written (null when the write failed or did not verify), so callers need not read the file again.
+     * The data is read once (copied and identified together) and the result once (to verify it).
      * file:// targets use write-to-sibling + rename so a crash can't leave a half file.
      */
-    fun writeVerified(context: Context, target: Uri, data: File): Boolean {
-        val expected = Identity.of(data) ?: return false
+    fun writeVerified(context: Context, target: Uri, data: File): String? {
         if (target.scheme == "file") {
-            val dest = File(target.path ?: return false)
+            val dest = File(target.path ?: return null)
             val sibling = File(dest.parentFile, dest.name + ".saving")
             return try {
-                FileOutputStream(sibling).use { out -> data.inputStream().use { it.copyTo(out) }; out.fd.sync() }
-                if (Identity.of(sibling) != expected || !sibling.renameTo(dest)) { sibling.delete(); false } else true
-            } catch (e: IOException) { sibling.delete(); false }
+                val expected = FileOutputStream(sibling).use { out ->
+                    data.inputStream().use { Identity.copyAndIdentify(it, out) }.also { out.fd.sync() }
+                }
+                if (Identity.of(sibling) != expected || !sibling.renameTo(dest)) { sibling.delete(); null } else expected
+            } catch (e: IOException) { sibling.delete(); null }
         }
-        val wrote = runCatching {
-            context.contentResolver.openOutputStream(target, "wt")?.use { out -> data.inputStream().use { it.copyTo(out) } } != null
-        }.getOrDefault(false)
-        return wrote && Identity.of(context, target) == expected
+        val expected = runCatching {
+            context.contentResolver.openOutputStream(target, "wt")?.use { out -> data.inputStream().use { Identity.copyAndIdentify(it, out) } }
+        }.getOrNull() ?: return null
+        return expected.takeIf { Identity.of(context, target) == it }
     }
 
     /** The single working copy for a read-only original. Visible to the user in Documents/[COPY_FOLDER]. */

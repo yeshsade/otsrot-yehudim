@@ -333,8 +333,8 @@ class ReaderActivity : AppCompatActivity() {
         // On the saves' thread: a save of this document still running from a moment ago finishes first (so the
         // copy has its marks), but opening never waits behind scans of the device.
         app.saves.execute {
-            val file = File(cacheDir, "open").apply { mkdirs() }.let { File(it, target.id + ".pdf") }
-            val ok = runCatching { prepareSnapshot(Uri.parse(target.uri), file); true }.getOrDefault(false)
+            val file = snapshotFile(target)
+            val ok = runCatching { prepareSnapshot(target, Uri.parse(target.uri), file); true }.getOrDefault(false)
             main.post {
                 if (isFinishing || isDestroyed) return@post
                 if (!ok) {
@@ -348,19 +348,59 @@ class ReaderActivity : AppCompatActivity() {
     }
 
     /**
-     * The private copy the screen shows. A file on the device that has not changed since the last copy (same
-     * size and time) is not copied again — copying a big booklet on every opening is what made opening slow.
+     * The private copy the screen shows. It is not copied again when it is known to match the document:
+     * a file on the device whose size and time did not change, or the app's own working copy whose content
+     * is what the app last saved. After a save the saved capture itself becomes this copy, so opening the
+     * booklet again never copies it (copying a big booklet on every opening is what made opening slow).
      */
-    private fun prepareSnapshot(source: Uri, file: File) {
+    private fun prepareSnapshot(target: Doc, source: Uri, file: File) {
         val stamp = File(file.path + ".stamp")
-        val real = if (source.scheme == "file") File(source.path ?: "") else null
-        val now = real?.takeIf { it.isFile }?.let { "${it.length()}:${it.lastModified()}" }
+        val now = currentStamp(target, source)
         if (now != null && file.isFile && runCatching { stamp.readText() }.getOrNull() == now) return
         stamp.delete()
         val partial = File(file.path + ".part")
         contentResolver.openInputStream(source)!!.use { input -> partial.outputStream().use { input.copyTo(it) } }
         if (!partial.renameTo(file)) { file.delete(); check(partial.renameTo(file)) }
         if (now != null) stamp.writeText(now)
+    }
+
+    private fun snapshotFile(target: Doc) = File(File(cacheDir, "open").apply { mkdirs() }, target.id + ".pdf")
+
+    /**
+     * What the document is now, cheaply, to tell whether the private copy still matches it; null when it
+     * can't be told without reading the whole file (then the copy is always refreshed).
+     * - a file on the device: its size and time;
+     * - the app's own working copy (only the app writes it): the content identity the app last saved,
+     *   checked against the file's current size.
+     */
+    private fun currentStamp(target: Doc, source: Uri): String? {
+        if (source.scheme == "file") {
+            return File(source.path ?: return null).takeIf { it.isFile }?.let { "${it.length()}:${it.lastModified()}" }
+        }
+        if (target.kind != Doc.Kind.COPY) return null
+        val identity = (app.library.get(target.id) ?: target).identity.ifEmpty { return null }
+        val size = runCatching {
+            contentResolver.query(source, arrayOf(android.provider.OpenableColumns.SIZE), null, null, null)?.use { c ->
+                if (c.moveToFirst() && !c.isNull(0)) c.getLong(0) else null
+            }
+        }.getOrNull() ?: return null
+        return if (identity.startsWith("s1-$size-")) "copy:$identity" else null
+    }
+
+    /**
+     * After a verified save: the capture is exactly what the document now holds, so it becomes the private
+     * copy for the next opening (instead of being deleted and the booklet copied again). The screen keeps
+     * reading the file it opened — renaming over it doesn't change what the engine has open.
+     */
+    private fun adoptAsSnapshot(target: Doc, source: Uri, capture: File, identity: String): Boolean {
+        val file = snapshotFile(target)
+        val stamp = File(file.path + ".stamp")
+        stamp.delete()
+        if (!capture.renameTo(file)) return false
+        val now = if (source.scheme == "file") currentStamp(target, source)
+            else if (target.kind == Doc.Kind.COPY) "copy:$identity" else null
+        if (now != null) runCatching { stamp.writeText(now) }
+        return true
     }
 
     private fun display(target: Doc, file: File) {
@@ -513,6 +553,7 @@ class ReaderActivity : AppCompatActivity() {
 
     /** Runs on the io thread. Writes the capture into the document's real file and verifies it. */
     private fun write(target: Doc, file: File): Boolean {
+        var kept = false
         try {
             val uri = Uri.parse(target.uri)
             // A file found on the device: remember what the original was before the first marks change it,
@@ -523,11 +564,13 @@ class ReaderActivity : AppCompatActivity() {
                     app.library.update(target.id) { it.copy(originIdentity = origin, identity = it.identity.ifEmpty { origin }) }
                 }
             }
-            val ok = Files.writeVerified(this, uri, file)
-            if (ok) Identity.of(file)?.let { id -> app.library.update(target.id) { it.copy(identity = id, size = file.length()) } }
-            return ok
+            val size = file.length()
+            val written = Files.writeVerified(this, uri, file) ?: return false
+            app.library.update(target.id) { it.copy(identity = written, size = size) }
+            kept = runCatching { adoptAsSnapshot(target, uri, file, written) }.getOrDefault(false)
+            return true
         } finally {
-            file.delete()
+            if (!kept) file.delete()
         }
     }
 

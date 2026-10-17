@@ -85,11 +85,19 @@ class LeanProbe : Instrumentation() {
             waitForIdleSync()
             record("Back right after a mark leaves to the list without asking, and the mark is in the file")
 
+            val snapshotFile = File(File(targetContext.cacheDir, "open"), doc.id + ".pdf")
+            waitFor("the saved capture becomes the private copy", 30_000) {
+                runCatching { File(snapshotFile.path + ".stamp").readText() }.getOrNull()?.startsWith("copy:") == true
+            }
+            val adoptedAt = snapshotFile.lastModified()
+            SystemClock.sleep(1100)
             reader = openShared(booklet, from = list)
             waitLoaded(reader)
             check(app.library.all().size == 1) { "list has ${app.library.all().size} entries" }
             check(countChecked(reader) == 2) { "shows ${countChecked(reader)}" }
             record("Opening the same share again shows the 2 marks; still one entry, no new copy")
+            check(snapshotFile.lastModified() == adoptedAt) { "the booklet was copied again on opening" }
+            record("After a save, opening the booklet again does not copy it: the saved file is reused")
 
             tapUnchecked(reader, null)
             waitFor("third mark saved", 90_000) { checkedIn(doc.uri) == 3 }
