@@ -61,6 +61,25 @@ Render the final cover and reject missing, clipped, or stale-colored edition tex
 - Days: read `days/SKILL.md`; deliver locally to `D:\מלמדים\הרב גלבך\אוצרות יהודים\לפי ימים`.
 - Topics: read `topics/SKILL.md`; deliver locally to `D:\מלמדים\הרב גלבך\אוצרות יהודים\מוכן`.
 
+## Destination labels on existing continuation buttons — update 2026-10-11
+
+For the days edition, read `references/daf-yomi-navigation.md`. Change only
+the text on existing continuation buttons, across ALL study topics that
+already have these buttons. Topics without continuation buttons must remain
+without them. Each label names its own topic and the target day: for example
+`לדף היומי-יום שני`, `למשניות-יום שלישי`, or `למשנה ברורה-יום ראשון`.
+The Gemara and Mishnah examples describe the rule for every topic; they do
+not restrict its scope.
+
+Preserve button counts, rectangles, destinations, and page order exactly.
+Sunday Gemara's existing previous-week button says `לדף היומי-שבוע שעבר`;
+Sunday Mishnah still has no top button, and its bottom button says
+`למשניות-יום שני`. Monday Mishnah says `למשניות-יום ראשון` at the top
+and `למשניות-יום שלישי` at the bottom. Retain existing reciprocal
+previous-week/Sunday links only where supplied. Do not add cross-topic
+buttons or previous-week buttons on other days. Keep TOC and return-to-TOC
+labels, confirmed duplicate-amud handling, and checkbox rules unchanged.
+
 ## Final filenames
 
 - Never put `סופי` in a delivered PDF filename.
@@ -90,3 +109,8 @@ Keep QA files until user acceptance, then remove only temporary artifacts.
 Before accepting workflow changes, run the Sukkot and Bereshit cases in
 `references/regression-cases.md`. Do not change Tehillim repetition, Zohar, or
 V-checkbox behavior unless a specific failing case proves that change is needed.
+
+Run `python -m unittest discover -s tests -v` from this skill's root for the
+generated-PDF navigation regressions. These exercise Sukkot/Bereshit regression
+answers and navigation preservation, but do not replace full checks on the
+original booklets, especially text clearance and template-based V placement.

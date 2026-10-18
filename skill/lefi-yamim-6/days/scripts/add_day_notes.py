@@ -11,6 +11,7 @@ from toc_template import (
     analysis_toc_config,
     continuation_rects_for_page,
     external_links_from_config,
+    font_candidates,
     insert_toc_links,
     make_continuation_button_images,
     make_return_button_image,
@@ -378,8 +379,22 @@ def continuation_rects(fitz, page):
     return continuation_rects_for_page(fitz, page)
 
 
-def make_continuation_label_images(out_dir, color="#6DCFF6"):
-    return make_continuation_button_images(out_dir, color=color)
+def continuation_label(topic, target_day):
+    """Name the destination of an existing button; never add a destination."""
+    display_topic = {DAF_YOMI_TOPIC: "דף היומי", "משנה": "משניות"}.get(topic, topic)
+    return f"ל{display_topic}-{target_day}"
+
+
+def make_continuation_label_images(out_dir, color="#6DCFF6", topics=None):
+    topics = CONTINUATION_TOPICS if topics is None else topics
+    target_days = [day for _slug, day in DAYS] + ["שבוע שעבר"]
+    texts = sorted({continuation_label(topic, day) for topic in topics for day in target_days})
+    labels = {f"label-{index}": text for index, text in enumerate(texts)}
+    paths = make_continuation_button_images(
+        out_dir, color=color, labels=labels,
+        font_file=font_path(font_candidates("bold")),
+    )
+    return {labels[key]: path for key, path in paths.items()}
 
 
 def draw_continuation_label(page, rect, label_path):
@@ -619,14 +634,20 @@ def add_continuation_links(fitz, doc, analysis, color="#6DCFF6", temp_parent=Non
             page = doc[source - 1]
             rect = continuation_rects(fitz, page)["next"]
             insert_goto_link(fitz, doc, page, rect, target)
-            draw_continuation_label(page, rect, label_paths["next"])
+            label = continuation_label(topic, DAYS[0][1])
+            draw_continuation_label(page, rect, label_paths[label])
             link_records.append({"type": "previous-week-next", "day": "׳™׳•׳ ׳¨׳׳©׳•׳", "topic": topic, "source": source, "target": target})
+
+            link_records[-1]["label"] = label
 
             page = doc[target - 1]
             rect = continuation_rects(fitz, page)["previous"]
             insert_goto_link(fitz, doc, page, rect, source)
-            draw_continuation_label(page, rect, label_paths["previous"])
+            label = continuation_label(topic, "שבוע שעבר")
+            draw_continuation_label(page, rect, label_paths[label])
             link_records.append({"type": "first-day-previous-week", "day": "׳™׳•׳ ׳¨׳׳©׳•׳", "topic": topic, "source": target, "target": source})
+
+            link_records[-1]["label"] = label
 
         previous_week_orig = daf_yomi_previous_week_gemara_page(analysis)
         if previous_week_orig:
@@ -645,7 +666,8 @@ def add_continuation_links(fitz, doc, analysis, color="#6DCFF6", temp_parent=Non
             page = doc[previous_week_final - 1]
             rect = continuation_rects(fitz, page)["next"]
             insert_goto_link(fitz, doc, page, rect, first_sunday_gemara)
-            draw_continuation_label(page, rect, label_paths["next"])
+            label = continuation_label(DAF_YOMI_TOPIC, DAYS[0][1])
+            draw_continuation_label(page, rect, label_paths[label])
             link_records.append(
                 {
                     "type": "daf-yomi-previous-week-next",
@@ -654,13 +676,15 @@ def add_continuation_links(fitz, doc, analysis, color="#6DCFF6", temp_parent=Non
                     "source": previous_week_final,
                     "target": first_sunday_gemara,
                     "source_original_page": previous_week_orig,
+                    "label": label,
                 }
             )
 
             page = doc[first_sunday_gemara - 1]
             rect = continuation_rects(fitz, page)["previous"]
             insert_goto_link(fitz, doc, page, rect, previous_week_final)
-            draw_continuation_label(page, rect, label_paths["previous"])
+            label = continuation_label(DAF_YOMI_TOPIC, "שבוע שעבר")
+            draw_continuation_label(page, rect, label_paths[label])
             link_records.append(
                 {
                     "type": "daf-yomi-first-day-previous-week",
@@ -669,6 +693,7 @@ def add_continuation_links(fitz, doc, analysis, color="#6DCFF6", temp_parent=Non
                     "source": first_sunday_gemara,
                     "target": previous_week_final,
                     "target_original_page": previous_week_orig,
+                    "label": label,
                 }
             )
 
@@ -695,9 +720,10 @@ def add_continuation_links(fitz, doc, analysis, color="#6DCFF6", temp_parent=Non
                     page = doc[source - 1]
                     rect = continuation_rects(fitz, page)["previous"]
                     insert_goto_link(fitz, doc, page, rect, target)
-                    draw_continuation_label(page, rect, label_paths["previous"])
+                    label = continuation_label(topic, DAYS[day_index - 1][1])
+                    draw_continuation_label(page, rect, label_paths[label])
                     link_records.append(
-                        {"type": "previous", "day": day_text, "topic": topic, "source": source, "target": target}
+                        {"type": "previous", "day": day_text, "topic": topic, "source": source, "target": target, "label": label}
                     )
 
                 if next_slug and final_segments.get(next_slug, {}).get(topic):
@@ -713,8 +739,9 @@ def add_continuation_links(fitz, doc, analysis, color="#6DCFF6", temp_parent=Non
                     page = doc[source - 1]
                     rect = continuation_rects(fitz, page)["next"]
                     insert_goto_link(fitz, doc, page, rect, target)
-                    draw_continuation_label(page, rect, label_paths["next"])
-                    link_records.append({"type": "next", "day": day_text, "topic": topic, "source": source, "target": target})
+                    label = continuation_label(topic, DAYS[day_index + 1][1])
+                    draw_continuation_label(page, rect, label_paths[label])
+                    link_records.append({"type": "next", "day": day_text, "topic": topic, "source": source, "target": target, "label": label})
 
     summary = {"segments": final_segments, "context_segments": final_context_segments, "links": link_records}
     validate_previous_week_continuation_links(analysis, summary)

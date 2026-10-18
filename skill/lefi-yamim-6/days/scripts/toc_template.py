@@ -566,7 +566,7 @@ def make_return_button_image(output_path, color=DEFAULT_ACCENT):
     return output_path
 
 
-def make_continuation_button_images(out_dir, color=DEFAULT_ACCENT):
+def make_continuation_button_images(out_dir, color=DEFAULT_ACCENT, labels=None, font_file=None):
     from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
     out_dir = Path(out_dir)
@@ -590,8 +590,26 @@ def make_continuation_button_images(out_dir, color=DEFAULT_ACCENT):
         draw.rounded_rectangle(box, radius=12, fill=(*soft, 84), outline=(*deep, 160), width=2)
         draw.rectangle((box[0] + 2, box[1] + 2, box[2] - 2, box[1] + 8), fill=(255, 255, 255, 40))
         draw.line((box[0] + 14, box[3] - 6, box[2] - 14, box[3] - 6), fill=(*deep, 68), width=2)
-        draw_center_box(draw, text, (box[0] + 4, box[1] - 1, box[2] - 4, box[3] - 1), fnt, (*dark, 232))
+        label_font = fnt
+        if labels is not None:
+            if not font_file:
+                raise RuntimeError("A Hebrew font is required for named navigation labels.")
+            # BASIC layout with the existing Hebrew reversal avoids applying
+            # bidirectional shaping twice; these labels contain Hebrew and '-'.
+            for size in range(29, 23, -1):
+                label_font = ImageFont.truetype(font_file, size, layout_engine=ImageFont.Layout.BASIC)
+                if text_width(draw, text, label_font) <= width - 32:
+                    break
+            else:
+                raise RuntimeError(f"Navigation label does not fit: {text}")
+        draw_center_box(draw, text, (box[0] + 4, box[1] - 1, box[2] - 4, box[3] - 1), label_font, (*dark, 232))
         img.save(path)
+
+    if labels is not None:
+        paths = {key: out_dir / f"continuation-{key}.png" for key in labels}
+        for key, text in labels.items():
+            make(text, paths[key])
+        return paths
 
     paths = {
         "previous": out_dir / "continuation-previous.png",

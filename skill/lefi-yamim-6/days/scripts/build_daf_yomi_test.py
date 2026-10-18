@@ -5,7 +5,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from add_day_notes import DAYS, continuation_rects, draw_continuation_label, insert_goto_link, make_continuation_label_images
+from add_day_notes import DAYS, continuation_label, continuation_rects, draw_continuation_label, insert_goto_link, make_continuation_label_images
 
 
 DAF_YOMI_TOPIC = "\u05d4\u05d3\u05e3 \u05d4\u05d9\u05d5\u05de\u05d9"
@@ -187,7 +187,7 @@ def build_daf_yomi_test(args):
 
     link_records = []
     with tempfile.TemporaryDirectory() as tmp:
-        label_paths = make_continuation_label_images(Path(tmp))
+        label_paths = make_continuation_label_images(Path(tmp), topics=(DAF_YOMI_TOPIC,))
         if previous_week_test_page:
             first_run = day_runs[0]
             first_day = first_run["day"]
@@ -196,7 +196,8 @@ def build_daf_yomi_test(args):
             page = out_doc[previous_week_test_page - 1]
             rect = continuation_rects(fitz, page)["next"]
             insert_goto_link(fitz, out_doc, page, rect, first_gemara_page)
-            draw_continuation_label(page, rect, label_paths["next"])
+            label = continuation_label(DAF_YOMI_TOPIC, first_day)
+            draw_continuation_label(page, rect, label_paths[label])
             link_records.append(
                 {
                     "type": "previous-week-next",
@@ -205,13 +206,15 @@ def build_daf_yomi_test(args):
                     "target_test_page": first_gemara_page,
                     "source_original_page": int(args.previous_week_gemara_page),
                     "target_day": first_day,
+                    "label": label,
                 }
             )
 
             page = out_doc[first_gemara_page - 1]
             rect = continuation_rects(fitz, page)["previous"]
             insert_goto_link(fitz, out_doc, page, rect, previous_week_test_page)
-            draw_continuation_label(page, rect, label_paths["previous"])
+            label = continuation_label(DAF_YOMI_TOPIC, "שבוע שעבר")
+            draw_continuation_label(page, rect, label_paths[label])
             link_records.append(
                 {
                     "type": "first-week-previous",
@@ -220,6 +223,7 @@ def build_daf_yomi_test(args):
                     "target_test_page": previous_week_test_page,
                     "source_original_page": first_run["source_pages"][1],
                     "target_original_page": int(args.previous_week_gemara_page),
+                    "label": label,
                 }
             )
 
@@ -235,7 +239,8 @@ def build_daf_yomi_test(args):
                 page = out_doc[source_page_number - 1]
                 rect = continuation_rects(fitz, page)["previous"]
                 insert_goto_link(fitz, out_doc, page, rect, target_page_number)
-                draw_continuation_label(page, rect, label_paths["previous"])
+                label = continuation_label(DAF_YOMI_TOPIC, previous_run["day"])
+                draw_continuation_label(page, rect, label_paths[label])
                 link_records.append(
                     {
                         "type": "previous",
@@ -244,6 +249,7 @@ def build_daf_yomi_test(args):
                         "target_test_page": target_page_number,
                         "source_original_page": run["source_pages"][endpoints["model"].index("gemara-a") if "gemara-a" in endpoints["model"] else 1],
                         "target_day": previous_run["day"],
+                        "label": label,
                     }
                 )
 
@@ -253,7 +259,8 @@ def build_daf_yomi_test(args):
                 page = out_doc[source_page_number - 1]
                 rect = continuation_rects(fitz, page)["next"]
                 insert_goto_link(fitz, out_doc, page, rect, target_page_number)
-                draw_continuation_label(page, rect, label_paths["next"])
+                label = continuation_label(DAF_YOMI_TOPIC, next_run["day"])
+                draw_continuation_label(page, rect, label_paths[label])
                 link_records.append(
                     {
                         "type": "next",
@@ -262,6 +269,7 @@ def build_daf_yomi_test(args):
                         "target_test_page": target_page_number,
                         "source_original_page": run["source_pages"][endpoints["model"].index("gemara-b") if "gemara-b" in endpoints["model"] else 4],
                         "target_day": next_run["day"],
+                        "label": label,
                     }
                 )
 
