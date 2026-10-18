@@ -54,17 +54,13 @@ class PageTurn(
 
     private fun turn(from: Int, to: Int, direction: Int): Boolean {
         val style = style()
-        android.util.Log.i("PageTurn", "turn $style $from->$to")
         if (style == "slide") return false
-        val t0 = android.os.SystemClock.uptimeMillis()
         finish()
         if (style == "none" || pdfView.width == 0 || pdfView.height == 0) { pdfView.jumpTo(to); return true }
         pdfView.jumpTo(from) // the whole page at rest, not where the finger left it
         val picture = picture() ?: return false // the engine slides instead
         pdfView.jumpTo(to)
-        val t1 = android.os.SystemClock.uptimeMillis()
         play(style, picture, direction > 0)
-        android.util.Log.i("PageTurn", "$style ${from}->$to picture ${t1 - t0} ms, start ${android.os.SystemClock.uptimeMillis() - t1} ms")
         return true
     }
 
