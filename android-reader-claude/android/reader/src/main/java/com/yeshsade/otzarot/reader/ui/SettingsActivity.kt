@@ -43,6 +43,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var wording: Map<String, JSONObject>
     private var sheet: BottomSheetDialog? = null
     private var scrollPosition = 0
+    private var turnApproved = false
     private lateinit var scroll: ScrollView
     /** The groups opened on this screen ("only the headings show; a tap opens the options below"). */
     private val open = linkedSetOf<String>()
@@ -78,9 +79,14 @@ class SettingsActivity : AppCompatActivity() {
         val fifth = JSONObject(assets.open("settings-copy-2026-10-18.json").bufferedReader().use { it.readText() })
         require(fifth.getString("status") == "approved")
         val newest = fifth.getJSONArray("entries")
+        // the page-turn animation: its row shows only once the owner approved its wording
+        val sixth = JSONObject(assets.open("settings-copy-2026-10-18b.json").bufferedReader().use { it.readText() })
+        turnApproved = sixth.getString("status") == "approved"
+        val turnWording = if (turnApproved) sixth.getJSONArray("entries") else org.json.JSONArray()
         wording = ((0 until entries.length()).map { entries.getJSONObject(it) } + (0 until extra.length()).map { extra.getJSONObject(it) } +
             (0 until more.length()).map { more.getJSONObject(it) } + (0 until latest.length()).map { latest.getJSONObject(it) } +
-            (0 until newest.length()).map { newest.getJSONObject(it) })
+            (0 until newest.length()).map { newest.getJSONObject(it) } +
+            (0 until turnWording.length()).map { turnWording.getJSONObject(it) })
             .associateBy { it.getString("id") }
         font = Fonts.regular(this)
         mediumFont = Fonts.medium(this)
@@ -116,6 +122,11 @@ class SettingsActivity : AppCompatActivity() {
         ), subgroups = listOf(Group("paging", R.id.otzr_group_paging, listOf(
             Setting("scroll", R.id.otzr_scroll_label, R.id.otzr_scroll_desc, listOf(Choice("vertical", R.id.otzr_scroll_vertical), Choice("horizontal", R.id.otzr_scroll_horizontal))),
             Setting("pages", R.id.otzr_pages_label, R.id.otzr_pages_desc, listOf(Choice("single", R.id.otzr_pages_single), Choice("continuous", R.id.otzr_pages_continuous))),
+        ) + (if (!turnApproved) emptyList() else listOf(
+            Setting("turn", R.id.otzr_turn_label, R.id.otzr_turn_desc, listOf(Choice("none", R.id.otzr_turn_none),
+                Choice("slide", R.id.otzr_turn_slide), Choice("cover", R.id.otzr_turn_cover), Choice("fade", R.id.otzr_turn_fade),
+                Choice("depth", R.id.otzr_turn_depth), Choice("book", R.id.otzr_turn_book)), enabled = settings.singlePage),
+        )) + listOf(
             Setting("handle", R.id.otzr_handle_label, R.id.otzr_handle_desc, emptyList(), kind = Kind.HANDLE),
         )))),
         Group("display", R.id.otzr_group_display, displayRows()),
@@ -144,6 +155,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun current(key: String): String = when (key) {
         "scroll" -> settings.scroll
         "pages" -> settings.pages
+        "turn" -> settings.pageTurn
         "resume" -> settings.resume
         "marks" -> "once"
         "awake" -> settings.awake.name.lowercase()
@@ -159,6 +171,7 @@ class SettingsActivity : AppCompatActivity() {
         when (key) {
             "scroll" -> settings.scroll = value
             "pages" -> settings.pages = value
+            "turn" -> settings.pageTurn = value
             "resume" -> settings.resume = value
             "awake" -> settings.awake = AwakeMode.valueOf(value.uppercase())
             "rotation" -> settings.lockedOrientation = if (value == "phone") Settings.UNLOCKED else ScreenOrientation.current(this)
@@ -279,7 +292,8 @@ class SettingsActivity : AppCompatActivity() {
         isFocusable = setting.enabled
         isClickable = setting.enabled
         alpha = if (setting.enabled) 1f else .55f
-        val summary = summary(setting)
+        // a row that can't be used yet says why, instead of its value ("works only with One page")
+        val summary = if (!setting.enabled && setting.key == "turn") copy(setting.description) else summary(setting)
         val text = column()
         text.addView(label(copy(setting.label), 16f, colors.ink, true))
         text.addView(label(summary, 13f, colors.accent).apply { setPadding(0, dp(5), 0, 0) })

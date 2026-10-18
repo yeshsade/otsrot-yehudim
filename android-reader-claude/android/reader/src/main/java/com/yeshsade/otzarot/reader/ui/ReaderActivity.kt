@@ -49,6 +49,7 @@ import java.util.concurrent.TimeUnit
 class ReaderActivity : AppCompatActivity() {
     private lateinit var ui: Ui
     private lateinit var pdfView: PDFView
+    private lateinit var pageTurn: PageTurn
     private lateinit var undoButton: ImageButton
     private lateinit var redoButton: ImageButton
     private lateinit var bookmarks: Bookmarks
@@ -136,6 +137,7 @@ class ReaderActivity : AppCompatActivity() {
     private fun layoutSettings() = app.settings.run { "$frameMode|$scrubberSide|$scrubberHoldMillis|$scrubberAlways|$scroll|$pages" }
 
     override fun onStop() {
+        if (::pageTurn.isInitialized) pageTurn.release()
         if (saveState.dirty) saveNow()
         super.onStop()
     }
@@ -187,6 +189,8 @@ class ReaderActivity : AppCompatActivity() {
         val body = FrameLayout(this)
         pdfView = PDFView(this, null).apply { setBackgroundColor(ui.colors.canvas) }
         body.addView(pdfView, FrameLayout.LayoutParams(-1, -1))
+        pageTurn = PageTurn(body, pdfView, { if (settings.singlePage) settings.pageTurn else "slide" },
+            horizontal = settings.scrollHorizontal, rtl = ui.rtl(settings.language))
         bookmarks = Bookmarks(this, pdfView, ui, settings, app.quick) { step ->
             undo.push(step)
             marked()
@@ -261,6 +265,7 @@ class ReaderActivity : AppCompatActivity() {
 
     /** Touching the top bar, the toolbar or the handle keeps the frame up for its full time again. */
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (event.actionMasked == MotionEvent.ACTION_DOWN && ::pageTurn.isInitialized) pageTurn.finish()
         if (event.actionMasked == MotionEvent.ACTION_DOWN && ::chrome.isInitialized) {
             edgeSwipe = !chrome.shown && FramePolicy.canHide(app.settings.frameMode) && fromPhoneEdge(event)
             if (chrome.shown && (inside(header, event) || inside(toolbar, event))) chrome.used()

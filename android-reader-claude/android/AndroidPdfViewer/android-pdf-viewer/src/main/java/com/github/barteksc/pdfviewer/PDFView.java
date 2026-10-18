@@ -951,6 +951,45 @@ public class PDFView extends RelativeLayout {
         jumpTo(pageIndex, false);
     }
 
+    /**
+     * Lets the app play its own page-turn animation (fade, cover, book page…) in one page mode instead of
+     * the engine's slide. Return true when the turn was handled; the handler then moves to the page itself.
+     * [direction] is 1 for the next page and -1 for the previous one. Otzarot reader, GPLv3.
+     */
+    private boolean snapshotting;
+
+    /**
+     * Draws what is on screen into [canvas] quickly, for the picture a page-turn animation moves: without
+     * smoothing, and without the low-resolution previews under pages already drawn sharp. A full draw by hand
+     * took far too long on a slow phone.
+     */
+    public void drawSnapshot(Canvas canvas) {
+        snapshotting = true;
+        try {
+            draw(canvas);
+        } finally {
+            snapshotting = false;
+        }
+    }
+
+    public interface PageTurnHandler {
+        boolean onPageTurn(int fromPage, int toPage, int direction);
+    }
+
+    private PageTurnHandler pageTurnHandler;
+
+    public void setPageTurnHandler(PageTurnHandler handler) {
+        pageTurnHandler = handler;
+    }
+
+    boolean handlePageTurn(int fromPage, int toPage, int direction) {
+        if (pageTurnHandler == null || pdfFile == null || fromPage == toPage) {
+            return false;
+        }
+        animationManager.stopAll();
+        return pageTurnHandler.onPageTurn(fromPage, toPage, direction);
+    }
+
     public void jumpUsingPageNumber(int pageNumber) {
         jumpTo(pageNumber - 1, false);
     }
@@ -1414,7 +1453,7 @@ public class PDFView extends RelativeLayout {
 
         // Draws background
 
-        if (enableAntialiasing) {
+        if (enableAntialiasing && !snapshotting) {
             canvas.setDrawFilter(antialiasFilter);
         }
 
@@ -1782,7 +1821,18 @@ public class PDFView extends RelativeLayout {
         }
         previewVisiblePages.clear();
         collectVisiblePages(previewVisiblePages);
+        Set<Integer> sharp = null;
+        if (snapshotting) {
+            // a page-turn picture: the blurry preview is not needed where the sharp parts are already drawn
+            sharp = new java.util.HashSet<>();
+            for (PagePart part : cacheManager.getPageParts()) {
+                sharp.add(part.getPage());
+            }
+        }
         for (Integer page : previewVisiblePages) {
+            if (sharp != null && sharp.contains(page)) {
+                continue;
+            }
             Bitmap preview = store.peek(page);
             if (preview == null) {
                 requestPreview(page);

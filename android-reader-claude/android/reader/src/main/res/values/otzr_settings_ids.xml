@@ -13,6 +13,14 @@
   <item type="id" name="otzr_pages_desc" />
   <item type="id" name="otzr_pages_single" />
   <item type="id" name="otzr_pages_continuous" />
+  <item type="id" name="otzr_turn_label" />
+  <item type="id" name="otzr_turn_desc" />
+  <item type="id" name="otzr_turn_none" />
+  <item type="id" name="otzr_turn_slide" />
+  <item type="id" name="otzr_turn_cover" />
+  <item type="id" name="otzr_turn_fade" />
+  <item type="id" name="otzr_turn_depth" />
+  <item type="id" name="otzr_turn_book" />
   <item type="id" name="otzr_resume_label" />
   <item type="id" name="otzr_resume_desc" />
   <item type="id" name="otzr_resume_last" />

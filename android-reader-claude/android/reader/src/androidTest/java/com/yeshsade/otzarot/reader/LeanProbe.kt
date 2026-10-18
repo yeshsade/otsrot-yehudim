@@ -54,6 +54,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "perf") { perf(); return }
         if (mode == "manage") { manage(); return }
         if (mode == "map") { mapChecks(); return }
+        if (mode == "onepage") { onePageOnly(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -1063,44 +1064,95 @@ class LeanProbe : Instrumentation() {
             onMainChecked { snapshot(reader, "reader-top-bar.png"); reader.finish() }
             record("Undo and redo sit outside the menu, and both work")
 
-            // "עמודים מרובים" → "עמוד אחד": a swipe brings exactly the next whole page; a short drag goes back
-            app.settings.pages = "single"
-            val single = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
-            waitLoaded(single)
-            onMainChecked { pdfView(single).jumpTo(0) }
-            SystemClock.sleep(1500); waitForIdleSync()
-            fun settled(): Boolean {
-                var ok = false
-                onMainChecked {
-                    val v = pdfView(single)
-                    val edge = PDFView::class.java.getDeclaredMethod("findSnapEdge", Int::class.javaPrimitiveType).apply { isAccessible = true }.invoke(v, v.currentPage)
-                    val snap = PDFView::class.java.getDeclaredMethod("snapOffsetForPage", Int::class.javaPrimitiveType, edge.javaClass).apply { isAccessible = true }.invoke(v, v.currentPage, edge) as Float
-                    ok = kotlin.math.abs(v.currentYOffset + snap) < 3f
-                }
-                return ok
-            }
-            fun swipe(fromY: Float, toY: Float, steps: Int, stepMs: Long) {
-                val v = pdfView(single); val at = IntArray(2); runOnMainSync { v.getLocationOnScreen(at) }
-                val x = at[0] + v.width * .5f; val y0 = at[1] + v.height * fromY; val y1 = at[1] + v.height * toY
-                val down = SystemClock.uptimeMillis(); var t = down
-                sendPointerSync(MotionEvent.obtain(down, t, MotionEvent.ACTION_DOWN, x, y0, 0))
-                for (i in 1..steps) { t += stepMs; sendPointerSync(MotionEvent.obtain(down, t, MotionEvent.ACTION_MOVE, x, y0 + (y1 - y0) * i / steps, 0)); SystemClock.sleep(stepMs) }
-                sendPointerSync(MotionEvent.obtain(down, t + stepMs, MotionEvent.ACTION_UP, x, y1, 0))
-            }
-            var pages = 0; onMainChecked { pages = pdfView(single).pageCount; check(pdfView(single).isPageSnap) { "one page mode is off" } }
-            swipe(.7f, .35f, 4, 12) // a quick swipe up
-            waitFor("one page on", 10_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == 1 || pages < 2 }
-            SystemClock.sleep(1200); waitForIdleSync()
-            check(settled()) { "the next page did not land whole on the screen" }
-            onMainChecked { snapshot(single, "one-page.png") }
-            swipe(.6f, .45f, 20, 40) // a slow short drag, then letting go
-            SystemClock.sleep(1500); waitForIdleSync()
-            onMainChecked { check(pdfView(single).currentPage == 1 || pages < 2) { "a short drag moved to another page" } }
-            check(settled()) { "a short drag left the page stuck halfway" }
-            app.settings.pages = "continuous"
-            onMainChecked { single.finish() }
-            record("One page: a swipe brings exactly the next whole page, and a short drag springs back")
+            pageModes()
 
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /** "עמודים מרובים" and the page-turn animations (also on its own: -e mode onepage). */
+    private fun pageModes() {
+        // "עמודים מרובים" → "עמוד אחד": a swipe brings exactly the next whole page; a short drag goes back
+        app.settings.pages = "single"
+        val single = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
+        waitLoaded(single)
+        onMainChecked { pdfView(single).jumpTo(0) }
+        SystemClock.sleep(1500); waitForIdleSync()
+        writePng(uiAutomation.takeScreenshot(), "one-start.png")
+        fun settled(): Boolean {
+            var ok = false
+            onMainChecked {
+                val v = pdfView(single)
+                val edge = PDFView::class.java.getDeclaredMethod("findSnapEdge", Int::class.javaPrimitiveType).apply { isAccessible = true }.invoke(v, v.currentPage)
+                val snap = PDFView::class.java.getDeclaredMethod("snapOffsetForPage", Int::class.javaPrimitiveType, edge.javaClass).apply { isAccessible = true }.invoke(v, v.currentPage, edge) as Float
+                ok = kotlin.math.abs(v.currentYOffset + snap) < 3f
+            }
+            return ok
+        }
+        fun swipe(fromY: Float, toY: Float, steps: Int, stepMs: Long) {
+            val v = pdfView(single); val at = IntArray(2); runOnMainSync { v.getLocationOnScreen(at) }
+            val x = at[0] + v.width * .5f; val y0 = at[1] + v.height * fromY; val y1 = at[1] + v.height * toY
+            val down = SystemClock.uptimeMillis(); var t = down
+            sendPointerSync(MotionEvent.obtain(down, t, MotionEvent.ACTION_DOWN, x, y0, 0))
+            for (i in 1..steps) { t += stepMs; sendPointerSync(MotionEvent.obtain(down, t, MotionEvent.ACTION_MOVE, x, y0 + (y1 - y0) * i / steps, 0)); SystemClock.sleep(stepMs) }
+            sendPointerSync(MotionEvent.obtain(down, t + stepMs, MotionEvent.ACTION_UP, x, y1, 0))
+        }
+        var pages = 0; onMainChecked { pages = pdfView(single).pageCount; check(pdfView(single).isPageSnap) { "one page mode is off" } }
+        swipe(.7f, .35f, 4, 12) // a quick swipe up
+        waitFor("one page on", 10_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == 1 || pages < 2 }
+        SystemClock.sleep(1200); waitForIdleSync()
+        check(settled()) { "the next page did not land whole on the screen" }
+        onMainChecked { snapshot(single, "one-page.png") }
+        swipe(.6f, .45f, 20, 40) // a slow short drag, then letting go
+        SystemClock.sleep(1500); waitForIdleSync()
+        onMainChecked { check(pdfView(single).currentPage == 1 || pages < 2) { "a short drag moved to another page" } }
+        check(settled()) { "a short drag left the page stuck halfway" }
+        record("One page: a swipe brings exactly the next whole page, and a short drag springs back")
+        // the page-turn animations: each one plays, lands on the right page, and leaves nothing behind
+        for (style in listOf("none", "cover", "fade", "depth", "book")) {
+            app.settings.pageTurn = style
+            var start = -1; onMainChecked { start = pdfView(single).currentPage }
+            val turn = field<com.yeshsade.otzarot.reader.ui.PageTurn>(single, "pageTurn")
+            swipe(.7f, .35f, 4, 12)
+            SystemClock.sleep(110)
+            var mid = false; onMainChecked { mid = turn.busy }
+            if (style != "none") {
+                check(mid) { "$style: no animation played" }
+                writePng(uiAutomation.takeScreenshot(), "turn-$style.png")
+            }
+            waitFor("$style forward", 10_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == start + 1 }
+            SystemClock.sleep(700); waitForIdleSync()
+            onMainChecked {
+                val v = pdfView(single)
+                check(!turn.busy && v.alpha == 1f && v.translationX == 0f && v.translationY == 0f && v.rotationY == 0f && v.scaleX == 1f) { "$style left the page moved" }
+            }
+            check(settled()) { "$style: the page did not land whole" }
+            swipe(.35f, .7f, 4, 12)
+            SystemClock.sleep(110)
+            if (style != "none") { onMainChecked { mid = turn.busy }; check(mid) { "$style back: no animation" }; writePng(uiAutomation.takeScreenshot(), "turn-$style-back.png") }
+            waitFor("$style back", 10_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == start }
+            SystemClock.sleep(700); waitForIdleSync()
+            check(settled()) { "$style back: the page did not land whole" }
+        }
+        app.settings.pageTurn = "slide"
+        app.settings.pages = "continuous"
+        onMainChecked { single.finish() }
+        record("Page-turn animations (none, cover, fade, depth, book page) play both ways and land on the right page")
+    }
+
+    private fun onePageOnly() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; true }.getOrDefault(false) }
+            app.settings.whatsAppPromptDismissed = true
+            app.settings.language = "he"
+            onMainChecked { androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags("he")) }
+            app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP
+            pageModes()
             result.putString("stream", "Passed $passed checks.\n")
             finish(Activity.RESULT_OK, result)
         } catch (error: Throwable) {

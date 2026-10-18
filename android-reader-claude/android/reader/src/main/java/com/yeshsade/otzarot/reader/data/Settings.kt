@@ -18,6 +18,10 @@ class Settings(context: Context) {
         get() = prefs.getString(PAGES, "continuous")!!
         set(v) = prefs.edit().putString(PAGES, v).apply()
     val singlePage get() = pages == "single"
+    /** The page-turn animation in one page mode: none, slide, cover, fade, depth, book (owner, 2026-10-18). */
+    var pageTurn: String
+        get() = prefs.getString(TURN, "slide")!!
+        set(v) = prefs.edit().putString(TURN, v).apply()
     var resume: String
         get() = prefs.getString(RESUME, "last")!!
         set(v) = prefs.edit().putString(RESUME, v).apply()
@@ -106,6 +110,7 @@ class Settings(context: Context) {
         const val UNLOCKED = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         const val SCROLL = "scroll"
         const val PAGES = "pages"
+        const val TURN = "page_turn"
         const val RESUME = "resume"
         const val AWAKE = "awake"
         const val ROTATION = "rotation"
