@@ -1082,7 +1082,6 @@ class LeanProbe : Instrumentation() {
         waitLoaded(single)
         onMainChecked { pdfView(single).jumpTo(0) }
         SystemClock.sleep(1500); waitForIdleSync()
-        writePng(uiAutomation.takeScreenshot(), "one-start.png")
         fun settled(): Boolean {
             var ok = false
             onMainChecked {
@@ -1102,8 +1101,16 @@ class LeanProbe : Instrumentation() {
             sendPointerSync(MotionEvent.obtain(down, t + stepMs, MotionEvent.ACTION_UP, x, y1, 0))
         }
         var pages = 0; onMainChecked { pages = pdfView(single).pageCount; check(pdfView(single).isPageSnap) { "one page mode is off" } }
-        swipe(.7f, .35f, 4, 12) // a quick swipe up
-        waitFor("one page on", 30_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == 1 || pages < 2 }
+        // a quick swipe up (the slow emulator sometimes drops the first one, so a second is allowed)
+        for (attempt in 1..2) {
+            swipe(.7f, .35f, 4, 12)
+            val until = SystemClock.uptimeMillis() + 15_000
+            var p = -1
+            while (SystemClock.uptimeMillis() < until) { onMainChecked { p = pdfView(single).currentPage }; if (p == 1) break; SystemClock.sleep(250) }
+            if (p == 1 || pages < 2) break
+            SystemClock.sleep(1500); waitForIdleSync()
+        }
+        waitFor("one page on", 5_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == 1 || pages < 2 }
         SystemClock.sleep(1200); waitForIdleSync()
         check(settled()) { "the next page did not land whole on the screen" }
         onMainChecked { snapshot(single, "one-page.png") }
@@ -1136,7 +1143,7 @@ class LeanProbe : Instrumentation() {
                 if (style != "none") {
                     check(turn.played > before) { "$style ${if (forward) "forward" else "back"}: no animation played" }
                     SystemClock.sleep(1300)
-                    writePng(uiAutomation.takeScreenshot(), "turn-$style${if (forward) "" else "-back"}.png")
+                    onMainChecked { snapshot(single, "turn-$style${if (forward) "" else "-back"}.png") }
                 }
                 waitFor("$style lands", 30_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == want }
                 waitFor("$style ends", 30_000) { var b = true; onMainChecked { b = turn.busy }; !b }
