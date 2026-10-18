@@ -98,10 +98,11 @@
     <string name="menu_bookmarks">כל הסימניות</string>
     <string name="menu_info">פרטי הקובץ</string>
     <string name="reader_redo">חזרה על הפעולה שבוטלה</string>
-    <!-- 📝 proposed, waiting for the owner's approval -->
+    <!-- approved 2026-10-18 -->
     <string name="goto_title">מעבר לעמוד</string>
     <string name="goto_hint">מספר עמוד, 1 עד %1$d</string>
     <string name="goto_go">מעבר</string>
+    <!-- 📝 proposed, waiting for the owner's approval -->
     <string name="info_title">פרטי הקובץ</string>
     <string name="info_name">שם: %1$s</string>
     <string name="info_pages">עמודים: %1$d</string>
