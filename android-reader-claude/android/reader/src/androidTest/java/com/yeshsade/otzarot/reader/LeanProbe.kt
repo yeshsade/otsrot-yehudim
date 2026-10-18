@@ -1121,13 +1121,23 @@ class LeanProbe : Instrumentation() {
                 val before = turn.played
                 // slow motion, so the picture catches the page halfway
                 runOnMainSync { turn.slowMotion = if (style == "none") 1f else 12f }
-                if (forward) swipe(.7f, .35f, 4, 12) else swipe(.35f, .7f, 4, 12)
+                val want = if (forward) start + 1 else start
+                // the slow emulator sometimes drops a swipe; a second one is allowed
+                for (attempt in 1..2) {
+                    if (forward) swipe(.7f, .35f, 4, 12) else swipe(.35f, .7f, 4, 12)
+                    val t = SystemClock.uptimeMillis() + 12_000
+                    while (SystemClock.uptimeMillis() < t) {
+                        var p = -1; onMainChecked { p = pdfView(single).currentPage }
+                        if (turn.played > before || (style == "none" && p == want)) break
+                        SystemClock.sleep(200)
+                    }
+                    if (turn.played > before || style == "none") break
+                }
                 if (style != "none") {
-                    waitFor("$style ${if (forward) "forward" else "back"} starts", 30_000) { turn.played > before }
+                    check(turn.played > before) { "$style ${if (forward) "forward" else "back"}: no animation played" }
                     SystemClock.sleep(1300)
                     writePng(uiAutomation.takeScreenshot(), "turn-$style${if (forward) "" else "-back"}.png")
                 }
-                val want = if (forward) start + 1 else start
                 waitFor("$style lands", 30_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == want }
                 waitFor("$style ends", 30_000) { var b = true; onMainChecked { b = turn.busy }; !b }
                 SystemClock.sleep(600); waitForIdleSync()

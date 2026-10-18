@@ -965,17 +965,11 @@ public class PDFView extends RelativeLayout {
      */
     public void drawSnapshot(Canvas canvas) {
         snapshotting = true;
-        long t0 = android.os.SystemClock.uptimeMillis();
         try {
             draw(canvas);
         } finally {
             snapshotting = false;
         }
-        long t1 = android.os.SystemClock.uptimeMillis();
-        android.graphics.Bitmap probe = android.graphics.Bitmap.createBitmap(540, 1170, android.graphics.Bitmap.Config.RGB_565);
-        new Canvas(probe).drawColor(Color.GRAY);
-        long t2 = android.os.SystemClock.uptimeMillis();
-        android.util.Log.i("PageTurn", "snapshot draw " + (t1 - t0) + " ms, parts " + cacheManager.getPageParts().size() + ", fill calibration " + (t2 - t1) + " ms");
     }
 
     public interface PageTurnHandler {
@@ -1487,7 +1481,16 @@ public class PDFView extends RelativeLayout {
         drawPreviews(canvas);
 
         // Draws parts
+        Set<Integer> onScreen = null;
+        if (snapshotting) {
+            // a page-turn picture: only the pages on screen (the cache also holds the pages around them)
+            onScreen = new java.util.HashSet<>();
+            collectVisiblePages(onScreen);
+        }
         for (PagePart part : cacheManager.getPageParts()) {
+            if (onScreen != null && !onScreen.contains(part.getPage())) {
+                continue;
+            }
             visiblePages.add(part.getPage());
             drawPart(canvas, part);
             if (callbacks.getOnDrawAll() != null
