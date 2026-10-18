@@ -13,6 +13,11 @@ class Settings(context: Context) {
         get() = prefs.getString(SCROLL, "vertical")!!
         set(v) = prefs.edit().putString(SCROLL, v).apply()
     val scrollHorizontal get() = scroll == "horizontal"
+    /** "עמודים מרובים" (owner, 2026-10-18): "single" = one whole page per swipe, "continuous" = a free feed (as before). */
+    var pages: String
+        get() = prefs.getString(PAGES, "continuous")!!
+        set(v) = prefs.edit().putString(PAGES, v).apply()
+    val singlePage get() = pages == "single"
     var resume: String
         get() = prefs.getString(RESUME, "last")!!
         set(v) = prefs.edit().putString(RESUME, v).apply()
@@ -100,6 +105,7 @@ class Settings(context: Context) {
     companion object {
         const val UNLOCKED = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         const val SCROLL = "scroll"
+        const val PAGES = "pages"
         const val RESUME = "resume"
         const val AWAKE = "awake"
         const val ROTATION = "rotation"

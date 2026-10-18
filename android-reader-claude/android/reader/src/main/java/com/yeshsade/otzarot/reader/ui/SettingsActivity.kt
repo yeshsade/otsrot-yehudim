@@ -74,8 +74,13 @@ class SettingsActivity : AppCompatActivity() {
         val fourth = JSONObject(assets.open("settings-copy-2026-10-17.json").bufferedReader().use { it.readText() })
         require(fourth.getString("status") == "approved")
         val latest = fourth.getJSONArray("entries")
+        // and on 2026-10-18 ("עמודים מרובים")
+        val fifth = JSONObject(assets.open("settings-copy-2026-10-18.json").bufferedReader().use { it.readText() })
+        require(fifth.getString("status") == "approved")
+        val newest = fifth.getJSONArray("entries")
         wording = ((0 until entries.length()).map { entries.getJSONObject(it) } + (0 until extra.length()).map { extra.getJSONObject(it) } +
-            (0 until more.length()).map { more.getJSONObject(it) } + (0 until latest.length()).map { latest.getJSONObject(it) })
+            (0 until more.length()).map { more.getJSONObject(it) } + (0 until latest.length()).map { latest.getJSONObject(it) } +
+            (0 until newest.length()).map { newest.getJSONObject(it) })
             .associateBy { it.getString("id") }
         font = Fonts.regular(this)
         mediumFont = Fonts.medium(this)
@@ -110,6 +115,7 @@ class SettingsActivity : AppCompatActivity() {
             Setting("marks", R.id.otzr_marks_label, R.id.otzr_marks_desc, listOf(Choice("once", R.id.otzr_marks_once), Choice("repeat", R.id.otzr_marks_repeat)), enabled = false),
         ), subgroups = listOf(Group("paging", R.id.otzr_group_paging, listOf(
             Setting("scroll", R.id.otzr_scroll_label, R.id.otzr_scroll_desc, listOf(Choice("vertical", R.id.otzr_scroll_vertical), Choice("horizontal", R.id.otzr_scroll_horizontal))),
+            Setting("pages", R.id.otzr_pages_label, R.id.otzr_pages_desc, listOf(Choice("single", R.id.otzr_pages_single), Choice("continuous", R.id.otzr_pages_continuous))),
             Setting("handle", R.id.otzr_handle_label, R.id.otzr_handle_desc, emptyList(), kind = Kind.HANDLE),
         )))),
         Group("display", R.id.otzr_group_display, displayRows()),
@@ -137,6 +143,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun current(key: String): String = when (key) {
         "scroll" -> settings.scroll
+        "pages" -> settings.pages
         "resume" -> settings.resume
         "marks" -> "once"
         "awake" -> settings.awake.name.lowercase()
@@ -151,6 +158,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun choose(key: String, value: String) {
         when (key) {
             "scroll" -> settings.scroll = value
+            "pages" -> settings.pages = value
             "resume" -> settings.resume = value
             "awake" -> settings.awake = AwakeMode.valueOf(value.uppercase())
             "rotation" -> settings.lockedOrientation = if (value == "phone") Settings.UNLOCKED else ScreenOrientation.current(this)

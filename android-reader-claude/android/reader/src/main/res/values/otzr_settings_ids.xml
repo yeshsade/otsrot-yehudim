@@ -9,6 +9,10 @@
   <item type="id" name="otzr_scroll_desc" />
   <item type="id" name="otzr_scroll_vertical" />
   <item type="id" name="otzr_scroll_horizontal" />
+  <item type="id" name="otzr_pages_label" />
+  <item type="id" name="otzr_pages_desc" />
+  <item type="id" name="otzr_pages_single" />
+  <item type="id" name="otzr_pages_continuous" />
   <item type="id" name="otzr_resume_label" />
   <item type="id" name="otzr_resume_desc" />
   <item type="id" name="otzr_resume_last" />

@@ -931,7 +931,7 @@ class LeanProbe : Instrumentation() {
             onMainChecked { check(tagged("setting_resume")?.isShown == true && tagged("setting_handle")?.isShown != true) { "reading heading" } }
             onMainChecked { tagged("group_paging").performClick() }
             SystemClock.sleep(400); waitForIdleSync()
-            onMainChecked { check(tagged("setting_handle")?.isShown == true) { "the flipping sub-heading did not open" } }
+            onMainChecked { check(tagged("setting_handle")?.isShown == true && tagged("setting_pages")?.isShown == true) { "the flipping sub-heading did not open" } }
             record("A tap on a heading opens its options under it; flipping is a sub-heading inside the reading screen")
             onMainChecked { snapshot(settingsScreen, "settings-open.png") }
             onMainChecked { tagged("group_display").performClick() }
@@ -957,7 +957,7 @@ class LeanProbe : Instrumentation() {
             }
             record("The settings screen has ☰ too, without a way into settings")
             SystemClock.sleep(1200); waitForIdleSync()
-            for (key in listOf("frame", "handle")) {
+            for (key in listOf("frame", "handle", "pages")) {
                 onMainChecked { settingsScreen.window.decorView.findViewWithTag<View>("setting_$key").performClick() }
                 SystemClock.sleep(1200); waitForIdleSync()
                 onMainChecked {
@@ -1062,6 +1062,44 @@ class LeanProbe : Instrumentation() {
             check(countChecked(reader) == before + 1) { "redo did not put the mark back" }
             onMainChecked { snapshot(reader, "reader-top-bar.png"); reader.finish() }
             record("Undo and redo sit outside the menu, and both work")
+
+            // "עמודים מרובים" → "עמוד אחד": a swipe brings exactly the next whole page; a short drag goes back
+            app.settings.pages = "single"
+            val single = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
+            waitLoaded(single)
+            onMainChecked { pdfView(single).jumpTo(0) }
+            SystemClock.sleep(1500); waitForIdleSync()
+            fun settled(): Boolean {
+                var ok = false
+                onMainChecked {
+                    val v = pdfView(single)
+                    val edge = PDFView::class.java.getDeclaredMethod("findSnapEdge", Int::class.javaPrimitiveType).apply { isAccessible = true }.invoke(v, v.currentPage)
+                    val snap = PDFView::class.java.getDeclaredMethod("snapOffsetForPage", Int::class.javaPrimitiveType, edge.javaClass).apply { isAccessible = true }.invoke(v, v.currentPage, edge) as Float
+                    ok = kotlin.math.abs(v.currentYOffset + snap) < 3f
+                }
+                return ok
+            }
+            fun swipe(fromY: Float, toY: Float, steps: Int, stepMs: Long) {
+                val v = pdfView(single); val at = IntArray(2); runOnMainSync { v.getLocationOnScreen(at) }
+                val x = at[0] + v.width * .5f; val y0 = at[1] + v.height * fromY; val y1 = at[1] + v.height * toY
+                val down = SystemClock.uptimeMillis(); var t = down
+                sendPointerSync(MotionEvent.obtain(down, t, MotionEvent.ACTION_DOWN, x, y0, 0))
+                for (i in 1..steps) { t += stepMs; sendPointerSync(MotionEvent.obtain(down, t, MotionEvent.ACTION_MOVE, x, y0 + (y1 - y0) * i / steps, 0)); SystemClock.sleep(stepMs) }
+                sendPointerSync(MotionEvent.obtain(down, t + stepMs, MotionEvent.ACTION_UP, x, y1, 0))
+            }
+            var pages = 0; onMainChecked { pages = pdfView(single).pageCount; check(pdfView(single).isPageSnap) { "one page mode is off" } }
+            swipe(.7f, .35f, 4, 12) // a quick swipe up
+            waitFor("one page on", 10_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == 1 || pages < 2 }
+            SystemClock.sleep(1200); waitForIdleSync()
+            check(settled()) { "the next page did not land whole on the screen" }
+            onMainChecked { snapshot(single, "one-page.png") }
+            swipe(.6f, .45f, 20, 40) // a slow short drag, then letting go
+            SystemClock.sleep(1500); waitForIdleSync()
+            onMainChecked { check(pdfView(single).currentPage == 1 || pages < 2) { "a short drag moved to another page" } }
+            check(settled()) { "a short drag left the page stuck halfway" }
+            app.settings.pages = "continuous"
+            onMainChecked { single.finish() }
+            record("One page: a swipe brings exactly the next whole page, and a short drag springs back")
 
             result.putString("stream", "Passed $passed checks.\n")
             finish(Activity.RESULT_OK, result)

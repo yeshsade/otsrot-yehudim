@@ -133,7 +133,7 @@ class ReaderActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    private fun layoutSettings() = app.settings.run { "$frameMode|$scrubberSide|$scrubberHoldMillis|$scrubberAlways|$scroll" }
+    private fun layoutSettings() = app.settings.run { "$frameMode|$scrubberSide|$scrubberHoldMillis|$scrubberAlways|$scroll|$pages" }
 
     override fun onStop() {
         if (saveState.dirty) saveNow()
@@ -449,6 +449,11 @@ class ReaderActivity : AppCompatActivity() {
             .enableAnnotationRendering(true)
             .enableDoubleTap(true)
             .spacing(8)
+            // "עמוד אחד": every page fills one screen and a swipe brings exactly the next one, like a book.
+            // "גלילה רציפה": the free feed the reader always had.
+            .autoSpacing(settings.singlePage)
+            .pageSnap(settings.singlePage)
+            .pageFling(settings.singlePage)
             .onTap { event -> tap(event) }
             .onPageScroll { _, offset -> scrubber.follow(offset); scrubber.pagesMoved() }
             .onLoad { pages ->

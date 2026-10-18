@@ -1,0 +1,11 @@
+{
+  "version": "2026-10-18",
+  "status": "approved",
+  "note": "Approved by the owner on 2026-10-18 (Hebrew, his own wording, after the sketch: 'מושלם'). No description line. English is Claude's translation.",
+  "entries": [
+    {"id": "pages_label", "he": "עמודים מרובים", "en": "Multiple pages"},
+    {"id": "pages_desc", "he": "", "en": ""},
+    {"id": "pages_single", "he": "עמוד אחד", "en": "One page"},
+    {"id": "pages_continuous", "he": "גלילה רציפה", "en": "Continuous scrolling"}
+  ]
+}
