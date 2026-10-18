@@ -49,9 +49,8 @@ import java.util.concurrent.TimeUnit
 class ReaderActivity : AppCompatActivity() {
     private lateinit var ui: Ui
     private lateinit var pdfView: PDFView
-    private lateinit var titleView: TextView
-    private lateinit var subtitle: TextView
     private lateinit var undoButton: ImageButton
+    private lateinit var redoButton: ImageButton
     private lateinit var bookmarks: Bookmarks
     private lateinit var header: View
     private lateinit var toolbar: View
@@ -169,16 +168,15 @@ class ReaderActivity : AppCompatActivity() {
     private fun buildScreen() {
         val settings = app.settings
         val root = ui.column().apply { setBackgroundColor(ui.colors.canvas) }
-        val (header, titles) = ui.header(getString(R.string.app_name), " ")
+        // Only ☰ on the left (owner, 2026-10-17). Undo and redo stay outside the menu ("but not in such a
+        // crude design"): two quiet arrows on the right, dimmed while there is nothing to undo or redo.
+        val (header, extras) = ui.menuBar(this) { openMenu() }
         this.header = header
-        titleView = titles.getChildAt(0) as TextView
-        subtitle = titles.findViewWithTag("subtitle")
-        undoButton = ui.headerButton(R.drawable.ic_undo, getString(R.string.reader_undo)) { undoLast() }
-        undoButton.alpha = .45f
-        header.addView(undoButton)
-        header.addView(ui.headerButton(if (ui.night) R.drawable.otzr_ic_sun else R.drawable.otzr_ic_moon,
-            getString(if (ui.night) R.string.library_day else R.string.library_night)) { toggleNight() })
-        header.addView(ui.headerButton(R.drawable.otzr_ic_back, getString(R.string.reader_back)) { leave() })
+        undoButton = ui.quietButton(R.drawable.ic_undo, getString(R.string.reader_undo)) { undoLast() }.apply { tag = "undo" }
+        redoButton = ui.quietButton(R.drawable.ic_redo, getString(R.string.reader_redo)) { redoLast() }.apply { tag = "redo" }
+        extras.addView(undoButton)
+        extras.addView(redoButton)
+        updateUndoButtons()
         header.elevation = ui.dp(4).toFloat()
 
         // The frame can hide: then the top bar floats over the page, so hiding it never resizes (and moves) the page.
@@ -361,8 +359,9 @@ class ReaderActivity : AppCompatActivity() {
         if (doc?.id == target.id && pageCount > 0) return
         doc = target
         bookmarks.clear()
-        titleView.text = target.name
-        subtitle.text = " "
+        // undo and redo belong to the document they were made in
+        undo.clear()
+        updateUndoButtons()
         // On the saves' thread: a save of this document still running from a moment ago finishes first (so the
         // copy has its marks), but opening never waits behind scans of the device.
         app.saves.execute {
@@ -468,7 +467,6 @@ class ReaderActivity : AppCompatActivity() {
 
     private fun showPage(page: Int) {
         val text = getString(R.string.reader_page, page + 1, pageCount)
-        subtitle.text = text
         infoLine.setPage(text)
         scrubber.follow(pdfView.positionOffset)
     }
@@ -507,7 +505,7 @@ class ReaderActivity : AppCompatActivity() {
                     if (isDestroyed) return@post
                     pdfView.formFieldApplied(page, annotation, ok)
                     done(ok)
-                    undoButton.alpha = if (undo.isEmpty) .45f else 1f
+                    updateUndoButtons()
                 }
             }
         }
@@ -518,6 +516,104 @@ class ReaderActivity : AppCompatActivity() {
             is UndoStack.Mark -> mark(step.page, step.annotation, step.before)
             is UndoStack.BookmarkChange -> { bookmarks.revert(step); marked() }
         }
+    }
+
+    /** Applies again the last step that was undone. */
+    private fun redoLast() {
+        when (val step = undo.redo() ?: return) {
+            is UndoStack.Mark -> mark(step.page, step.annotation, !step.before)
+            is UndoStack.BookmarkChange -> { bookmarks.revert(UndoStack.BookmarkChange(step.after, step.before)); marked() }
+        }
+    }
+
+    private fun updateUndoButtons() {
+        if (!::undoButton.isInitialized) return
+        undoButton.alpha = if (undo.isEmpty) .38f else 1f
+        undoButton.isEnabled = !undo.isEmpty
+        redoButton.alpha = if (undo.canRedo) 1f else .38f
+        redoButton.isEnabled = undo.canRedo
+    }
+
+    // ---------- the menu (☰), in the owner's order (drawer board, 2026-10-17) ----------
+
+    /** The open menu and the last go-to-page / file-details windows (for tests). */
+    var lastMenu: Drawer.Shown? = null
+        private set
+    var lastWindow: android.app.Dialog? = null
+        private set
+
+    private fun openMenu() {
+        chrome.hold()
+        val target = doc
+        val page = if (pageCount > 0) getString(R.string.reader_page, pdfView.currentPage + 1, pageCount) else null
+        val files = Drawer.Item(R.drawable.ic_list, getString(R.string.menu_files), "menu_files") { leave() }
+        val goTo = Drawer.Item(R.drawable.ic_goto, getString(R.string.menu_goto), "menu_goto") { goToPage() }
+        val marks = Drawer.Item(R.drawable.ic_bookmark, getString(R.string.menu_bookmarks), "menu_bookmarks") { bookmarks.showList() }
+        val info = Drawer.Item(R.drawable.ic_info, getString(R.string.menu_info), "menu_info") { fileDetails() }
+        // still to come, in the owner's places: "quick marking" (top, second) and "share the file" (in More)
+        lastMenu = Drawer.show(this, ui, target?.name, page,
+            top = listOfNotNull(AppMenu.night(this) { saveNow() }, AppMenu.rotationLock(this), files, goTo.takeIf { pageCount > 0 }),
+            more = listOfNotNull(marks.takeIf { pageCount > 0 }, info.takeIf { target != null }),
+            pinned = listOf(AppMenu.settings(this)))
+        lastMenu?.dialog?.setOnDismissListener { chrome.used() }
+    }
+
+    private fun goToPage() {
+        if (pageCount == 0) return
+        val dialog = android.app.Dialog(this)
+        val sheet = Messages.sheet(ui)
+        val group = Messages.group(ui)
+        group.addView(Messages.header(ui, getString(R.string.goto_title), null, null))
+        val input = android.widget.EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            hint = getString(R.string.goto_hint, pageCount)
+            textSize = 20f
+            gravity = Gravity.CENTER
+            setTextColor(ui.colors.ink)
+            setHintTextColor(ui.colors.muted)
+            typeface = ui.font
+            background = ui.rounded(ui.colors.canvas, 14f)
+            setPadding(ui.dp(16), ui.dp(12), ui.dp(16), ui.dp(12))
+            imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_GO
+            tag = "goto_input"
+        }
+        group.addView(input, LinearLayout.LayoutParams(-1, -2).apply { setMargins(ui.dp(20), 0, ui.dp(20), ui.dp(16)) })
+        fun go() {
+            val n = input.text.toString().trim().toIntOrNull() ?: return
+            dialog.dismiss()
+            pdfView.jumpTo((n - 1).coerceIn(0, pageCount - 1))
+        }
+        input.setOnEditorActionListener { _, _, _ -> go(); true }
+        group.addView(Messages.divider(ui))
+        group.addView(Messages.action(ui, getString(R.string.goto_go), ui.colors.accent, bold = true) { go() }.apply { tag = "goto_go" })
+        sheet.addView(group)
+        sheet.addView(Messages.cancel(ui, getString(R.string.action_cancel)) { dialog.dismiss() }, Messages.gap(ui))
+        Messages.show(dialog, sheet, ui, cancelable = true)
+        dialog.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+        input.requestFocus()
+        lastWindow = dialog
+    }
+
+    private fun fileDetails() {
+        val target = app.library.get(doc?.id ?: return) ?: doc ?: return
+        val dialog = android.app.Dialog(this)
+        val sheet = Messages.sheet(ui)
+        val group = Messages.group(ui)
+        val place = if (target.kind == Doc.Kind.COPY) getString(R.string.info_place_copy)
+            else Uri.parse(target.uri).let { it.path?.substringBeforeLast('/') ?: it.toString() }
+        val lines = listOfNotNull(
+            getString(R.string.info_name, android.text.BidiFormatter.getInstance().unicodeWrap(target.name)),
+            if (pageCount > 0) getString(R.string.info_pages, pageCount) else null,
+            target.size.takeIf { it > 0 }?.let { getString(R.string.info_size, android.text.format.Formatter.formatShortFileSize(this, it)) },
+            getString(R.string.info_place, place),
+            target.receivedAt.takeIf { it > 0 }?.let { getString(R.string.info_received,
+                android.text.format.DateFormat.getMediumDateFormat(this).format(java.util.Date(it))) },
+        )
+        group.addView(Messages.header(ui, getString(R.string.info_title), null, lines.joinToString("\n")))
+        sheet.addView(group)
+        sheet.addView(Messages.cancel(ui, getString(R.string.action_close)) { dialog.dismiss() }.apply { tag = "info_close" }, Messages.gap(ui))
+        Messages.show(dialog, sheet, ui, cancelable = true)
+        lastWindow = dialog
     }
 
     /** The last bookmark hint shown (for tests and screenshots). */
@@ -544,7 +640,7 @@ class ReaderActivity : AppCompatActivity() {
 
     private fun marked() {
         saveState.edit()
-        undoButton.alpha = if (undo.isEmpty) .45f else 1f
+        updateUndoButtons()
         main.removeCallbacks(saveRunnable)
         main.postDelayed(saveRunnable, SAVE_DELAY_MS)
     }
@@ -621,11 +717,6 @@ class ReaderActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun toggleNight() {
-        saveNow()
-        app.settings.night = !app.settings.night
-        ReaderApp.applyTheme(app.settings)
-    }
 
     companion object {
         const val EXTRA_DOC = "doc"

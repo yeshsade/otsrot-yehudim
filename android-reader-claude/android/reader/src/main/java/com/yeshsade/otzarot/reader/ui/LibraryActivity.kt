@@ -78,15 +78,8 @@ class LibraryActivity : AppCompatActivity() {
 
     private fun buildScreen() {
         val root = ui.column().apply { setBackgroundColor(ui.colors.canvas) }
-        val (header, _) = ui.header(getString(R.string.library_title))
-        header.addView(ui.headerButton(if (ui.night) R.drawable.otzr_ic_sun else R.drawable.otzr_ic_moon,
-            getString(if (ui.night) R.string.library_day else R.string.library_night)) {
-            app.settings.night = !app.settings.night
-            ReaderApp.applyTheme(app.settings)
-        })
-        header.addView(ui.headerButton(R.drawable.ic_settings, getString(R.string.library_settings)) {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        })
+        // only ☰ on the left (owner, 2026-10-17); night mode and settings are in the menu
+        val (header, _) = ui.menuBar(this) { openMenu() }
         root.addView(header)
 
         sortLabel = ui.label("", 13f, ui.colors.accent, true).apply {
@@ -135,6 +128,16 @@ class LibraryActivity : AppCompatActivity() {
         open.addView(ui.label(getString(R.string.library_open_pdf), 17f, ui.colors.buttonInk, true))
         root.addView(open, LinearLayout.LayoutParams(-1, -2).apply { setMargins(ui.dp(16), ui.dp(4), ui.dp(16), ui.dp(14)) })
         ui.install(this, root, header)
+    }
+
+    /** The open menu (for tests). */
+    var lastMenu: Drawer.Shown? = null
+        private set
+
+    private fun openMenu() {
+        lastMenu = Drawer.show(this, ui, null, null,
+            top = listOf(AppMenu.night(this), AppMenu.rotationLock(this)),
+            more = emptyList(), pinned = listOf(AppMenu.settings(this)))
     }
 
     /** The day the list was last drawn: after midnight "today"/"yesterday" labels must be redrawn. */

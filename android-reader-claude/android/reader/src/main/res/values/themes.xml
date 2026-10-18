@@ -6,6 +6,10 @@
         <item name="android:windowBackground">@color/canvas</item>
     </style>
     <!-- Messages slide up from the bottom (owner's choice "ג", 2026-10-16) -->
+    <style name="OtzrDrawerAnimation">
+        <item name="android:windowEnterAnimation">@anim/otzr_drawer_in</item>
+        <item name="android:windowExitAnimation">@anim/otzr_drawer_out</item>
+    </style>
     <style name="OtzrSheetAnimation">
         <item name="android:windowEnterAnimation">@anim/otzr_sheet_in</item>
         <item name="android:windowExitAnimation">@anim/otzr_sheet_out</item>

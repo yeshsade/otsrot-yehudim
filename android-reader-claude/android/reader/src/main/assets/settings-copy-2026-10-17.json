@@ -1,0 +1,8 @@
+{
+  "version": "2026-10-17",
+  "status": "approved",
+  "note": "Approved by the owner on 2026-10-17 (Hebrew): the reading group is now called 'מסך הקריאה' (from the settings board). English is Claude's translation.",
+  "entries": [
+    {"id": "group_reading", "he": "מסך הקריאה", "en": "Reading screen"}
+  ]
+}

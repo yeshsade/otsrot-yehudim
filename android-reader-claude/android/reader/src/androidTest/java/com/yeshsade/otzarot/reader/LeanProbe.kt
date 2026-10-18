@@ -913,12 +913,47 @@ class LeanProbe : Instrumentation() {
             app.settings.language = "he" // the settings screen takes its wording language from here
             val settingsScreen = startActivitySync(Intent(targetContext, SettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as SettingsActivity
             SystemClock.sleep(1500); waitForIdleSync()
+            fun tagged(t: String) = settingsScreen.window.decorView.findViewWithTag<View>(t)
+            // only the headings show at first; a tap on a heading opens its options right under it
             onMainChecked {
-                val scroll = settingsScreen.window.decorView.findViewWithTag<View>("setting_frame").parent.parent.parent as android.widget.ScrollView
-                scroll.scrollTo(0, settingsScreen.window.decorView.findViewWithTag<View>("setting_awake").top)
+                for (g in listOf("reading", "display", "app")) check(tagged("group_$g")?.isShown == true) { "heading $g not shown" }
+                check(tagged("setting_frame")?.isShown != true) { "options show before their heading was opened" }
+                snapshot(settingsScreen, "settings-headings.png")
             }
-            SystemClock.sleep(500); waitForIdleSync()
-            onMainChecked { snapshot(settingsScreen, "settings-new-rows.png") }
+            record("Settings show only the headings")
+            onMainChecked { tagged("group_display").performClick() }
+            SystemClock.sleep(400); waitForIdleSync()
+            onMainChecked { check(tagged("setting_frame")?.isShown == true) { "the display heading did not open" } }
+            onMainChecked { tagged("group_reading").performClick() }
+            SystemClock.sleep(400); waitForIdleSync()
+            onMainChecked { check(tagged("setting_resume")?.isShown == true && tagged("setting_handle")?.isShown != true) { "reading heading" } }
+            onMainChecked { tagged("group_paging").performClick() }
+            SystemClock.sleep(400); waitForIdleSync()
+            onMainChecked { check(tagged("setting_handle")?.isShown == true) { "the flipping sub-heading did not open" } }
+            record("A tap on a heading opens its options under it; flipping is a sub-heading inside the reading screen")
+            onMainChecked { snapshot(settingsScreen, "settings-open.png") }
+            onMainChecked { tagged("group_display").performClick() }
+            SystemClock.sleep(400); waitForIdleSync()
+            onMainChecked { check(tagged("setting_frame")?.isShown != true) { "a second tap did not close the heading" } }
+            record("Another tap closes it")
+            onMainChecked { tagged("group_display").performClick() }
+            SystemClock.sleep(400); waitForIdleSync()
+            onMainChecked {
+                var v: View? = tagged("setting_frame")
+                while (v != null && v !is android.widget.ScrollView) v = v.parent as? View
+                (v as android.widget.ScrollView).scrollTo(0, 0)
+                snapshot(settingsScreen, "settings-new-rows.png")
+            }
+            // the menu on the settings screen: everything but "settings"
+            onMainChecked { tagged("menu_button").performClick() }
+            SystemClock.sleep(800); waitForIdleSync()
+            onMainChecked {
+                val menu = settingsScreen.lastMenu ?: error("no menu")
+                check(menu.root.findViewWithTag<View>("menu_settings") == null) { "settings inside settings" }
+                check(menu.root.findViewWithTag<View>("menu_night") != null && menu.root.findViewWithTag<View>("menu_files") != null)
+                snapshotView(menu.dialog.window!!.decorView, "menu-settings.png"); menu.dialog.dismiss()
+            }
+            record("The settings screen has ☰ too, without a way into settings")
             for (key in listOf("frame", "handle")) {
                 onMainChecked { settingsScreen.window.decorView.findViewWithTag<View>("setting_$key").performClick() }
                 SystemClock.sleep(1200); waitForIdleSync()
@@ -937,7 +972,77 @@ class LeanProbe : Instrumentation() {
             var d: android.app.Dialog? = null
             onMainChecked { d = LibraryActivity::class.java.getDeclaredMethod("allFilesDialog").apply { isAccessible = true }.invoke(lib) as android.app.Dialog }
             SystemClock.sleep(1500); waitForIdleSync()
-            onMainChecked { snapshotView(d!!.window!!.decorView, "all-files-dialog.png"); d!!.dismiss(); lib.finish() }
+            onMainChecked { snapshotView(d!!.window!!.decorView, "all-files-dialog.png"); d!!.dismiss() }
+            // the list's menu: ☰ on the left, nothing else in the top bar; night mode and settings inside
+            onMainChecked {
+                val button = lib.window.decorView.findViewWithTag<View>("menu_button")
+                val at = IntArray(2); button.getLocationOnScreen(at)
+                check(at[0] < lib.window.decorView.width / 2) { "☰ is not on the left" }
+                button.performClick()
+            }
+            SystemClock.sleep(800); waitForIdleSync()
+            onMainChecked {
+                val menu = lib.lastMenu ?: error("no menu on the list")
+                check(menu.root.findViewWithTag<View>("menu_settings") != null && menu.root.findViewWithTag<View>("menu_night") != null)
+                snapshotView(menu.dialog.window!!.decorView, "menu-list.png"); menu.dialog.dismiss(); lib.finish()
+            }
+            record("The list has only ☰ on the left; its menu holds night mode and settings")
+
+            // the reading screen's menu, in the owner's order, with "More"; go to page; file details; undo and redo
+            app.settings.whatsAppPromptDismissed = true
+            val reader = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
+            waitLoaded(reader)
+            onMainChecked { reader.window.decorView.findViewWithTag<View>("menu_button").performClick() }
+            SystemClock.sleep(800); waitForIdleSync()
+            onMainChecked {
+                val menu = reader.lastMenu ?: error("no menu in the reader")
+                val r = menu.root
+                for (t in listOf("menu_night", "menu_rotation", "menu_files", "menu_goto", "menu_settings")) check(r.findViewWithTag<View>(t)?.isShown == true) { "$t not shown" }
+                check(r.findViewWithTag<View>("menu_bookmarks")?.isShown != true) { "bookmarks should be under More" }
+                snapshotView(menu.dialog.window!!.decorView, "menu-reader.png")
+                r.findViewWithTag<View>("drawer_more").performClick()
+            }
+            SystemClock.sleep(400); waitForIdleSync()
+            onMainChecked {
+                val menu = reader.lastMenu!!
+                check(menu.root.findViewWithTag<View>("menu_bookmarks")?.isShown == true && menu.root.findViewWithTag<View>("menu_info")?.isShown == true) { "More did not open" }
+                snapshotView(menu.dialog.window!!.decorView, "menu-reader-more.png")
+                menu.root.findViewWithTag<View>("menu_goto").performClick()
+            }
+            record("The reading screen's menu: night, rotation lock, file list, go to page, then More (bookmarks, file details), settings at the bottom")
+            SystemClock.sleep(800); waitForIdleSync()
+            onMainChecked {
+                val w = reader.lastWindow ?: error("no go-to-page window")
+                (w.findViewById<View>(android.R.id.content).findViewWithTag<android.widget.EditText>("goto_input")).setText("3")
+                snapshotView(w.window!!.decorView, "goto.png")
+                w.findViewById<View>(android.R.id.content).findViewWithTag<View>("goto_go").performClick()
+            }
+            waitFor("went to page 3", 15_000) { var p = -1; onMainChecked { p = pdfView(reader).currentPage }; p == 2 || pdfView(reader).pageCount < 3 }
+            record("Go to page… moves to the page typed")
+            onMainChecked { reader.window.decorView.findViewWithTag<View>("menu_button").performClick() }
+            SystemClock.sleep(800); waitForIdleSync()
+            onMainChecked { reader.lastMenu!!.root.findViewWithTag<View>("drawer_more").performClick() }
+            SystemClock.sleep(300); waitForIdleSync()
+            onMainChecked { reader.lastMenu!!.root.findViewWithTag<View>("menu_info").performClick() }
+            SystemClock.sleep(800); waitForIdleSync()
+            onMainChecked { val w = reader.lastWindow!!; check(w.isShowing); snapshotView(w.window!!.decorView, "file-details.png"); w.dismiss() }
+            record("File details show the file's name, pages, size, place and when it arrived")
+            // undo and redo outside the menu
+            onMainChecked { pdfView(reader).jumpTo(0) }
+            SystemClock.sleep(1500); waitForIdleSync()
+            val before = countChecked(reader)
+            tapUnchecked(reader, null)
+            SystemClock.sleep(800)
+            check(countChecked(reader) == before + 1)
+            onMainChecked { reader.window.decorView.findViewWithTag<View>("undo").performClick() }
+            SystemClock.sleep(1200); waitForIdleSync()
+            check(countChecked(reader) == before) { "undo did not take the mark back" }
+            onMainChecked { check(reader.window.decorView.findViewWithTag<View>("redo").isEnabled) { "redo not available" } }
+            onMainChecked { reader.window.decorView.findViewWithTag<View>("redo").performClick() }
+            SystemClock.sleep(1200); waitForIdleSync()
+            check(countChecked(reader) == before + 1) { "redo did not put the mark back" }
+            onMainChecked { snapshot(reader, "reader-top-bar.png"); reader.finish() }
+            record("Undo and redo sit outside the menu, and both work")
 
             result.putString("stream", "Passed $passed checks.\n")
             finish(Activity.RESULT_OK, result)

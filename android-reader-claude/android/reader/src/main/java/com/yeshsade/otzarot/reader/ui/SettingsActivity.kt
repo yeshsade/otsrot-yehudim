@@ -44,6 +44,8 @@ class SettingsActivity : AppCompatActivity() {
     private var sheet: BottomSheetDialog? = null
     private var scrollPosition = 0
     private lateinit var scroll: ScrollView
+    /** The groups opened on this screen ("only the headings show; a tap opens the options below"). */
+    private val open = linkedSetOf<String>()
 
     private data class Choice(val value: String, val label: Int)
     private enum class Kind { RADIO, FRAME, HANDLE }
@@ -68,18 +70,24 @@ class SettingsActivity : AppCompatActivity() {
         val third = JSONObject(assets.open("settings-copy-2026-10-16.json").bufferedReader().use { it.readText() })
         require(third.getString("status") == "approved")
         val more = third.getJSONArray("entries")
+        // and on 2026-10-17 (the reading group's new name)
+        val fourth = JSONObject(assets.open("settings-copy-2026-10-17.json").bufferedReader().use { it.readText() })
+        require(fourth.getString("status") == "approved")
+        val latest = fourth.getJSONArray("entries")
         wording = ((0 until entries.length()).map { entries.getJSONObject(it) } + (0 until extra.length()).map { extra.getJSONObject(it) } +
-            (0 until more.length()).map { more.getJSONObject(it) })
+            (0 until more.length()).map { more.getJSONObject(it) } + (0 until latest.length()).map { latest.getJSONObject(it) })
             .associateBy { it.getString("id") }
         font = Fonts.regular(this)
         mediumFont = Fonts.medium(this)
         headingFont = Fonts.heading(this)
         scrollPosition = savedInstanceState?.getInt("settingsScroll", 0) ?: 0
+        savedInstanceState?.getStringArrayList("settingsOpen")?.let { open.addAll(it) }
         render()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt("settingsScroll", scroll.scrollY)
+        outState.putStringArrayList("settingsOpen", ArrayList(open))
         super.onSaveInstanceState(outState)
     }
 
@@ -89,17 +97,32 @@ class SettingsActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    /** Groups and rows, in the order the owner set on 2026-10-15. */
-    private fun definitions() = listOf(
-        R.id.otzr_group_reading to listOf(
+    /**
+     * Groups and rows. Order and grouping set by the owner on 2026-10-17 (the settings board): "flipping"
+     * is a sub-group inside the reading screen.
+     */
+    private data class Group(val id: String, val title: Int, val settings: List<Setting>, val subgroups: List<Group> = emptyList())
+
+    private fun groups() = listOf(
+        Group("reading", R.id.otzr_group_reading, listOf(
             Setting("resume", R.id.otzr_resume_label, R.id.otzr_resume_desc, listOf(Choice("last", R.id.otzr_resume_last), Choice("start", R.id.otzr_resume_start))),
             // Repeat marking requires the forthcoming inline pen/highlighter tools; do not offer a no-op control.
             Setting("marks", R.id.otzr_marks_label, R.id.otzr_marks_desc, listOf(Choice("once", R.id.otzr_marks_once), Choice("repeat", R.id.otzr_marks_repeat)), enabled = false),
-        ),
-        R.id.otzr_group_paging to listOf(
+        ), subgroups = listOf(Group("paging", R.id.otzr_group_paging, listOf(
             Setting("scroll", R.id.otzr_scroll_label, R.id.otzr_scroll_desc, listOf(Choice("vertical", R.id.otzr_scroll_vertical), Choice("horizontal", R.id.otzr_scroll_horizontal))),
             Setting("handle", R.id.otzr_handle_label, R.id.otzr_handle_desc, emptyList(), kind = Kind.HANDLE),
-        ),
+        )))),
+        Group("display", R.id.otzr_group_display, displayRows()),
+        Group("app", R.id.otzr_group_app, appRows()),
+    )
+
+    /** Every row, for finding one by its key. */
+    private fun definitions(): List<Pair<Int, List<Setting>>> = groups().flatMap { g -> listOf(g.title to g.settings) + g.subgroups.map { it.title to it.settings } }
+
+    private fun displayRows() = plainGroups()[0].second
+    private fun appRows() = plainGroups()[1].second
+
+    private fun plainGroups() = listOf(
         R.id.otzr_group_display to listOf(
             Setting("awake", R.id.otzr_awake_label, R.id.otzr_awake_desc, listOf(Choice("more", R.id.otzr_awake_more), Choice("always", R.id.otzr_awake_always), Choice("system", R.id.otzr_awake_system))),
             Setting("frame", R.id.otzr_frame_label, R.id.otzr_frame_desc, listOf(Choice(FramePolicy.AUTO, R.id.otzr_frame_auto), Choice(FramePolicy.TAP, R.id.otzr_frame_tap), Choice(FramePolicy.ALWAYS, R.id.otzr_frame_always)), kind = Kind.FRAME),
@@ -130,7 +153,7 @@ class SettingsActivity : AppCompatActivity() {
             "scroll" -> settings.scroll = value
             "resume" -> settings.resume = value
             "awake" -> settings.awake = AwakeMode.valueOf(value.uppercase())
-            "rotation" -> settings.lockedOrientation = if (value == "phone") Settings.UNLOCKED else currentOrientation()
+            "rotation" -> settings.lockedOrientation = if (value == "phone") Settings.UNLOCKED else ScreenOrientation.current(this)
             "theme" -> {
                 settings.night = value == "night"
                 ReaderApp.applyTheme(settings)
@@ -150,44 +173,38 @@ class SettingsActivity : AppCompatActivity() {
         if (key == "frame") definitions().flatMap { it.second }.firstOrNull { it.key == "frame" }?.let { showChoices(it) }
     }
 
-    @Suppress("DEPRECATION")
-    private fun currentOrientation(): Int {
-        val rotation = if (Build.VERSION.SDK_INT >= 30) display?.rotation ?: Surface.ROTATION_0 else windowManager.defaultDisplay.rotation
-        val reverse = rotation == Surface.ROTATION_180 || rotation == Surface.ROTATION_270
-        return if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (reverse) ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        } else if (reverse) ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    /** The menu (☰): the same as on every screen, without settings (this is it). */
+    var lastMenu: Drawer.Shown? = null
+        private set
+
+    private fun openMenu() {
+        val ui = Ui(this)
+        lastMenu = Drawer.show(this, ui, null, null,
+            top = listOf(AppMenu.night(this), AppMenu.rotationLock(this),
+                Drawer.Item(R.drawable.ic_list, getString(R.string.menu_files), "menu_files") {
+                    startActivity(android.content.Intent(this, LibraryActivity::class.java).putExtra(LibraryActivity.EXTRA_STAY, true)
+                        .addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP))
+                    finish()
+                }),
+            more = emptyList(), pinned = emptyList())
     }
+
 
     private fun render() {
         val root = column().apply { setBackgroundColor(colors.canvas); layoutDirection = if (language() == "he") View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR }
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        val header = row().apply {
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(12), 0, dp(12), 0)
-            background = rounded(colors.header, 23f, bottomOnly = true)
-        }
-        header.addView(label(copy(R.id.otzr_settings_title), 25f, Color.WHITE, true).apply { typeface = headingFont }, LinearLayout.LayoutParams(0, dp(72), 1f))
-        header.addView(icon(if (night) R.drawable.otzr_ic_sun else R.drawable.otzr_ic_moon, copy(if (night) R.id.otzr_theme_day else R.id.otzr_theme_dark), Color.WHITE) { choose("theme", if (night) "day" else "night") })
-        header.addView(icon(R.drawable.otzr_ic_back, copy(R.id.otzr_settings_back), Color.WHITE) { finish() })
+        // only ☰ on the left, as on every screen; here the menu has no "settings" (owner, 2026-10-17)
+        val (header, _) = Ui(this).menuBar(this) { openMenu() }
         root.addView(header)
         scroll = ScrollView(this).apply { isFillViewport = true; clipToPadding = false }
         val list = column().apply { setPadding(dp(14), dp(10), dp(14), dp(22)) }
-        definitions().forEach { (title, settings) ->
-            list.addView(label(copy(title), 13f, colors.accent, true).apply { setPadding(dp(9), dp(16), dp(9), dp(9)) })
-            val card = column().apply { background = rounded(colors.card, 18f, border = colors.border) }
-            settings.forEachIndexed { index, setting ->
-                if (index != 0) card.addView(View(this).apply { setBackgroundColor(colors.border) }, LinearLayout.LayoutParams(-1, dp(1)))
-                card.addView(settingRow(setting))
-            }
-            list.addView(card)
-        }
+        groups().forEach { group -> list.addView(groupView(group, nested = false)) }
         list.addView(label(copy(R.id.otzr_settings_footer), 12f, colors.muted).apply { setPadding(dp(9), dp(18), dp(9), 0) })
         scroll.addView(list)
         root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
         ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            header.setPadding(dp(12), bars.top, dp(12), 0)
+            header.setPadding(dp(12), bars.top + dp(8), dp(12), dp(10))
             root.setPadding(bars.left, 0, bars.right, bars.bottom)
             insets
         }
@@ -196,6 +213,52 @@ class SettingsActivity : AppCompatActivity() {
         WindowCompat.getInsetsController(window, root).isAppearanceLightNavigationBars = !night
         ViewCompat.requestApplyInsets(root)
         scroll.post { scroll.scrollTo(0, scrollPosition) }
+    }
+
+    /**
+     * One heading. Closed, only its bar shows; a tap opens its options right under it, another tap closes
+     * them (owner, 2026-10-18). A sub-group (flipping, inside the reading screen) opens the same way.
+     */
+    private fun groupView(group: Group, nested: Boolean): View {
+        val box = column().apply {
+            if (!nested) background = rounded(colors.card, 18f)
+            tag = "groupbox_" + group.id
+        }
+        val isOpen = group.id in open
+        val bar = row().apply {
+            tag = "group_" + group.id
+            gravity = Gravity.CENTER_VERTICAL
+            minimumHeight = dp(if (nested) 54 else 62)
+            setPadding(dp(18), dp(8), dp(14), dp(8))
+            isClickable = true; isFocusable = true
+            contentDescription = copy(group.title)
+            setOnClickListener {
+                if (!open.add(group.id)) open.remove(group.id)
+                scrollPosition = scroll.scrollY
+                render()
+            }
+        }
+        bar.addView(label(copy(group.title), if (nested) 16f else 18f, if (nested) colors.accent else colors.ink, true), LinearLayout.LayoutParams(0, -2, 1f))
+        bar.addView(ImageView(this).apply {
+            setImageResource(R.drawable.otzr_ic_chevron)
+            imageTintList = ColorStateList.valueOf(colors.muted)
+            // points to the side while closed, down while open
+            rotation = if (!isOpen) 0f else if (language() == "he") -90f else 90f
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }, LinearLayout.LayoutParams(dp(18), dp(18)))
+        box.addView(bar)
+        val content = column().apply { visibility = if (isOpen) View.VISIBLE else View.GONE }
+        group.settings.forEach { setting ->
+            content.addView(View(this).apply { setBackgroundColor(colors.border) }, LinearLayout.LayoutParams(-1, dp(1)).apply { marginStart = dp(18); marginEnd = dp(18) })
+            content.addView(settingRow(setting))
+        }
+        group.subgroups.forEach { sub ->
+            content.addView(View(this).apply { setBackgroundColor(colors.border) }, LinearLayout.LayoutParams(-1, dp(1)).apply { marginStart = dp(18); marginEnd = dp(18) })
+            content.addView(groupView(sub, nested = true))
+        }
+        box.addView(content)
+        if (nested) return box
+        return box.also { it.layoutParams = LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(10) } }
     }
 
     private fun settingRow(setting: Setting): View = row().apply {

@@ -41,15 +41,26 @@ class UndoStack(private val limit: Int = 200) {
     data class BookmarkChange(val before: Bookmark?, val after: Bookmark?) : Step
 
     private val marks = ArrayDeque<Step>()
+    /** Steps taken back, for "redo"; a new step clears them. */
+    private val undone = ArrayDeque<Step>()
     val isEmpty get() = marks.isEmpty()
+    val canRedo get() = undone.isNotEmpty()
 
     fun push(step: Step) {
         marks.addLast(step)
         while (marks.size > limit) marks.removeFirst()
+        undone.clear()
     }
 
-    fun pop(): Step? = marks.removeLastOrNull()
+    /** Takes the last step back; it can then be redone. */
+    fun pop(): Step? = marks.removeLastOrNull()?.also { undone.addLast(it) }
+
+    /** Gives back the last step taken back (to apply again); it can then be undone again. */
+    fun redo(): Step? = undone.removeLastOrNull()?.also { marks.addLast(it) }
 
     /** Takes back a step that turned out not to happen (the engine could not apply it). */
     fun remove(step: Step) { marks.lastIndexOf(step).takeIf { it >= 0 }?.let { marks.removeAt(it) } }
+
+    /** A new document on the same screen: nothing to undo or redo from the old one. */
+    fun clear() { marks.clear(); undone.clear() }
 }

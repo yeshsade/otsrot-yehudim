@@ -83,6 +83,37 @@ class Ui(private val context: Context) {
         return header to titles
     }
 
+    /**
+     * The top bar as the owner set it on 2026-10-17: nothing in it but ☰ on the left ("I don't want anything
+     * in the header, only a hamburger on the left"). Returns (header, extras): [extras] is the right side, for
+     * the few buttons that must stay outside the menu (undo and redo on the reading screen).
+     */
+    fun menuBar(context: Context, openMenu: () -> Unit): Pair<LinearLayout, LinearLayout> {
+        val header = row().apply {
+            // ☰ is on the physical left in Hebrew and English alike
+            layoutDirection = View.LAYOUT_DIRECTION_LTR
+            setPadding(dp(12), 0, dp(12), dp(10))
+            background = rounded(colors.header, 22f, bottomOnly = true)
+            minimumHeight = dp(64)
+        }
+        header.addView(Drawer.button(context, this, openMenu), LinearLayout.LayoutParams(dp(48), dp(48)))
+        header.addView(View(context), LinearLayout.LayoutParams(0, 1, 1f))
+        val extras = row().apply { layoutDirection = View.LAYOUT_DIRECTION_LOCALE }
+        header.addView(extras, LinearLayout.LayoutParams(-2, -2))
+        return header to extras
+    }
+
+    /** A quiet button for the top bar: no box around it, dimmed while it can't be used. */
+    fun quietButton(icon: Int, description: String, action: () -> Unit) = ImageButton(context).apply {
+        setImageResource(icon)
+        imageTintList = ColorStateList.valueOf(Color.WHITE)
+        contentDescription = description
+        background = android.graphics.drawable.RippleDrawable(ColorStateList.valueOf(c("#33FFFFFF")), null, rounded(Color.WHITE, 20f))
+        setPadding(dp(10), dp(10), dp(10), dp(10))
+        layoutParams = LinearLayout.LayoutParams(dp(44), dp(44)).apply { marginStart = dp(2) }
+        setOnClickListener { action() }
+    }
+
     /** Edge-to-edge with the header painted under the status bar. */
     fun install(activity: Activity, root: LinearLayout, header: View) {
         WindowCompat.setDecorFitsSystemWindows(activity.window, false)

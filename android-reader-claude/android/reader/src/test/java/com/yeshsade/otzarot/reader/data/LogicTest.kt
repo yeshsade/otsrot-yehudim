@@ -190,6 +190,20 @@ class LogicTest {
     }
 
     // ----- identity -----
+    @Test fun undoThenRedoGivesTheStepBackAndANewStepClearsRedo() {
+        val u = UndoStack()
+        val a = UndoStack.Mark(0, 1, false); val b = UndoStack.Mark(0, 2, false)
+        u.push(a); u.push(b)
+        assertEquals(b, u.pop())
+        assertTrue(u.canRedo)
+        assertEquals(b, u.redo())
+        assertFalse(u.canRedo)
+        assertEquals(b, u.pop())
+        u.push(UndoStack.Mark(1, 1, true))
+        assertFalse(u.canRedo)
+        assertNull(u.redo())
+    }
+
     @Test fun copyingAndIdentifyingTogetherGivesTheSameIdentityAndBytes() {
         val bytes = ByteArray(200_000) { (it * 31 % 251).toByte() }
         val out = java.io.ByteArrayOutputStream()

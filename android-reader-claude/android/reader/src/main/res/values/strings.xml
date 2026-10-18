@@ -89,4 +89,24 @@
     <string name="bm_hint_list">לחיצה ארוכה על סמל הסימנייה למטה בסרגל מציגה את כל הסימניות.</string>
     <string name="bm_hint_never">לא להציג עוד פעם</string>
     <string name="action_ok">אישור</string>
+    <!-- The menu (☰), owner's arrangement 2026-10-17 (the drawer board). Item names are the owner's. -->
+    <string name="menu_open">תפריט</string>
+    <string name="menu_more">עוד</string>
+    <string name="menu_rotation_lock">נעילת סיבוב המסך</string>
+    <string name="menu_files">רשימת הקבצים</string>
+    <string name="menu_goto">מעבר לעמוד…</string>
+    <string name="menu_bookmarks">כל הסימניות</string>
+    <string name="menu_info">פרטי הקובץ</string>
+    <string name="reader_redo">חזרה על הפעולה שבוטלה</string>
+    <!-- 📝 proposed, waiting for the owner's approval -->
+    <string name="goto_title">מעבר לעמוד</string>
+    <string name="goto_hint">מספר עמוד, 1 עד %1$d</string>
+    <string name="goto_go">מעבר</string>
+    <string name="info_title">פרטי הקובץ</string>
+    <string name="info_name">שם: %1$s</string>
+    <string name="info_pages">עמודים: %1$d</string>
+    <string name="info_size">גודל: %1$s</string>
+    <string name="info_place">נמצא ב: %1$s</string>
+    <string name="info_received">התקבל: %1$s</string>
+    <string name="info_place_copy">עותק של האפליקציה (המקור לא משתנה)</string>
 </resources>

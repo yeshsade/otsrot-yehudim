@@ -84,4 +84,22 @@
     <string name="bm_hint_list">Long-press the bookmark icon in the bar below to see all bookmarks.</string>
     <string name="bm_hint_never">Don’t show again</string>
     <string name="action_ok">OK</string>
+    <string name="menu_open">Menu</string>
+    <string name="menu_more">More</string>
+    <string name="menu_rotation_lock">Lock screen rotation</string>
+    <string name="menu_files">File list</string>
+    <string name="menu_goto">Go to page…</string>
+    <string name="menu_bookmarks">All bookmarks</string>
+    <string name="menu_info">File details</string>
+    <string name="reader_redo">Redo</string>
+    <string name="goto_title">Go to page</string>
+    <string name="goto_hint">Page number, 1 to %1$d</string>
+    <string name="goto_go">Go</string>
+    <string name="info_title">File details</string>
+    <string name="info_name">Name: %1$s</string>
+    <string name="info_pages">Pages: %1$d</string>
+    <string name="info_size">Size: %1$s</string>
+    <string name="info_place">Location: %1$s</string>
+    <string name="info_received">Received: %1$s</string>
+    <string name="info_place_copy">The app\'s own copy (the original is not changed)</string>
 </resources>
