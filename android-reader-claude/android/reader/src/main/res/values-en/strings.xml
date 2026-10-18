@@ -102,4 +102,8 @@
     <string name="info_place">Location: %1$s</string>
     <string name="info_received">Received: %1$s</string>
     <string name="info_place_copy">The app\'s own copy (the original is not changed)</string>
+    <string name="search_open">Search</string>
+    <string name="search_close">Close search</string>
+    <string name="search_hint">Search by name</string>
+    <string name="search_none">No file with this name</string>
 </resources>

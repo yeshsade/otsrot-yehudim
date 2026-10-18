@@ -180,7 +180,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun openMenu() {
         val ui = Ui(this)
         lastMenu = Drawer.show(this, ui, null, null,
-            top = listOf(AppMenu.night(this), AppMenu.rotationLock(this),
+            top = listOf(AppMenu.rotationLock(this),
                 Drawer.Item(R.drawable.ic_list, getString(R.string.menu_files), "menu_files") {
                     startActivity(android.content.Intent(this, LibraryActivity::class.java).putExtra(LibraryActivity.EXTRA_STAY, true)
                         .addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP))
@@ -193,8 +193,9 @@ class SettingsActivity : AppCompatActivity() {
     private fun render() {
         val root = column().apply { setBackgroundColor(colors.canvas); layoutDirection = if (language() == "he") View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR }
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        // only ☰ on the left, as on every screen; here the menu has no "settings" (owner, 2026-10-17)
-        val (header, _) = Ui(this).menuBar(this) { openMenu() }
+        // ☰ and day/night on the left, as on every screen; here the menu has no "settings" (owner, 2026-10-17/18)
+        val (header, left, _) = Ui(this).menuBar(this) { openMenu() }
+        left.addView(Ui(this).nightButton(this))
         root.addView(header)
         scroll = ScrollView(this).apply { isFillViewport = true; clipToPadding = false }
         val list = column().apply { setPadding(dp(14), dp(10), dp(14), dp(22)) }

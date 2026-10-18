@@ -15,6 +15,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.ViewCompat
+import com.yeshsade.otzarot.reader.R
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 
@@ -84,35 +85,48 @@ class Ui(private val context: Context) {
     }
 
     /**
-     * The top bar as the owner set it on 2026-10-17: nothing in it but ☰ on the left ("I don't want anything
-     * in the header, only a hamburger on the left"). Returns (header, extras): [extras] is the right side, for
-     * the few buttons that must stay outside the menu (undo and redo on the reading screen).
+     * The top bar (owner, 2026-10-17/18): on the left ☰, and next to it the search and day/night buttons;
+     * on the right, undo and redo on the reading screen. Everything quiet — "but delicate": thin white icons
+     * with no box around them. Returns (header, left, right): [left] already holds ☰.
      */
-    fun menuBar(context: Context, openMenu: () -> Unit): Pair<LinearLayout, LinearLayout> {
+    fun menuBar(context: Context, openMenu: () -> Unit): Triple<LinearLayout, LinearLayout, LinearLayout> {
         val header = row().apply {
             // ☰ is on the physical left in Hebrew and English alike
             layoutDirection = View.LAYOUT_DIRECTION_LTR
-            setPadding(dp(12), 0, dp(12), dp(10))
+            setPadding(dp(8), 0, dp(8), dp(8))
             background = rounded(colors.header, 22f, bottomOnly = true)
-            minimumHeight = dp(64)
+            minimumHeight = dp(60)
         }
-        header.addView(Drawer.button(context, this, openMenu), LinearLayout.LayoutParams(dp(48), dp(48)))
+        val left = row().apply { layoutDirection = View.LAYOUT_DIRECTION_LTR }
+        left.addView(quietButton(R.drawable.ic_menu, context.getString(R.string.menu_open), openMenu).apply { tag = "menu_button" })
+        header.addView(left, LinearLayout.LayoutParams(-2, -2))
         header.addView(View(context), LinearLayout.LayoutParams(0, 1, 1f))
-        val extras = row().apply { layoutDirection = View.LAYOUT_DIRECTION_LOCALE }
-        header.addView(extras, LinearLayout.LayoutParams(-2, -2))
-        return header to extras
+        val right = row().apply { layoutDirection = View.LAYOUT_DIRECTION_LOCALE }
+        header.addView(right, LinearLayout.LayoutParams(-2, -2))
+        return Triple(header, left, right)
     }
 
-    /** A quiet button for the top bar: no box around it, dimmed while it can't be used. */
+    /** A quiet button for the top bar: a thin white icon, no box around it, dimmed while it can't be used. */
     fun quietButton(icon: Int, description: String, action: () -> Unit) = ImageButton(context).apply {
         setImageResource(icon)
-        imageTintList = ColorStateList.valueOf(Color.WHITE)
+        imageTintList = ColorStateList.valueOf(c("#EEFFFFFF"))
         contentDescription = description
-        background = android.graphics.drawable.RippleDrawable(ColorStateList.valueOf(c("#33FFFFFF")), null, rounded(Color.WHITE, 20f))
-        setPadding(dp(10), dp(10), dp(10), dp(10))
-        layoutParams = LinearLayout.LayoutParams(dp(44), dp(44)).apply { marginStart = dp(2) }
+        background = android.graphics.drawable.RippleDrawable(ColorStateList.valueOf(c("#26FFFFFF")), null, rounded(Color.WHITE, 22f))
+        setPadding(dp(11), dp(11), dp(11), dp(11))
+        layoutParams = LinearLayout.LayoutParams(dp(44), dp(44)).apply { marginStart = dp(2); marginEnd = dp(2) }
         setOnClickListener { action() }
     }
+
+    /** Day/night for the top bar. */
+    fun nightButton(context: Context, before: () -> Unit = {}) = quietButton(
+        if (night) R.drawable.otzr_ic_sun else R.drawable.otzr_ic_moon,
+        context.getString(if (night) R.string.library_day else R.string.library_night),
+    ) {
+        before()
+        val settings = (context.applicationContext as com.yeshsade.otzarot.reader.ReaderApp).settings
+        settings.night = !settings.night
+        com.yeshsade.otzarot.reader.ReaderApp.applyTheme(settings)
+    }.apply { tag = "night_button" }
 
     /** Edge-to-edge with the header painted under the status bar. */
     fun install(activity: Activity, root: LinearLayout, header: View) {

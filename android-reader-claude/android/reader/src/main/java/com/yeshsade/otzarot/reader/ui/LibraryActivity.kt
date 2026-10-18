@@ -78,9 +78,16 @@ class LibraryActivity : AppCompatActivity() {
 
     private fun buildScreen() {
         val root = ui.column().apply { setBackgroundColor(ui.colors.canvas) }
-        // only ☰ on the left (owner, 2026-10-17); night mode and settings are in the menu
-        val (header, _) = ui.menuBar(this) { openMenu() }
-        root.addView(header)
+        // on the left ☰, search and day/night (owner, 2026-10-18) — quiet, "but delicate"
+        val (header, left, _) = ui.menuBar(this) { openMenu() }
+        left.addView(ui.quietButton(R.drawable.ic_search, getString(R.string.search_open)) { startSearch() }.apply { tag = "search_button" })
+        left.addView(ui.nightButton(this))
+        searchBar = buildSearchBar(header)
+        root.addView(android.widget.FrameLayout(this).apply {
+            addView(header, android.widget.FrameLayout.LayoutParams(-1, -2))
+            addView(searchBar, android.widget.FrameLayout.LayoutParams(-1, -1))
+        })
+        topBar = header
 
         sortLabel = ui.label("", 13f, ui.colors.accent, true).apply {
             setPadding(ui.dp(20), ui.dp(12), ui.dp(20), ui.dp(6))
@@ -128,6 +135,14 @@ class LibraryActivity : AppCompatActivity() {
         open.addView(ui.label(getString(R.string.library_open_pdf), 17f, ui.colors.buttonInk, true))
         root.addView(open, LinearLayout.LayoutParams(-1, -2).apply { setMargins(ui.dp(16), ui.dp(4), ui.dp(16), ui.dp(14)) })
         ui.install(this, root, header)
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (searching) { endSearch(); return }
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+                isEnabled = true
+            }
+        })
     }
 
     /** The open menu (for tests). */
@@ -136,18 +151,82 @@ class LibraryActivity : AppCompatActivity() {
 
     private fun openMenu() {
         lastMenu = Drawer.show(this, ui, null, null,
-            top = listOf(AppMenu.night(this), AppMenu.rotationLock(this)),
+            top = listOf(AppMenu.rotationLock(this)),
             more = emptyList(), pinned = listOf(AppMenu.settings(this)))
     }
 
     /** The day the list was last drawn: after midnight "today"/"yesterday" labels must be redrawn. */
     private var shownDay: java.time.LocalDate? = null
 
+    // ---------- search by name (owner: "search a file by name"; the magnifier in the top bar) ----------
+
+    private lateinit var topBar: LinearLayout
+    private lateinit var searchBar: LinearLayout
+    private lateinit var searchField: android.widget.EditText
+    /** What the reader typed; empty = the whole list. */
+    private var query = ""
+
+    /** The search field takes the top bar's place while searching; ✕ (or back) ends the search. */
+    private fun buildSearchBar(header: LinearLayout): LinearLayout {
+        val bar = ui.row().apply {
+            visibility = View.GONE
+            gravity = Gravity.CENTER_VERTICAL
+            background = ui.rounded(ui.colors.header, 22f, bottomOnly = true)
+            tag = "search_bar"
+        }
+        searchField = android.widget.EditText(this).apply {
+            hint = getString(R.string.search_hint)
+            setTextColor(android.graphics.Color.WHITE)
+            setHintTextColor(Ui.c("#B8B0DD"))
+            textSize = 17f
+            typeface = ui.font
+            isSingleLine = true
+            background = ui.rounded(Ui.c("#24FFFFFF"), 14f)
+            setPadding(ui.dp(14), ui.dp(9), ui.dp(14), ui.dp(9))
+            imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
+            textDirection = View.TEXT_DIRECTION_LOCALE
+            tag = "search_field"
+            addTextChangedListener(object : android.text.TextWatcher {
+                override fun beforeTextChanged(t: CharSequence?, a: Int, b: Int, c: Int) = Unit
+                override fun onTextChanged(t: CharSequence?, a: Int, b: Int, c: Int) = Unit
+                override fun afterTextChanged(t: android.text.Editable?) { query = t?.toString()?.trim() ?: ""; refresh() }
+            })
+        }
+        bar.addView(searchField, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = ui.dp(12) })
+        bar.addView(ui.quietButton(R.drawable.otzr_ic_close, getString(R.string.search_close)) { endSearch() }.apply { tag = "search_close" })
+        // the bar sits exactly where the top bar is, below the phone's status bar
+        header.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            bar.setPadding(ui.dp(4), header.paddingTop, ui.dp(8), header.paddingBottom)
+        }
+        return bar
+    }
+
+    private fun startSearch() {
+        searchBar.visibility = View.VISIBLE
+        topBar.visibility = View.INVISIBLE
+        searchField.requestFocus()
+        (getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
+            .showSoftInput(searchField, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun endSearch() {
+        searchField.setText("")
+        (getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
+            .hideSoftInputFromWindow(searchField.windowToken, 0)
+        searchBar.visibility = View.GONE
+        topBar.visibility = View.VISIBLE
+    }
+
+    /** True while the search field is open (back closes it first). */
+    val searching get() = ::searchBar.isInitialized && searchBar.visibility == View.VISIBLE
+
     private fun refresh() {
         val order = app.settings.sortOrder
-        val docs = order.apply(app.library.all(), java.text.Collator.getInstance())
+        val all = order.apply(app.library.all(), java.text.Collator.getInstance())
+        val docs = if (query.isEmpty()) all else all.filter { com.yeshsade.otzarot.reader.data.NameSearch.matches(it.name, query) }
         sortLabel.text = getString(R.string.library_sort_prefix) + " " + SortTexts.short(this, order) + "  ▾"
         empty.visibility = if (docs.isEmpty()) View.VISIBLE else View.GONE
+        empty.text = getString(if (query.isNotEmpty() && all.isNotEmpty()) R.string.search_none else R.string.library_empty)
         val today = java.time.LocalDate.now()
         val newDay = shownDay != null && shownDay != today
         shownDay = today

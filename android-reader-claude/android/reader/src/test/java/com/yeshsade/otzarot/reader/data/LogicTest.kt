@@ -190,6 +190,15 @@ class LogicTest {
     }
 
     // ----- identity -----
+    @Test fun searchByNameForgivesCaseMarksQuotesAndSeparators() {
+        assertTrue(NameSearch.matches("נח 841 - אוצרות", "נח"))
+        assertTrue(NameSearch.matches("ליקוטי_מוהר\"ן.pdf", "ליקוטי מוהרן"))
+        assertTrue(NameSearch.matches("לִקּוּטֵי הֲלָכוֹת", "לקוטי הלכות"))
+        assertTrue(NameSearch.matches("Booklet-2", "booklet 2"))
+        assertFalse(NameSearch.matches("נח 841", "וירא"))
+        assertTrue(NameSearch.matches("anything", "  "))
+    }
+
     @Test fun undoThenRedoGivesTheStepBackAndANewStepClearsRedo() {
         val u = UndoStack()
         val a = UndoStack.Mark(0, 1, false); val b = UndoStack.Mark(0, 2, false)

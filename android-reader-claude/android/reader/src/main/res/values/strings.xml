@@ -109,4 +109,9 @@
     <string name="info_place">נמצא ב: %1$s</string>
     <string name="info_received">התקבל: %1$s</string>
     <string name="info_place_copy">עותק של האפליקציה (המקור לא משתנה)</string>
+    <string name="search_open">חיפוש</string>
+    <string name="search_close">סגירת החיפוש</string>
+    <!-- 📝 proposed, waiting for the owner's approval -->
+    <string name="search_hint">חיפוש לפי שם</string>
+    <string name="search_none">לא נמצא קובץ בשם הזה</string>
 </resources>

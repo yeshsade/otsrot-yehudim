@@ -168,9 +168,10 @@ class ReaderActivity : AppCompatActivity() {
     private fun buildScreen() {
         val settings = app.settings
         val root = ui.column().apply { setBackgroundColor(ui.colors.canvas) }
-        // Only ☰ on the left (owner, 2026-10-17). Undo and redo stay outside the menu ("but not in such a
-        // crude design"): two quiet arrows on the right, dimmed while there is nothing to undo or redo.
-        val (header, extras) = ui.menuBar(this) { openMenu() }
+        // On the left ☰ and day/night; on the right undo and redo, outside the menu (owner, 2026-10-17/18:
+        // "not in such a crude design" — "but delicate"): quiet arrows, dimmed while there is nothing to do.
+        val (header, left, extras) = ui.menuBar(this) { openMenu() }
+        left.addView(ui.nightButton(this) { saveNow() })
         this.header = header
         undoButton = ui.quietButton(R.drawable.ic_undo, getString(R.string.reader_undo)) { undoLast() }.apply { tag = "undo" }
         redoButton = ui.quietButton(R.drawable.ic_redo, getString(R.string.reader_redo)) { redoLast() }.apply { tag = "redo" }
@@ -552,7 +553,7 @@ class ReaderActivity : AppCompatActivity() {
         val info = Drawer.Item(R.drawable.ic_info, getString(R.string.menu_info), "menu_info") { fileDetails() }
         // still to come, in the owner's places: "quick marking" (top, second) and "share the file" (in More)
         lastMenu = Drawer.show(this, ui, target?.name, page,
-            top = listOfNotNull(AppMenu.night(this) { saveNow() }, AppMenu.rotationLock(this), files, goTo.takeIf { pageCount > 0 }),
+            top = listOfNotNull(AppMenu.rotationLock(this), files, goTo.takeIf { pageCount > 0 }),
             more = listOfNotNull(marks.takeIf { pageCount > 0 }, info.takeIf { target != null }),
             pinned = listOf(AppMenu.settings(this)))
         lastMenu?.dialog?.setOnDismissListener { chrome.used() }

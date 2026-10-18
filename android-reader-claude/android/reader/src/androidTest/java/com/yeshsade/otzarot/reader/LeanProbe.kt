@@ -950,7 +950,7 @@ class LeanProbe : Instrumentation() {
             onMainChecked {
                 val menu = settingsScreen.lastMenu ?: error("no menu")
                 check(menu.root.findViewWithTag<View>("menu_settings") == null) { "settings inside settings" }
-                check(menu.root.findViewWithTag<View>("menu_night") != null && menu.root.findViewWithTag<View>("menu_files") != null)
+                check(menu.root.findViewWithTag<View>("menu_rotation") != null && menu.root.findViewWithTag<View>("menu_files") != null)
                 snapshotView(menu.dialog.window!!.decorView, "menu-settings.png"); menu.dialog.dismiss()
             }
             record("The settings screen has ☰ too, without a way into settings")
@@ -983,10 +983,26 @@ class LeanProbe : Instrumentation() {
             SystemClock.sleep(800); waitForIdleSync()
             onMainChecked {
                 val menu = lib.lastMenu ?: error("no menu on the list")
-                check(menu.root.findViewWithTag<View>("menu_settings") != null && menu.root.findViewWithTag<View>("menu_night") != null)
-                snapshotView(menu.dialog.window!!.decorView, "menu-list.png"); menu.dialog.dismiss(); lib.finish()
+                check(menu.root.findViewWithTag<View>("menu_settings") != null && menu.root.findViewWithTag<View>("menu_rotation") != null)
+                check(lib.window.decorView.findViewWithTag<View>("search_button") != null && lib.window.decorView.findViewWithTag<View>("night_button") != null)
+                snapshotView(menu.dialog.window!!.decorView, "menu-list.png"); menu.dialog.dismiss()
             }
-            record("The list has only ☰ on the left; its menu holds night mode and settings")
+            record("The list's top bar: ☰, search and day/night on the left; its menu holds rotation lock and settings")
+            // search by name: the list keeps only matching names, and says so when nothing matches
+            onMainChecked { lib.window.decorView.findViewWithTag<View>("search_button").performClick() }
+            SystemClock.sleep(500); waitForIdleSync()
+            onMainChecked { lib.window.decorView.findViewWithTag<android.widget.EditText>("search_field").setText("zz-nothing-zz") }
+            SystemClock.sleep(600); waitForIdleSync()
+            onMainChecked {
+                val list = lib.window.decorView.findViewWithTag<androidx.recyclerview.widget.RecyclerView>("doc_list")
+                check((list.adapter?.itemCount ?: -1) == 0) { "search did not filter" }
+                snapshot(lib, "search-none.png")
+                lib.window.decorView.findViewWithTag<View>("search_close").performClick()
+            }
+            SystemClock.sleep(600); waitForIdleSync()
+            onMainChecked { check(lib.window.decorView.findViewWithTag<View>("search_bar").visibility != View.VISIBLE) { "search did not close" } }
+            record("Search by name filters the list, says when nothing matches, and ✕ closes it")
+            onMainChecked { snapshot(lib, "list-top-bar.png"); lib.finish() }
 
             // the reading screen's menu, in the owner's order, with "More"; go to page; file details; undo and redo
             app.settings.whatsAppPromptDismissed = true
@@ -997,7 +1013,7 @@ class LeanProbe : Instrumentation() {
             onMainChecked {
                 val menu = reader.lastMenu ?: error("no menu in the reader")
                 val r = menu.root
-                for (t in listOf("menu_night", "menu_rotation", "menu_files", "menu_goto", "menu_settings")) check(r.findViewWithTag<View>(t)?.isShown == true) { "$t not shown" }
+                for (t in listOf("menu_rotation", "menu_files", "menu_goto", "menu_settings")) check(r.findViewWithTag<View>(t)?.isShown == true) { "$t not shown" }
                 check(r.findViewWithTag<View>("menu_bookmarks")?.isShown != true) { "bookmarks should be under More" }
                 snapshotView(menu.dialog.window!!.decorView, "menu-reader.png")
                 r.findViewWithTag<View>("drawer_more").performClick()
