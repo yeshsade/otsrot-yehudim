@@ -911,6 +911,8 @@ class LeanProbe : Instrumentation() {
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; true }.getOrDefault(false) }
             app.settings.language = "he" // the settings screen takes its wording language from here
+            onMainChecked { androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags("he")) }
+            app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP // screenshots of the reader with its top bar
             val settingsScreen = startActivitySync(Intent(targetContext, SettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as SettingsActivity
             SystemClock.sleep(1500); waitForIdleSync()
             fun tagged(t: String) = settingsScreen.window.decorView.findViewWithTag<View>(t)
@@ -954,6 +956,7 @@ class LeanProbe : Instrumentation() {
                 snapshotView(menu.dialog.window!!.decorView, "menu-settings.png"); menu.dialog.dismiss()
             }
             record("The settings screen has ☰ too, without a way into settings")
+            SystemClock.sleep(1200); waitForIdleSync()
             for (key in listOf("frame", "handle")) {
                 onMainChecked { settingsScreen.window.decorView.findViewWithTag<View>("setting_$key").performClick() }
                 SystemClock.sleep(1200); waitForIdleSync()
