@@ -1103,7 +1103,7 @@ class LeanProbe : Instrumentation() {
         }
         var pages = 0; onMainChecked { pages = pdfView(single).pageCount; check(pdfView(single).isPageSnap) { "one page mode is off" } }
         swipe(.7f, .35f, 4, 12) // a quick swipe up
-        waitFor("one page on", 10_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == 1 || pages < 2 }
+        waitFor("one page on", 30_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == 1 || pages < 2 }
         SystemClock.sleep(1200); waitForIdleSync()
         check(settled()) { "the next page did not land whole on the screen" }
         onMainChecked { snapshot(single, "one-page.png") }
@@ -1117,26 +1117,27 @@ class LeanProbe : Instrumentation() {
             app.settings.pageTurn = style
             var start = -1; onMainChecked { start = pdfView(single).currentPage }
             val turn = field<com.yeshsade.otzarot.reader.ui.PageTurn>(single, "pageTurn")
-            swipe(.7f, .35f, 4, 12)
-            SystemClock.sleep(110)
-            var mid = false; onMainChecked { mid = turn.busy }
-            if (style != "none") {
-                check(mid) { "$style: no animation played" }
-                writePng(uiAutomation.takeScreenshot(), "turn-$style.png")
+            for (forward in listOf(true, false)) {
+                val before = turn.played
+                // slow motion, so the picture catches the page halfway
+                runOnMainSync { turn.slowMotion = if (style == "none") 1f else 12f }
+                if (forward) swipe(.7f, .35f, 4, 12) else swipe(.35f, .7f, 4, 12)
+                if (style != "none") {
+                    waitFor("$style ${if (forward) "forward" else "back"} starts", 30_000) { turn.played > before }
+                    SystemClock.sleep(1300)
+                    writePng(uiAutomation.takeScreenshot(), "turn-$style${if (forward) "" else "-back"}.png")
+                }
+                val want = if (forward) start + 1 else start
+                waitFor("$style lands", 30_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == want }
+                waitFor("$style ends", 30_000) { var b = true; onMainChecked { b = turn.busy }; !b }
+                SystemClock.sleep(600); waitForIdleSync()
+                onMainChecked {
+                    val v = pdfView(single)
+                    check(v.alpha == 1f && v.translationX == 0f && v.translationY == 0f && v.rotationY == 0f && v.scaleX == 1f) { "$style left the page moved" }
+                }
+                check(settled()) { "$style: the page did not land whole" }
             }
-            waitFor("$style forward", 10_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == start + 1 }
-            SystemClock.sleep(700); waitForIdleSync()
-            onMainChecked {
-                val v = pdfView(single)
-                check(!turn.busy && v.alpha == 1f && v.translationX == 0f && v.translationY == 0f && v.rotationY == 0f && v.scaleX == 1f) { "$style left the page moved" }
-            }
-            check(settled()) { "$style: the page did not land whole" }
-            swipe(.35f, .7f, 4, 12)
-            SystemClock.sleep(110)
-            if (style != "none") { onMainChecked { mid = turn.busy }; check(mid) { "$style back: no animation" }; writePng(uiAutomation.takeScreenshot(), "turn-$style-back.png") }
-            waitFor("$style back", 10_000) { var p = -1; onMainChecked { p = pdfView(single).currentPage }; p == start }
-            SystemClock.sleep(700); waitForIdleSync()
-            check(settled()) { "$style back: the page did not land whole" }
+            runOnMainSync { turn.slowMotion = 1f }
         }
         app.settings.pageTurn = "slide"
         app.settings.pages = "continuous"

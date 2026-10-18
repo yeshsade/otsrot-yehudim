@@ -40,6 +40,9 @@ class PageTurn(
     private var running: ValueAnimator? = null
 
     val busy get() = running != null
+    /** How many turns were animated (for the checks), and a slow-motion factor so a check can photograph one. */
+    var played = 0; private set
+    var slowMotion = 1f
 
     init {
         val i = body.indexOfChild(pdfView)
@@ -142,8 +145,9 @@ class PageTurn(
             }
         }
         step(0f)
+        played++
         running = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = if (style == "book") 380 else 280
+            duration = ((if (style == "book") 380 else 280) * slowMotion).toLong()
             interpolator = DecelerateInterpolator(1.4f)
             addUpdateListener { step(it.animatedValue as Float) }
             addListener(object : AnimatorListenerAdapter() {
