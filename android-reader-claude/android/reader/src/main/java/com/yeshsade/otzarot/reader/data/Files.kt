@@ -57,6 +57,58 @@ object Files {
         return expected.takeIf { Identity.of(context, target) == it }
     }
 
+    // ---------- a save that can't be lost half-way (review finding 5, 2026-10-19) ----------
+    //
+    // Android can only overwrite a document reached through a folder permission or the media store by emptying
+    // it first and writing it again. If the phone dies in between, the booklet is left half-written. So the new
+    // version is first kept, complete and synced, in the app's own storage ("pending"), and only then written
+    // over the document; after the write is verified the pending copy is let go. If the write never finished,
+    // the next opening of the booklet finds the pending copy and finishes the job.
+
+    /** Where a save of [docId] waits until it is safely in the document. */
+    fun pendingFile(context: Context, docId: String): File =
+        File(File(context.filesDir, "pending").apply { mkdirs() }, "$docId.pdf")
+
+    /** Moves [from] to [to] (same storage: a rename) and makes sure it is on the disk. */
+    fun keep(from: File, to: File): Boolean = runCatching {
+        to.delete()
+        if (!from.renameTo(to)) { from.copyTo(to, overwrite = true); from.delete() }
+        java.io.RandomAccessFile(to, "rw").use { it.fd.sync() }
+        true
+    }.getOrDefault(false)
+
+    /**
+     * Finishes a save that was cut off. [lastSaved] is the identity of the document's last completed save.
+     * Returns the identity now in the document when it wrote the pending copy, null when there was nothing
+     * to do. The pending copy is written only when the document is broken or still holds [lastSaved] (the
+     * marks never reached it); a document someone else has changed since is left alone.
+     */
+    fun finishPending(context: Context, target: Uri, docId: String, lastSaved: String): String? {
+        val pending = pendingFile(context, docId)
+        if (!pending.isFile) return null
+        val now = Identity.of(context, target)
+        val wanted = Identity.of(pending)
+        val restore = wanted != null && now != wanted && (now == null || now == lastSaved || !looksWhole(context, target))
+        if (!restore) { pending.delete(); return null }
+        val written = writeVerified(context, target, pending) ?: return null
+        pending.delete()
+        return written
+    }
+
+    /** A complete PDF starts with %PDF and ends with %%EOF; a write that was cut off does not. */
+    private fun looksWhole(context: Context, uri: Uri): Boolean = runCatching {
+        context.contentResolver.openFileDescriptor(uri, "r")!!.use { pfd ->
+            val size = pfd.statSize
+            if (size < 16) return@use false
+            java.io.FileInputStream(pfd.fileDescriptor).channel.use { ch ->
+                val head = java.nio.ByteBuffer.allocate(5); ch.read(head, 0)
+                val tailLength = minOf(1024L, size).toInt()
+                val tail = java.nio.ByteBuffer.allocate(tailLength); ch.read(tail, size - tailLength)
+                String(head.array(), Charsets.ISO_8859_1) == "%PDF-" && String(tail.array(), Charsets.ISO_8859_1).contains("%%EOF")
+            }
+        }
+    }.getOrDefault(false)
+
     /** The single working copy for a read-only original. Visible to the user in Documents/[COPY_FOLDER]. */
     fun createWorkingCopy(context: Context, source: Uri, name: String): Uri? {
         val fileName = sanitize(name)

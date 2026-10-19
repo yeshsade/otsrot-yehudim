@@ -387,6 +387,13 @@ class ReaderActivity : AppCompatActivity() {
         // On the saves' thread: a save of this document still running from a moment ago finishes first (so the
         // copy has its marks), but opening never waits behind scans of the device.
         app.saves.execute {
+            // a save that was cut off last time (the phone died in the middle) is finished first
+            runCatching {
+                val last = (app.library.get(target.id) ?: target).identity
+                Files.finishPending(this, Uri.parse(target.uri), target.id, last)?.let { done ->
+                    app.library.update(target.id) { it.copy(identity = done) }
+                }
+            }
             val file = snapshotFile(target)
             val ok = runCatching { prepareSnapshot(target, Uri.parse(target.uri), file); true }.getOrDefault(false)
             main.post {
@@ -732,9 +739,18 @@ class ReaderActivity : AppCompatActivity() {
 
     /** Runs on the io thread. Writes the capture into the document's real file and verifies it. */
     private fun write(target: Doc, file: File): Boolean {
+        val uri = Uri.parse(target.uri)
+        // A document Android can only overwrite by emptying it first: the new version waits, complete, in the
+        // app's own storage until it is safely in the document (a cut-off write is finished at the next opening).
+        var data = file
+        if (uri.scheme != "file") {
+            val pending = Files.pendingFile(this, target.id)
+            if (!Files.keep(file, pending)) { file.delete(); return false }
+            data = pending
+        }
         var kept = false
+        var written: String? = null
         try {
-            val uri = Uri.parse(target.uri)
             // A file found on the device: remember what the original was before the first marks change it,
             // so the same original arriving again (e.g. from WhatsApp) opens this entry.
             val current = app.library.get(target.id) ?: target
@@ -743,13 +759,14 @@ class ReaderActivity : AppCompatActivity() {
                     app.library.update(target.id) { it.copy(originIdentity = origin, identity = it.identity.ifEmpty { origin }) }
                 }
             }
-            val size = file.length()
-            val written = Files.writeVerified(this, uri, file) ?: return false
+            val size = data.length()
+            written = Files.writeVerified(this, uri, data) ?: return false
             app.library.update(target.id) { it.copy(identity = written, size = size) }
-            kept = runCatching { adoptAsSnapshot(target, uri, file, written) }.getOrDefault(false)
+            kept = runCatching { adoptAsSnapshot(target, uri, data, written) }.getOrDefault(false)
             return true
         } finally {
-            if (!kept) file.delete()
+            // a pending copy stays only while its write has not been verified
+            if (!kept && (written != null || data === file)) data.delete()
         }
     }
 

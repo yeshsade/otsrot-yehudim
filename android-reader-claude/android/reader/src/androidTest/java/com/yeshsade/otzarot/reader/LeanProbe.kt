@@ -57,6 +57,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "onepage") { onePageOnly(); return }
         if (mode == "zoom") { zoomChecks(); return }
         if (mode == "twice") { twoScreens(); return }
+        if (mode == "pending") { cutOffSave(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -1272,6 +1273,49 @@ class LeanProbe : Instrumentation() {
             onMainChecked { second.finish() }
             waitFor("both marks saved", 90_000) { checkedIn(doc.uri) == before + 2 }
             record("Marks from both screens are in the file; nothing was written over")
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /**
+     * A save cut off in the middle (the phone died after the document was emptied): the next opening finishes
+     * it from the copy kept in the app's storage, and a normal save leaves no such copy behind (-e mode pending).
+     */
+    private fun cutOffSave() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            app.settings.whatsAppPromptDismissed = true
+            val reader = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
+            waitLoaded(reader)
+            val doc = app.library.all().single()
+            check(Uri.parse(doc.uri).scheme == "content") { "the working copy is not a content:// document: ${doc.uri}" }
+            val before = countChecked(reader)
+            tapUnchecked(reader, null)
+            waitFor("mark saved", 90_000) { checkedIn(doc.uri) == before + 1 }
+            val pending = com.yeshsade.otzarot.reader.data.Files.pendingFile(targetContext, doc.id)
+            SystemClock.sleep(500)
+            check(!pending.exists()) { "a finished save left its pending copy behind" }
+            record("A normal save writes the document and lets its safety copy go")
+            onMainChecked { reader.finish() }
+            SystemClock.sleep(3000); waitForIdleSync()
+            // the phone "dies" in the middle of the next save: the new version is kept, the document half-written
+            val whole = targetContext.contentResolver.openInputStream(Uri.parse(doc.uri))!!.use { it.readBytes() }
+            pending.writeBytes(whole)
+            targetContext.contentResolver.openOutputStream(Uri.parse(doc.uri), "wt")!!.use { it.write(whole, 0, whole.size / 2) }
+            check(runCatching { checkedIn(doc.uri) }.isFailure || checkedIn(doc.uri) != before + 1) { "the document was not broken by the test" }
+            val again = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
+            waitLoaded(again)
+            check(app.library.all().single().id == doc.id)
+            check(checkedIn(doc.uri) == before + 1) { "the cut-off save was not finished" }
+            check(!pending.exists()) { "the pending copy stayed after it was written" }
+            check(countChecked(again) == before + 1) { "the screen does not show the restored mark" }
+            record("A save cut off half-way is finished at the next opening; the booklet and its mark are whole")
+            onMainChecked { again.finish() }
             result.putString("stream", "Passed $passed checks.\n")
             finish(Activity.RESULT_OK, result)
         } catch (error: Throwable) {
