@@ -1,0 +1,33 @@
+{
+  "source_sha256": "896db8b7cc07a749744d9ec7627a84b58399ca3f35537f78ecd7016a26f246b3",
+  "booklet": {
+    "issue": "845",
+    "parsha": "תולדות",
+    "week_start": "2026-11-08",
+    "date_label": "כ״ח חשון – ד׳ כסלו תשפ״ז"
+  },
+  "previous_week": {
+    "mishnah_berurah": 67,
+    "likutey_moharan": 99,
+    "likutey_halakhot": 152,
+    "gemara": 151
+  },
+  "tehillim": {
+    "boundaries_reviewed": true,
+    "exclude_after_psalms": [
+      {
+        "page": 92,
+        "column": 1,
+        "end_y_pt": 57.61
+      }
+    ],
+    "review_provenance": "Source renders and independent visual review; Psalm150:6 ends in the first line of source92."
+  },
+  "owner_answers_provenance": {
+    "mishnah_berurah": "Confirmed in this chat: source67",
+    "likutey_moharan": "Confirmed in this chat: source99",
+    "likutey_halakhot": "Confirmed in this chat: source152",
+    "gemara": "Confirmed from source151 image in this chat"
+  },
+  "cover_sha256": "ad39325c7454d96f98dd0601a707953162dce3a539e52dcb0c98717ad1404d9e"
+}

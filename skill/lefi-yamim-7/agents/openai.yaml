@@ -1,0 +1,4 @@
+interface:
+  display_name: "לפי ימים 7"
+  short_description: "הפקת חוברת ממקורות נקיים עם תיבות מדודות ומפה נסתרת"
+  default_prompt: "השתמש ב-$lefi-yamim-7 ובתשובות שכבר אישרתי להכנת המהדורה שביקשתי."
