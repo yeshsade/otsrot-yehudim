@@ -76,6 +76,21 @@ def main(path):
         pages = sorted({p for p, _ in touching})
         problems.append(f"{len(touching)} תיבות נוגעות בטקסט, בקישור או בתיבה אחרת. עמודים: {', '.join(map(str, pages))}")
 
+    # navigation buttons (not "back to contents") whose label sits on the page's own text: a warning, the owner decides
+    targets = Counter(l.get("page") for page in doc for l in page.get_links() if l.get("kind") == fitz.LINK_GOTO)
+    toc = targets.most_common(1)[0][0] if targets else None
+    covered = []
+    for page in doc:
+        words = [fitz.Rect(t[:4]) for t in page.get_text("words")]
+        for l in page.get_links():
+            r = fitz.Rect(l["from"])
+            if l.get("kind") != fitz.LINK_GOTO or l.get("page") == toc or (r.width < 40 and r.height < 40):
+                continue
+            if any(r.intersects(t) and (r & t).get_area() > 4 for t in words):
+                covered.append(page.number + 1)
+    if covered:
+        notes.append(f"אזהרה: {len(covered)} כפתורי מעבר יושבים על טקסט של העמוד. עמודים: {', '.join(map(str, sorted(set(covered))))}")
+
     # 1. the map
     if MAP_NAME not in doc.embfile_names():
         problems.append(f"אין מפה: הקובץ {MAP_NAME} לא מצורף ל־PDF")
