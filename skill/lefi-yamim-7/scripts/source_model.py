@@ -95,13 +95,27 @@ def learning_font_from_spans(items):
 
 
 def gray_backgrounds(page):
+    import numpy as np
+
     result = []
+    pixels = None
     for drawing in page.get_drawings():
         fill = drawing.get("fill")
-        if fill and len(fill) == 3 and .65 < min(fill) < .98 and max(fill) - min(fill) < .04:
-            r = drawing["rect"] * page.rotation_matrix
-            if r.width > 30 and r.height > 20:
-                result.append(r)
+        if fill is None:
+            continue
+        r = drawing["rect"] * page.rotation_matrix
+        if r.width <= 30 or r.height <= 20 or not page.rect.contains(r):
+            continue
+        if pixels is None:
+            # Transparency groups can turn a dark path fill into a light gray
+            # background. get_drawings() does not expose inherited group alpha.
+            # Measure the rendered background rather than trusting that fill.
+            pix = page.get_pixmap(matrix=fitz.Matrix(.5, .5), colorspace=fitz.csGRAY, alpha=False)
+            pixels = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.height, pix.width)
+        x0, y0, x1, y1 = [int(v * .5) for v in r]
+        patch = pixels[y0 + 1:y1, x0 + 1:x1]
+        if patch.size and .65 * 255 < np.median(patch) < .98 * 255:
+            result.append(r)
     return result
 
 

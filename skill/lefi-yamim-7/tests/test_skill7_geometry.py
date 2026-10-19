@@ -9,12 +9,22 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "days/scripts"))
 from placement import Canvas, box_count, measured_regions
-from source_model import column_of, validate_answers
+from source_model import column_of, validate_answers, gray_backgrounds
 from add_vcheck_boxes import CandidateBox, make_checkbox_appearances, add_checkbox
 from gemara_checkboxes import join_shared_fields, set_checkbox_state
 
 
 class Skill7GeometryTests(unittest.TestCase):
+    def test_transparent_dark_fill_is_detected_as_rendered_gray(self):
+        with fitz.open() as doc:
+            page = doc.new_page(width=680, height=468)
+            region = fitz.Rect(350, 240, 490, 440)
+            page.draw_rect(region, fill=(.13, .12, .125), color=None, fill_opacity=.12)
+            self.assertLess(page.get_drawings()[0]["fill"][0], .2)
+            detected = gray_backgrounds(page)
+            self.assertEqual(len(detected), 1)
+            self.assertTrue(detected[0].contains(fitz.Point(400, 300)))
+
     def test_owner_answers_are_bound_to_both_sources_and_not_assumed(self):
         base = {"source_sha256": "source", "cover_sha256": "cover", "total_original_pages": 160}
         answers = {"source_sha256": "source", "cover_sha256": "cover",
