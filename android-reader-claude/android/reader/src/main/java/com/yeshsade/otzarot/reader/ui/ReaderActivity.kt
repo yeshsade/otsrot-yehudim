@@ -37,7 +37,6 @@ import com.yeshsade.otzarot.reader.data.SaveState
 import com.yeshsade.otzarot.reader.data.UndoStack
 import java.io.File
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 /**
  * Reading screen. Marks are saved by themselves into the PDF: ~1.5 s after the last tap, and at once
@@ -145,27 +144,31 @@ class ReaderActivity : AppCompatActivity() {
     override fun onDestroy() {
         main.removeCallbacks(saveRunnable)
         // After the marks still waiting for the engine: a mark made after the last capture must not be lost
-        // when the screen closes. (The engine is recycled only after this.)
+        // when the screen closes. The capture runs on the document's thread, in the background (review finding 6:
+        // waiting for it here froze the screen for a moment on "back" right after a mark in a big booklet), and
+        // only after it is the engine let go. (The view does not let it go by itself when the window closes.)
         val generation = saveState.generation
         val pages = pageCount
-        val last = docThread.submit {
-            synchronized(captureLock) {
-                if (generation != capturedGeneration && pages > 0) {
-                    val target = doc
-                    val file = captureLocked(generation)
-                    if (target != null && file != null) app.saves.execute { write(target, file) }
-                }
-                destroyed = true
-            }
-        }
-        runCatching { last.get(FINAL_CAPTURE_WAIT_S, TimeUnit.SECONDS) }
-        docThread.shutdown()
-        runCatching { docThread.awaitTermination(FINAL_CAPTURE_WAIT_S, TimeUnit.SECONDS) }
-        pdfView.recycle()
-        doc?.let { if (app.readers[it.id] === this) app.readers.remove(it.id) }
-        // the last capture's write is queued on the saves' thread now; the screen taking over loads after it
-        handedOff?.invoke()
+        val target = doc
+        val view = pdfView
+        val takeOver = handedOff
         handedOff = null
+        if (target != null && app.readers[target.id] === this) app.readers.remove(target.id)
+        val finished = runCatching {
+            docThread.execute {
+                synchronized(captureLock) {
+                    if (generation != capturedGeneration && pages > 0) {
+                        val file = captureLocked(generation)
+                        if (target != null && file != null) app.saves.execute { write(target, file) }
+                    }
+                    destroyed = true
+                }
+                // the last capture's write is queued on the saves' thread now; the screen taking over loads after it
+                main.post { view.release(); takeOver?.invoke() }
+            }
+            docThread.shutdown()
+        }.isSuccess
+        if (!finished) { view.release(); takeOver?.invoke() }
         super.onDestroy()
     }
 
@@ -519,6 +522,8 @@ class ReaderActivity : AppCompatActivity() {
                 app.io.execute { app.library.update(target.id) { it.copy(page = page) } }
             }
             .onError { Messages.notice(this, getString(R.string.open_failed)) }
+            // let go of the engine only after the last capture (see onDestroy), not when the window closes
+            .autoReleasingWhenDetachedFromWindow(false)
             .load()
     }
 
@@ -792,7 +797,6 @@ class ReaderActivity : AppCompatActivity() {
         private const val STATE_DOC = "doc"
         private const val SAVE_DELAY_MS = 1500L
         private const val RETRY_DELAY_MS = 300L
-        private const val FINAL_CAPTURE_WAIT_S = 20L
         private const val HANDOFF_WAIT_MS = 25_000L
 
         fun open(activity: android.app.Activity, doc: Doc) {
