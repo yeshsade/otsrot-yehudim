@@ -601,7 +601,7 @@ def make_continuation_button_images(out_dir, color=DEFAULT_ACCENT, labels=None, 
                 raise RuntimeError("A Hebrew font is required for named navigation labels.")
             # Use the same bidi engine as rtl(): Windows uses explicit
             # reversal, while Linux uses Pillow's natural Hebrew shaping.
-            for size in range(29, 23, -1):
+            for size in range(64, 23, -1):
                 engine = ImageFont.Layout.BASIC if sys.platform.startswith("win") else ImageFont.Layout.RAQM
                 label_font = ImageFont.truetype(font_file, size, layout_engine=engine)
                 if text_width(draw, text, label_font) <= width - 32:
