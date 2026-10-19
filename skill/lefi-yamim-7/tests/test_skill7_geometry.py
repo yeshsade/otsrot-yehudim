@@ -12,9 +12,17 @@ from placement import Canvas, box_count, measured_regions
 from source_model import column_of, validate_answers, gray_backgrounds
 from add_vcheck_boxes import CandidateBox, make_checkbox_appearances, add_checkbox
 from gemara_checkboxes import join_shared_fields, set_checkbox_state
+from build_booklet import map_topics
 
 
 class Skill7GeometryTests(unittest.TestCase):
+    def test_split_subjects_keep_unique_order_before_tefilot(self):
+        topics = map_topics()
+        ids = [t["id"] for t in topics]
+        self.assertEqual([t["order"] for t in topics], list(range(len(topics))))
+        start = ids.index("sifrei_rabeinu")
+        self.assertEqual(ids[start:start + 4], ["sifrei_rabeinu", "sefer_hamidot",
+                                              "shemot_tzadikim", "likutey_tefilot"])
     def test_transparent_dark_fill_is_detected_as_rendered_gray(self):
         with fitz.open() as doc:
             page = doc.new_page(width=680, height=468)

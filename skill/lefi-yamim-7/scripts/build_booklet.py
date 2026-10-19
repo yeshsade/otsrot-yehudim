@@ -33,6 +33,20 @@ def write_json(path, data):
     Path(path).write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def map_topics():
+    ordered = []
+    for topic, name in TOPICS.items():
+        if topic == "combined_midot_tzadikim":
+            ordered.extend([("sefer_hamidot", "ספר המידות"), ("shemot_tzadikim", "שמות הצדיקים")])
+        else:
+            ordered.append((topic, name))
+    ordered.extend([("cover", "כריכה"), ("contents", "תוכן העניינים"),
+                    ("hareni_mekasher", "הריני מקשר"), ("day_note", "יום הלימוד"),
+                    ("introduction", "מבוא")])
+    return [{"id": topic, "label_he": name, "order": index}
+            for index, (topic, name) in enumerate(ordered)]
+
+
 def normalize(page):
     """Physical landscape pages keep identical appearance and one coordinate system.
 
@@ -317,13 +331,7 @@ def build(interior, cover, answers, output, checker, edition="days"):
             grouped[item["field"]] = {k: v for k, v in item.items() if k != "rect"}
     doc = join_shared_fields(doc)
 
-    topic_rows = [{"id": topic, "label_he": name, "order": index}
-                  for index, (topic, name) in enumerate(TOPICS.items()) if topic != "combined_midot_tzadikim"]
-    for topic, name in [("sefer_hamidot", "ספר המידות"), ("shemot_tzadikim", "שמות הצדיקים"),
-                        ("cover", "כריכה"), ("contents", "תוכן העניינים"),
-                        ("hareni_mekasher", "הריני מקשר"), ("day_note", "יום הלימוד"),
-                        ("introduction", "מבוא")]:
-        topic_rows.append({"id": topic, "label_he": name, "order": len(topic_rows)})
+    topic_rows = map_topics()
     for row in rows:
         if row["topic_id"] == "combined_midot_tzadikim":
             row["topic_id"] = "sefer_hamidot"
