@@ -70,6 +70,36 @@ class Skill7GeometryTests(unittest.TestCase):
             self.assertGreater(rect.x0, 40)
             self.assertFalse(canvas.clear(rect))
 
+    def test_crowded_header_keeps_continuation_and_return_clear(self):
+        with fitz.open() as doc:
+            page = doc.new_page(width=468, height=680)
+            for rect in ((327, 15, 445, 25), (70, 14, 115, 25), (30, 34, 440, 627)):
+                page.draw_rect(fitz.Rect(rect), fill=(0, 0, 0))
+            canvas = Canvas(page)
+            previous = canvas.button("previous")
+            back = canvas.button("return")
+            self.assertFalse(previous.intersects(back))
+            self.assertGreaterEqual(previous.width, 150 * .75)
+            self.assertGreater(back.y0, 627)
+
+    def test_dense_footer_moves_next_to_clear_top_margin(self):
+        with fitz.open() as doc:
+            page = doc.new_page(width=680, height=468)
+            page.draw_rect(fitz.Rect(10, 420, 670, 467), fill=(0, 0, 0))
+            rect = Canvas(page).button("next")
+            self.assertLess(rect.y1, 40)
+            self.assertGreaterEqual(rect.width, 150 * .75)
+
+    def test_landscape_with_full_edges_uses_rotated_side_control(self):
+        with fitz.open() as doc:
+            page = doc.new_page(width=680, height=468)
+            for rect in ((0, 0, 680, 35), (0, 433, 680, 468), (45, 35, 635, 433)):
+                page.draw_rect(fitz.Rect(rect), fill=(0, 0, 0))
+            rect = Canvas(page).button("next")
+            self.assertGreater(rect.height, rect.width)
+            self.assertGreaterEqual(rect.height, 150 * .75)
+            self.assertLess(rect.x1, 45)
+
     def test_nach_font_is_recognized_per_page_not_previous_subset_name(self):
         with fitz.open() as doc:
             page = doc.new_page(width=680, height=468)

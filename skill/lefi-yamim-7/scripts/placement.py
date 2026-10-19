@@ -173,6 +173,7 @@ class Canvas:
             # 90% control entirely in their white top margin.
             candidates += [fitz.Rect(w / 2 - 56.25, 1, w / 2 + 56.25, 19.9)]
             candidates += [fitz.Rect(x, 2, x + 105, 23) for x in range(80, int(w) - 110, 10)]
+            candidates += [fitz.Rect(w / 2 - 62.5, h - 23, w / 2 + 62.5, h - 2)]
         else:
             original = fitz.Rect(w - 160, 8, w - 10, 44) if kind == "previous" else fitz.Rect(10, h - 44, 160, h - 8)
             candidates = []
@@ -186,6 +187,20 @@ class Canvas:
             for y in ([2, 5, 8] if kind == "previous" else [h - bh - 2, h - bh - 5, h - bh - 8]):
                 for x in range(12, int(w - bw - 8), 8):
                     candidates.append(fitz.Rect(x, y, x + bw, y + bh))
+            # Dense source pages can have no clear strip at the preferred
+            # edge. Keep the readable size and destination at the other edge.
+            opposite_y = h - bh - 2 if kind == "previous" else 2
+            for x in range(12, int(w - bw - 8), 8):
+                candidates.append(fitz.Rect(x, opposite_y, x + bw, opposite_y + bh))
+            if w > h:
+                # Rotated book spreads often have only narrow side margins.
+                # Rotate the whole control, including its clickable rectangle.
+                for scale in (1, .875, .75):
+                    side_w, side_h = original.height * scale, original.width * scale
+                    sides = [w - side_w - 1, 1] if kind == "previous" else [1, w - side_w - 1]
+                    for x in sides:
+                        for y in range(40, int(h - side_h - 8), 8):
+                            candidates.append(fitz.Rect(x, y, x + side_w, y + side_h))
         for rect in candidates:
             if self.clear(rect, gap=.5):
                 return self.reserve(rect)

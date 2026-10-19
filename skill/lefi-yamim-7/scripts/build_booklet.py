@@ -232,15 +232,14 @@ def build(interior, cover, answers, output, checker, edition="days"):
     def link(source_page, target_page, kind):
         page = doc[source_page - 1]
         rect = canvases[source_page].button(kind)
-        page.insert_image(rect, filename=str(images[kind]), overlay=True)
+        image_rotation = 90 if rect.height > rect.width else 0
+        page.insert_image(rect, filename=str(images[kind]), overlay=True, rotate=image_rotation)
         page.insert_link({"kind": fitz.LINK_GOTO, "from": rect,
                           "page": target_page - 1, "to": fitz.Point(0, 0)})
         links.append({"source": source_page, "target": target_page, "kind": kind, "rect": list(rect)})
 
     # Controls yield to already reserved checkboxes. Visual and clickable
     # rectangles are identical, including any approved 25% reduction.
-    for number in canvases:
-        link(number, toc_number, "return")
     if edition == "days":
         for topic in TOPICS:
             if topic in NO_CONTINUATION or topic == "supplements":
@@ -259,6 +258,8 @@ def build(interior, cover, answers, output, checker, edition="days"):
             for (_, first), (_, second) in zip(runs, runs[1:]):
                 link(first[-1], second[0], "next")
                 link(second[0], first[-1], "previous")
+        for number in canvases:
+            link(number, toc_number, "return")
         targets = {("shabbos" if day == "saturday" else day): pn for day, pn in note_targets.items()}
         for topic, key in [("parsha", "parsha"), ("tikkun_haklali", "tikun")]:
             numbers = segments.get((topic, None, 0), [])
@@ -267,6 +268,8 @@ def build(interior, cover, answers, output, checker, edition="days"):
         insert_toc_links(fitz, doc[toc_number - 1], targets,
                          external_links_from_config(default_toc_config()))
     else:
+        for number in canvases:
+            link(number, toc_number, "return")
         from importlib.util import spec_from_file_location, module_from_spec
         spec = spec_from_file_location("skill7_topics_toc", ROOT / "topics/scripts/build_topics_booklet.py")
         toc_engine = module_from_spec(spec)

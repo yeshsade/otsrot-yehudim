@@ -25,13 +25,13 @@ Review the seven real Tehillim day boundaries and the end of Psalm 150. Set `teh
 
 ## Agreed placement rules
 
-* On landscape pages, measure the full column INCLUDING commentary as reference height H and only the study text as L. Use ceil(3L/H), between one and three boxes. An exact third gets one; slightly above one third gets two; slightly above two thirds gets three. Distribute along the study portion, ending with it. Commentary determines H but receives no boxes. Straight pages retain three per study column.
+* On landscape pages, measure the full column INCLUDING commentary as reference height H and only the study text as L. Use ceil(3L/H), between one and three boxes. An exact third gets one; slightly above one third gets two; slightly above two thirds gets three. Distribute along the study portion, ending with it. Commentary determines H but receives no boxes. Full neighboring columns establish the reference extent when a last column is short; never normalize a short final column to its own height. Straight pages retain three per study column.
 * Apply measured regions to Mishnah (before Bartenura), Zohar (before translation), current black Shulchan Aruch, Likutey Moharan, Likutey Halakhot, Sifrei Rabeinu, Sefer Hamidot, Shemot Tzadikim and Likutey Tefilot. Hamidot and Tzadikim are separate subjects on the right and left halves.
 * Nach gets one box after the verses and before commentary in each half: four per day. Mishnah Berurah gets one at the lower right of each page.
 * Gemara gets one at the lower left of each actual Gemara page, with amud A/B separate. Commentary-only pages get none. Two booklet pages belonging to the same amud share one PDF parent field with synchronized children, not two independent progress units.
 * Tehillim uses the same measured thirds on actual daily Psalm portions. A new day may start inside a column. Exclude text after Psalm 150, future gray reading and adjacent non-Tehillim pages.
 * Parsha and Tikkun Haklali receive no study boxes.
-* Continuation labels are exactly `העמוד הקודם` and `העמוד הבא`. Preserve the correct subject/day destination. Buttons may shrink to 75% with matching clickable rectangles; never cover text or a checkbox. Normalize PDF rotation physically before placing controls so text, links and widgets share coordinates.
+* Continuation labels are exactly `העמוד הקודם` and `העמוד הבא`. Preserve the correct subject/day destination. Buttons may shrink to 75% with matching clickable rectangles; never cover text or a checkbox. When the source leaves no clear horizontal edge, rotate the whole button into a clear side margin; its clickable rectangle must match. Reserve continuation controls before the more flexible return-to-contents control. Normalize PDF rotation physically before placing controls so text, links and widgets share coordinates.
 
 ## Build
 
