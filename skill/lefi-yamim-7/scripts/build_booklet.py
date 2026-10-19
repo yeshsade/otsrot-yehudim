@@ -268,6 +268,19 @@ def build(interior, cover, answers, output, checker, edition="days"):
         insert_toc_links(fitz, doc[toc_number - 1], targets,
                          external_links_from_config(default_toc_config()))
     else:
+        # A previous-week page may sit in the source appendix, away from its
+        # current topic. The TOC opens it first, so provide the actual next
+        # reading destination and the reciprocal context link.
+        for previous_source, topic in src["contexts"].items():
+            prior = segments.get((topic, None, -1), [])
+            current = [r["page"] for r in rows if r["topic_id"] == topic and r["week_offset"] == 0]
+            if topic == "gemara":
+                current = [pn for pn in current
+                           if gemara_identity(source[rows[pn - 1]["source_page"] - 1]) is not None]
+            if not prior or not current:
+                raise ValueError(f"Missing context/current navigation for {topic}")
+            link(prior[-1], current[0], "next")
+            link(current[0], prior[-1], "previous")
         for number in canvases:
             link(number, toc_number, "return")
         from importlib.util import spec_from_file_location, module_from_spec
