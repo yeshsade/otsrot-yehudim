@@ -1,15 +1,47 @@
 {
   "version": "2026-10-18b",
-  "status": "proposed",
-  "note": "Proposed by Claude on 2026-10-18 for the page-turn animation (owner: 'להוסיף הכל חוץ מסלסול פינה'). Waiting for the owner's approval: until the status is 'approved' the row does not show. English is Claude's translation.",
+  "status": "approved",
+  "note": "Proposed by Claude on 2026-10-18 for the page-turn animation (owner: 'להוסיף הכל חוץ מסלסול פינה'); approved by the owner on 2026-10-19 ('הנוסח מאושר'). English is Claude's translation.",
   "entries": [
-    {"id": "turn_label", "he": "אנימציית דפדוף", "en": "Page-turn animation"},
-    {"id": "turn_desc", "he": "פועל רק במצב \"עמוד אחד\"", "en": "Works only with \"One page\""},
-    {"id": "turn_none", "he": "בלי אנימציה", "en": "No animation"},
-    {"id": "turn_slide", "he": "החלקה", "en": "Slide"},
-    {"id": "turn_cover", "he": "כיסוי", "en": "Cover"},
-    {"id": "turn_fade", "he": "דהייה", "en": "Fade"},
-    {"id": "turn_depth", "he": "עומק", "en": "Depth"},
-    {"id": "turn_book", "he": "הפיכת דף כמו בספר", "en": "Turn the page like a book"}
+    {
+      "id": "turn_label",
+      "he": "אנימציית דפדוף",
+      "en": "Page-turn animation"
+    },
+    {
+      "id": "turn_desc",
+      "he": "פועל רק במצב \"עמוד אחד\"",
+      "en": "Works only with \"One page\""
+    },
+    {
+      "id": "turn_none",
+      "he": "בלי אנימציה",
+      "en": "No animation"
+    },
+    {
+      "id": "turn_slide",
+      "he": "החלקה",
+      "en": "Slide"
+    },
+    {
+      "id": "turn_cover",
+      "he": "כיסוי",
+      "en": "Cover"
+    },
+    {
+      "id": "turn_fade",
+      "he": "דהייה",
+      "en": "Fade"
+    },
+    {
+      "id": "turn_depth",
+      "he": "עומק",
+      "en": "Depth"
+    },
+    {
+      "id": "turn_book",
+      "he": "הפיכת דף כמו בספר",
+      "en": "Turn the page like a book"
+    }
   ]
 }
