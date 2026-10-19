@@ -1292,7 +1292,8 @@ class LeanProbe : Instrumentation() {
             app.settings.whatsAppPromptDismissed = true
             val reader = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
             waitLoaded(reader)
-            val doc = app.library.all().single()
+            // the shared booklet's entry (a scan of the device may add others)
+            val doc = app.library.all().first { it.kind == com.yeshsade.otzarot.reader.data.Doc.Kind.COPY }
             check(Uri.parse(doc.uri).scheme == "content") { "the working copy is not a content:// document: ${doc.uri}" }
             val before = countChecked(reader)
             tapUnchecked(reader, null)
@@ -1310,7 +1311,7 @@ class LeanProbe : Instrumentation() {
             check(runCatching { checkedIn(doc.uri) }.isFailure || checkedIn(doc.uri) != before + 1) { "the document was not broken by the test" }
             val again = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
             waitLoaded(again)
-            check(app.library.all().single().id == doc.id)
+            check(app.library.all().count { it.kind == com.yeshsade.otzarot.reader.data.Doc.Kind.COPY } == 1) { "the booklet got a second entry" }
             check(checkedIn(doc.uri) == before + 1) { "the cut-off save was not finished" }
             check(!pending.exists()) { "the pending copy stayed after it was written" }
             check(countChecked(again) == before + 1) { "the screen does not show the restored mark" }
