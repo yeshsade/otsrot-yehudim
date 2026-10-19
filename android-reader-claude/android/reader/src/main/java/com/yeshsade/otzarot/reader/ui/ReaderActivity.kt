@@ -162,6 +162,10 @@ class ReaderActivity : AppCompatActivity() {
         docThread.shutdown()
         runCatching { docThread.awaitTermination(FINAL_CAPTURE_WAIT_S, TimeUnit.SECONDS) }
         pdfView.recycle()
+        doc?.let { if (app.readers[it.id] === this) app.readers.remove(it.id) }
+        // the last capture's write is queued on the saves' thread now; the screen taking over loads after it
+        handedOff?.invoke()
+        handedOff = null
         super.onDestroy()
     }
 
@@ -373,6 +377,13 @@ class ReaderActivity : AppCompatActivity() {
         // undo and redo belong to the document they were made in
         undo.clear()
         updateUndoButtons()
+        // The document is held by one screen at a time: an older screen showing it saves, closes, and only
+        // then is it loaded here (owner's review finding, 2026-10-19).
+        claim(target) { load(target) }
+    }
+
+    private fun load(target: Doc) {
+        if (isFinishing || isDestroyed || doc?.id != target.id) return
         // On the saves' thread: a save of this document still running from a moment ago finishes first (so the
         // copy has its marks), but opening never waits behind scans of the device.
         app.saves.execute {
@@ -388,6 +399,29 @@ class ReaderActivity : AppCompatActivity() {
                 display(target, file)
             }
         }
+    }
+
+    /** Takes [target] for this screen. When another screen holds it, that screen hands it over first. */
+    private fun claim(target: Doc, then: () -> Unit) {
+        val readers = app.readers
+        readers.entries.removeAll { it.value === this && it.key != target.id }
+        val previous = readers[target.id]
+        readers[target.id] = this
+        if (previous == null || previous === this || previous.isDestroyed) { then(); return }
+        var started = false
+        val go = { if (!started) { started = true; then() } }
+        previous.handOff(go)
+        // never wait for ever: a screen that does not close within this time loses the document anyway
+        main.postDelayed(go, HANDOFF_WAIT_MS)
+    }
+
+    /** Another screen opens this document: close, and say when its last marks are queued for saving. */
+    private var handedOff: (() -> Unit)? = null
+
+    fun handOff(done: () -> Unit) {
+        handedOff = done
+        if (isDestroyed) { done(); return }
+        finish()
     }
 
     /**
@@ -742,6 +776,7 @@ class ReaderActivity : AppCompatActivity() {
         private const val SAVE_DELAY_MS = 1500L
         private const val RETRY_DELAY_MS = 300L
         private const val FINAL_CAPTURE_WAIT_S = 20L
+        private const val HANDOFF_WAIT_MS = 25_000L
 
         fun open(activity: android.app.Activity, doc: Doc) {
             activity.startActivity(Intent(activity, ReaderActivity::class.java).putExtra(EXTRA_DOC, doc.id))

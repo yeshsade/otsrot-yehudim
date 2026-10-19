@@ -56,6 +56,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "map") { mapChecks(); return }
         if (mode == "onepage") { onePageOnly(); return }
         if (mode == "zoom") { zoomChecks(); return }
+        if (mode == "twice") { twoScreens(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -1231,6 +1232,46 @@ class LeanProbe : Instrumentation() {
             onMainChecked { snapshot(reader, "zoom-20.png") }
             record("Zoom reaches 20 times the whole page and the page is drawn there")
             onMainChecked { reader.finish() }
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /**
+     * The same document opened again while a screen still shows it (from the list and then from WhatsApp):
+     * the old screen hands it over and closes, the new one shows the old screen's last mark, and nothing is
+     * written over (-e mode twice).
+     */
+    private fun twoScreens() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            app.settings.whatsAppPromptDismissed = true
+            val first = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
+            waitLoaded(first)
+            val doc = app.library.all().single()
+            val before = countChecked(first)
+            // a mark in the old screen, not saved yet (saving waits a moment after the last mark)
+            tapUnchecked(first, null)
+            SystemClock.sleep(200)
+            val monitor = addMonitor(ReaderActivity::class.java.name, null, false)
+            targetContext.startActivity(Intent(targetContext, ReaderActivity::class.java).putExtra(ReaderActivity.EXTRA_DOC, doc.id)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_MULTIPLE_TASK))
+            val second = waitForMonitorWithTimeout(monitor, 60_000) as? ReaderActivity ?: error("the second screen did not open")
+            removeMonitor(monitor)
+            check(second !== first)
+            waitLoaded(second)
+            waitFor("the old screen closes", 30_000) { first.isDestroyed }
+            check(countChecked(second) == before + 1) { "the new screen does not show the mark made in the old one" }
+            record("Opening a document that is already open: the old screen saves and closes, the new one shows its mark")
+            tapUnchecked(second, null)
+            SystemClock.sleep(800)
+            onMainChecked { second.finish() }
+            waitFor("both marks saved", 90_000) { checkedIn(doc.uri) == before + 2 }
+            record("Marks from both screens are in the file; nothing was written over")
             result.putString("stream", "Passed $passed checks.\n")
             finish(Activity.RESULT_OK, result)
         } catch (error: Throwable) {

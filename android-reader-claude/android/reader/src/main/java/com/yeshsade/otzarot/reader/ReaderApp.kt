@@ -30,6 +30,12 @@ class ReaderApp : Application() {
     val io: ExecutorService = Executors.newSingleThreadExecutor()
     /** Saving documents and preparing a document for display, in order, apart from scans of the device. */
     val saves: ExecutorService = Executors.newSingleThreadExecutor()
+    /**
+     * Which reading screen holds each document (doc id → screen), main thread only. A document is held by one
+     * screen at a time: when it is opened again (from the list and from WhatsApp, say), the older screen saves,
+     * closes, and only then does the new one load it — so the older screen can never write over newer marks.
+     */
+    val readers = HashMap<String, com.yeshsade.otzarot.reader.ui.ReaderActivity>()
     /** Work that must not wait behind saves and scans: covers. */
     val quick: ExecutorService = Executors.newFixedThreadPool(2)
     /** Small covers already decoded (doc id → bitmap), so returning to the list does not decode them again. */
