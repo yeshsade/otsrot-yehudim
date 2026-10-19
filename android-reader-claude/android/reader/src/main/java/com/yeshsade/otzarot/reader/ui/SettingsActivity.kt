@@ -362,7 +362,8 @@ class SettingsActivity : AppCompatActivity() {
         title.addView(label(copy(setting.label), 18f, colors.ink, true), LinearLayout.LayoutParams(0, -2, 1f))
         title.addView(icon(R.drawable.otzr_ic_close, copy(R.id.otzr_settings_close), colors.ink) { dialog.dismiss() })
         box.addView(title)
-        val description = copy(setting.description)
+        // the page-turn line ("works only with One page") belongs only under the grey row, not in its open sheet
+        val description = if (setting.key == "turn") "" else copy(setting.description)
         if (description.isNotBlank()) box.addView(label(description, 13f, colors.muted).apply { setPadding(dp(9), dp(5), dp(9), if (setting.kind == Kind.FRAME) dp(2) else dp(14)) })
         if (setting.kind == Kind.FRAME) box.addView(label(copy(R.id.otzr_frame_desc_tap), 13f, colors.ink, true).apply { setPadding(dp(9), 0, dp(9), dp(14)) })
         if (setting.kind == Kind.HANDLE) handleSheet(box)

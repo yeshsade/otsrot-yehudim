@@ -985,6 +985,7 @@ class LeanProbe : Instrumentation() {
             onMainChecked {
                 val sheet = SettingsActivity::class.java.getDeclaredField("sheet").apply { isAccessible = true }.get(settingsScreen) as android.app.Dialog
                 for (v in listOf("none", "slide", "cover", "fade", "depth", "book")) check(sheet.window!!.decorView.findViewWithTag<View>("choice_$v") != null) { "no $v" }
+                check(!allText(sheet.window!!.decorView).contains("פועל רק")) { "the grey row's reason shows inside the open sheet" }
                 snapshotView(sheet.window!!.decorView, "settings-sheet-turn.png"); sheet.dismiss()
             }
             SystemClock.sleep(500); waitForIdleSync()
