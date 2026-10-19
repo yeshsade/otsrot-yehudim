@@ -1253,7 +1253,8 @@ class LeanProbe : Instrumentation() {
             app.settings.whatsAppPromptDismissed = true
             val first = openShared(ReadOnlyPdfProvider.uri("booklet-1.pdf"))
             waitLoaded(first)
-            val doc = app.library.all().single()
+            // the shared booklet's entry (a scan of the device may add others)
+            val doc = app.library.all().first { it.kind == com.yeshsade.otzarot.reader.data.Doc.Kind.COPY }
             val before = countChecked(first)
             // a mark in the old screen, not saved yet (saving waits a moment after the last mark)
             tapUnchecked(first, null)
