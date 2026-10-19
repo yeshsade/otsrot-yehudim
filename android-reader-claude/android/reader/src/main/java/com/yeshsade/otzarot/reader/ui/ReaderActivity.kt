@@ -187,7 +187,12 @@ class ReaderActivity : AppCompatActivity() {
         if (!hides) root.addView(header)
 
         val body = FrameLayout(this)
-        pdfView = PDFView(this, null).apply { setBackgroundColor(ui.colors.canvas) }
+        pdfView = PDFView(this, null).apply {
+            setBackgroundColor(ui.colors.canvas)
+            // two-finger zoom reaches 20 times the whole page, like Xodo (measured from the owner's screenshots,
+            // 2026-10-19); a double tap still has one step and then back to the whole page
+            maxZoom = MAX_ZOOM
+        }
         body.addView(pdfView, FrameLayout.LayoutParams(-1, -1))
         pageTurn = PageTurn(body, pdfView, { if (settings.singlePage) settings.pageTurn else "slide" },
             horizontal = settings.scrollHorizontal, rtl = ui.rtl(settings.language))
@@ -730,6 +735,8 @@ class ReaderActivity : AppCompatActivity() {
 
 
     companion object {
+        /** Two-finger zoom limit, relative to the whole page (Xodo allows about the same). */
+        const val MAX_ZOOM = 20f
         const val EXTRA_DOC = "doc"
         private const val STATE_DOC = "doc"
         private const val SAVE_DELAY_MS = 1500L

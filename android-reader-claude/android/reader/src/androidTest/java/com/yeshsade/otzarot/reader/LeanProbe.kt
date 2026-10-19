@@ -55,6 +55,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "manage") { manage(); return }
         if (mode == "map") { mapChecks(); return }
         if (mode == "onepage") { onePageOnly(); return }
+        if (mode == "zoom") { zoomChecks(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -967,6 +968,29 @@ class LeanProbe : Instrumentation() {
                 }
                 SystemClock.sleep(500); waitForIdleSync()
             }
+            // the page-turn animation: grey with its reason under "continuous scrolling", open under "one page"
+            onMainChecked {
+                val row = settingsScreen.window.decorView.findViewWithTag<View>("setting_turn") ?: error("no page-turn row")
+                check(!row.isEnabled && allText(row).contains("עמוד אחד")) { "the page-turn row should be grey with its reason" }
+            }
+            onMainChecked {
+                settingsScreen.window.decorView.findViewWithTag<View>("setting_pages").performClick()
+            }
+            SystemClock.sleep(1200); waitForIdleSync()
+            onMainChecked { (SettingsActivity::class.java.getDeclaredField("sheet").apply { isAccessible = true }.get(settingsScreen) as android.app.Dialog)
+                .window!!.decorView.findViewWithTag<View>("choice_single").performClick() }
+            SystemClock.sleep(1200); waitForIdleSync()
+            onMainChecked { settingsScreen.window.decorView.findViewWithTag<View>("setting_turn").performClick() }
+            SystemClock.sleep(1200); waitForIdleSync()
+            onMainChecked {
+                val sheet = SettingsActivity::class.java.getDeclaredField("sheet").apply { isAccessible = true }.get(settingsScreen) as android.app.Dialog
+                for (v in listOf("none", "slide", "cover", "fade", "depth", "book")) check(sheet.window!!.decorView.findViewWithTag<View>("choice_$v") != null) { "no $v" }
+                snapshotView(sheet.window!!.decorView, "settings-sheet-turn.png"); sheet.dismiss()
+            }
+            SystemClock.sleep(500); waitForIdleSync()
+            check(app.settings.pages == "single")
+            app.settings.pages = "continuous"
+            record("Page-turn animation: grey with its reason until One page is chosen, then its six choices")
             onMainChecked { settingsScreen.finish() }
             record("The settings screen shows the new layout: frame (with the thin line) and the page handle (position, when shown, hold time)")
 
@@ -1171,6 +1195,41 @@ class LeanProbe : Instrumentation() {
             onMainChecked { androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags("he")) }
             app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP
             pageModes()
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /** Zoom up to 20 times the whole page, like Xodo: it renders sharp and a pinch stops there (-e mode zoom). */
+    private fun zoomChecks() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; true }.getOrDefault(false) }
+            app.settings.whatsAppPromptDismissed = true
+            app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP
+            val reader = openDoc()
+            waitLoaded(reader)
+            SystemClock.sleep(1500); waitForIdleSync()
+            onMainChecked { check(pdfView(reader).maxZoom == 20f) { "the zoom limit is ${pdfView(reader).maxZoom}" } }
+            // a pinch that asks for far more stops at 20
+            onMainChecked {
+                val v = pdfView(reader)
+                v.zoomCenteredTo(4f, android.graphics.PointF(v.width * .55f, v.height * .45f)); v.loadPages()
+            }
+            SystemClock.sleep(4000); waitForIdleSync()
+            onMainChecked { snapshot(reader, "zoom-4.png") }
+            onMainChecked {
+                val v = pdfView(reader)
+                v.zoomCenteredTo(20f, android.graphics.PointF(v.width * .55f, v.height * .45f)); v.loadPages()
+            }
+            waitFor("sharp at 20", 60_000) { var done = false; onMainChecked { done = pdfView(reader).zoom == 20f }; done }
+            SystemClock.sleep(12_000); waitForIdleSync()
+            onMainChecked { snapshot(reader, "zoom-20.png") }
+            record("Zoom reaches 20 times the whole page and the page is drawn there")
+            onMainChecked { reader.finish() }
             result.putString("stream", "Passed $passed checks.\n")
             finish(Activity.RESULT_OK, result)
         } catch (error: Throwable) {
