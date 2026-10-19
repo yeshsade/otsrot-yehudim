@@ -1,0 +1,633 @@
+{
+  "source_file": "845_תולדות_פנים.pdf",
+  "source_sha256": "896db8b7cc07a749744d9ec7627a84b58399ca3f35537f78ecd7016a26f246b3",
+  "scope": "Measurement of this booklet, independently visually verified; not a general parser or checkbox decision.",
+  "coordinate_system": "PDF points, page rotated 270 degrees; columns numbered right to left.",
+  "days": [
+    {
+      "day_id": "sunday",
+      "day_he": "יום ראשון",
+      "chapters": "קלה–קלט",
+      "start": {
+        "source_page": 89,
+        "column_rtl": 1,
+        "y_pt": 101.69
+      },
+      "end": {
+        "source_page": 90,
+        "column_rtl": 1,
+        "y_pt": 207.01
+      },
+      "segments": [
+        {
+          "source_page": 89,
+          "printed_page": 91,
+          "column_rtl": 1,
+          "rect_upright_pt": [
+            498.623,
+            101.687,
+            633.577,
+            440.12
+          ],
+          "height_pt": 338.433,
+          "height_mm": 119.39
+        },
+        {
+          "source_page": 89,
+          "printed_page": 91,
+          "column_rtl": 2,
+          "rect_upright_pt": [
+            358.361,
+            45.158,
+            491.54,
+            440.116
+          ],
+          "height_pt": 394.958,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 89,
+          "printed_page": 91,
+          "column_rtl": 3,
+          "rect_upright_pt": [
+            186.826,
+            45.159,
+            321.707,
+            440.116
+          ],
+          "height_pt": 394.957,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 89,
+          "printed_page": 91,
+          "column_rtl": 4,
+          "rect_upright_pt": [
+            46.55,
+            45.158,
+            179.679,
+            440.116
+          ],
+          "height_pt": 394.958,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 90,
+          "printed_page": 92,
+          "column_rtl": 1,
+          "rect_upright_pt": [
+            500.45,
+            45.159,
+            633.484,
+            207.006
+          ],
+          "height_pt": 161.847,
+          "height_mm": 57.1
+        }
+      ],
+      "sum_segment_heights_mm": 594.48
+    },
+    {
+      "day_id": "monday",
+      "day_he": "יום שני",
+      "chapters": "קמ–קמד",
+      "start": {
+        "source_page": 90,
+        "column_rtl": 1,
+        "y_pt": 223.93
+      },
+      "end": {
+        "source_page": 90,
+        "column_rtl": 4,
+        "y_pt": 434.04
+      },
+      "segments": [
+        {
+          "source_page": 90,
+          "printed_page": 92,
+          "column_rtl": 1,
+          "rect_upright_pt": [
+            498.617,
+            223.932,
+            633.646,
+            440.117
+          ],
+          "height_pt": 216.185,
+          "height_mm": 76.27
+        },
+        {
+          "source_page": 90,
+          "printed_page": 92,
+          "column_rtl": 2,
+          "rect_upright_pt": [
+            358.361,
+            45.158,
+            491.438,
+            440.116
+          ],
+          "height_pt": 394.958,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 90,
+          "printed_page": 92,
+          "column_rtl": 3,
+          "rect_upright_pt": [
+            186.789,
+            45.159,
+            321.706,
+            434.044
+          ],
+          "height_pt": 388.885,
+          "height_mm": 137.19
+        },
+        {
+          "source_page": 90,
+          "printed_page": 92,
+          "column_rtl": 4,
+          "rect_upright_pt": [
+            44.748,
+            45.159,
+            179.729,
+            433.78
+          ],
+          "height_pt": 388.621,
+          "height_mm": 137.1
+        }
+      ],
+      "sum_segment_heights_mm": 489.89
+    },
+    {
+      "day_id": "tuesday",
+      "day_he": "יום שלישי",
+      "chapters": "קמה–קנ",
+      "start": {
+        "source_page": 91,
+        "column_rtl": 1,
+        "y_pt": 61.16
+      },
+      "end": {
+        "source_page": 92,
+        "column_rtl": 1,
+        "y_pt": 57.61
+      },
+      "segments": [
+        {
+          "source_page": 91,
+          "printed_page": 93,
+          "column_rtl": 1,
+          "rect_upright_pt": [
+            500.442,
+            61.16,
+            633.665,
+            440.116
+          ],
+          "height_pt": 378.956,
+          "height_mm": 133.69
+        },
+        {
+          "source_page": 91,
+          "printed_page": 93,
+          "column_rtl": 2,
+          "rect_upright_pt": [
+            358.368,
+            45.159,
+            491.496,
+            440.116
+          ],
+          "height_pt": 394.957,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 91,
+          "printed_page": 93,
+          "column_rtl": 3,
+          "rect_upright_pt": [
+            188.636,
+            45.159,
+            321.746,
+            436.211
+          ],
+          "height_pt": 391.052,
+          "height_mm": 137.95
+        },
+        {
+          "source_page": 91,
+          "printed_page": 93,
+          "column_rtl": 4,
+          "rect_upright_pt": [
+            46.555,
+            45.159,
+            179.638,
+            436.213
+          ],
+          "height_pt": 391.053,
+          "height_mm": 137.95
+        },
+        {
+          "source_page": 92,
+          "printed_page": 94,
+          "column_rtl": 1,
+          "rect_upright_pt": [
+            511.906,
+            45.159,
+            621.359,
+            57.613
+          ],
+          "height_pt": 12.454,
+          "height_mm": 4.39
+        }
+      ],
+      "sum_segment_heights_mm": 553.31
+    },
+    {
+      "day_id": "wednesday",
+      "day_he": "יום רביעי",
+      "chapters": "א–ט",
+      "start": {
+        "source_page": 93,
+        "column_rtl": 1,
+        "y_pt": 74.45
+      },
+      "end": {
+        "source_page": 94,
+        "column_rtl": 2,
+        "y_pt": 329.25
+      },
+      "segments": [
+        {
+          "source_page": 93,
+          "printed_page": 95,
+          "column_rtl": 1,
+          "rect_upright_pt": [
+            498.622,
+            74.447,
+            633.498,
+            440.116
+          ],
+          "height_pt": 365.67,
+          "height_mm": 129.0
+        },
+        {
+          "source_page": 93,
+          "printed_page": 95,
+          "column_rtl": 2,
+          "rect_upright_pt": [
+            358.361,
+            45.158,
+            491.585,
+            440.113
+          ],
+          "height_pt": 394.955,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 93,
+          "printed_page": 95,
+          "column_rtl": 3,
+          "rect_upright_pt": [
+            186.768,
+            45.159,
+            321.958,
+            440.116
+          ],
+          "height_pt": 394.957,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 93,
+          "printed_page": 95,
+          "column_rtl": 4,
+          "rect_upright_pt": [
+            46.55,
+            45.158,
+            179.64,
+            440.116
+          ],
+          "height_pt": 394.958,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 94,
+          "printed_page": 96,
+          "column_rtl": 1,
+          "rect_upright_pt": [
+            500.442,
+            45.159,
+            633.495,
+            440.116
+          ],
+          "height_pt": 394.957,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 94,
+          "printed_page": 96,
+          "column_rtl": 2,
+          "rect_upright_pt": [
+            358.361,
+            45.158,
+            491.46,
+            329.252
+          ],
+          "height_pt": 284.094,
+          "height_mm": 100.22
+        }
+      ],
+      "sum_segment_heights_mm": 786.54
+    },
+    {
+      "day_id": "thursday",
+      "day_he": "יום חמישי",
+      "chapters": "י–יז",
+      "start": {
+        "source_page": 94,
+        "column_rtl": 2,
+        "y_pt": 346.15
+      },
+      "end": {
+        "source_page": 95,
+        "column_rtl": 3,
+        "y_pt": 179.86
+      },
+      "segments": [
+        {
+          "source_page": 94,
+          "printed_page": 96,
+          "column_rtl": 2,
+          "rect_upright_pt": [
+            358.361,
+            346.154,
+            490.781,
+            440.114
+          ],
+          "height_pt": 93.959,
+          "height_mm": 33.15
+        },
+        {
+          "source_page": 94,
+          "printed_page": 96,
+          "column_rtl": 3,
+          "rect_upright_pt": [
+            188.631,
+            45.159,
+            321.72,
+            436.211
+          ],
+          "height_pt": 391.052,
+          "height_mm": 137.95
+        },
+        {
+          "source_page": 94,
+          "printed_page": 96,
+          "column_rtl": 4,
+          "rect_upright_pt": [
+            46.55,
+            45.159,
+            179.723,
+            436.212
+          ],
+          "height_pt": 391.053,
+          "height_mm": 137.95
+        },
+        {
+          "source_page": 95,
+          "printed_page": 97,
+          "column_rtl": 1,
+          "rect_upright_pt": [
+            500.442,
+            45.159,
+            632.823,
+            440.117
+          ],
+          "height_pt": 394.957,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 95,
+          "printed_page": 97,
+          "column_rtl": 2,
+          "rect_upright_pt": [
+            358.361,
+            45.159,
+            491.438,
+            440.114
+          ],
+          "height_pt": 394.954,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 95,
+          "printed_page": 97,
+          "column_rtl": 3,
+          "rect_upright_pt": [
+            188.631,
+            45.159,
+            321.662,
+            179.862
+          ],
+          "height_pt": 134.703,
+          "height_mm": 47.52
+        }
+      ],
+      "sum_segment_heights_mm": 635.23
+    },
+    {
+      "day_id": "friday",
+      "day_he": "יום שישי",
+      "chapters": "יח–כב",
+      "start": {
+        "source_page": 95,
+        "column_rtl": 3,
+        "y_pt": 196.76
+      },
+      "end": {
+        "source_page": 97,
+        "column_rtl": 1,
+        "y_pt": 246.51
+      },
+      "segments": [
+        {
+          "source_page": 95,
+          "printed_page": 97,
+          "column_rtl": 3,
+          "rect_upright_pt": [
+            188.631,
+            196.764,
+            321.877,
+            440.117
+          ],
+          "height_pt": 243.353,
+          "height_mm": 85.85
+        },
+        {
+          "source_page": 95,
+          "printed_page": 97,
+          "column_rtl": 4,
+          "rect_upright_pt": [
+            44.724,
+            45.158,
+            179.701,
+            440.117
+          ],
+          "height_pt": 394.959,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 96,
+          "printed_page": 98,
+          "column_rtl": 1,
+          "rect_upright_pt": [
+            498.579,
+            45.159,
+            633.495,
+            440.116
+          ],
+          "height_pt": 394.957,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 96,
+          "printed_page": 98,
+          "column_rtl": 2,
+          "rect_upright_pt": [
+            358.361,
+            45.159,
+            491.592,
+            440.113
+          ],
+          "height_pt": 394.953,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 96,
+          "printed_page": 98,
+          "column_rtl": 3,
+          "rect_upright_pt": [
+            186.846,
+            45.159,
+            321.866,
+            440.116
+          ],
+          "height_pt": 394.957,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 96,
+          "printed_page": 98,
+          "column_rtl": 4,
+          "rect_upright_pt": [
+            44.743,
+            45.158,
+            179.741,
+            440.117
+          ],
+          "height_pt": 394.959,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 97,
+          "printed_page": 99,
+          "column_rtl": 1,
+          "rect_upright_pt": [
+            500.448,
+            45.159,
+            633.495,
+            246.509
+          ],
+          "height_pt": 201.35,
+          "height_mm": 71.03
+        }
+      ],
+      "sum_segment_heights_mm": 853.53
+    },
+    {
+      "day_id": "saturday",
+      "day_he": "שבת קודש",
+      "chapters": "כג–כח",
+      "start": {
+        "source_page": 97,
+        "column_rtl": 1,
+        "y_pt": 263.32
+      },
+      "end": {
+        "source_page": 98,
+        "column_rtl": 1,
+        "y_pt": 234.18
+      },
+      "segments": [
+        {
+          "source_page": 97,
+          "printed_page": 99,
+          "column_rtl": 1,
+          "rect_upright_pt": [
+            500.442,
+            263.315,
+            632.864,
+            440.116
+          ],
+          "height_pt": 176.801,
+          "height_mm": 62.37
+        },
+        {
+          "source_page": 97,
+          "printed_page": 99,
+          "column_rtl": 2,
+          "rect_upright_pt": [
+            358.361,
+            45.159,
+            491.438,
+            440.114
+          ],
+          "height_pt": 394.954,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 97,
+          "printed_page": 99,
+          "column_rtl": 3,
+          "rect_upright_pt": [
+            188.625,
+            45.159,
+            321.741,
+            440.116
+          ],
+          "height_pt": 394.957,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 97,
+          "printed_page": 99,
+          "column_rtl": 4,
+          "rect_upright_pt": [
+            44.747,
+            45.159,
+            179.695,
+            440.12
+          ],
+          "height_pt": 394.961,
+          "height_mm": 139.33
+        },
+        {
+          "source_page": 98,
+          "printed_page": 100,
+          "column_rtl": 1,
+          "rect_upright_pt": [
+            500.442,
+            45.159,
+            633.606,
+            234.175
+          ],
+          "height_pt": 189.016,
+          "height_mm": 66.68
+        }
+      ],
+      "sum_segment_heights_mm": 547.04
+    }
+  ],
+  "excluded": {
+    "source99": "Previous-week Likutey Moharan; not Tehillim.",
+    "source92_after_psalm150": "Additional verses and prayers are separately identifiable; whether to give them checkboxes is unresolved.",
+    "source98_gray": "Future reading after Saturday Psalm28 excluded."
+  }
+}
