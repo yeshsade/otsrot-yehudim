@@ -35,6 +35,8 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
     fun touched() {
         if (map == null || !allowed()) return
         animator?.cancel()
+        strength = 1f
+        pdfView.invalidate()
         animator = ValueAnimator.ofFloat(1f, 0f).apply {
             duration = SHOW_MS + FADE_MS
             interpolator = LinearInterpolator()
@@ -58,9 +60,7 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
             if (info.weekOffset != 0) continue
             for ((dayId, frame) in parts(info, page)) {
                 val label = map.day(dayId)?.label ?: continue
-                val box = pdfView.frameRectToView(page, frame)
-                if (android.util.Log.isLoggable("DayName", android.util.Log.DEBUG)) android.util.Log.d("DayName", "page $page $dayId $frame -> $box open=${pdfView.isPageOpen(page)}")
-                box ?: continue
+                val box = pdfView.frameRectToView(page, frame) ?: continue
                 drawName(canvas, label, box)
             }
         }

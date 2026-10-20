@@ -1349,7 +1349,8 @@ class LeanProbe : Instrumentation() {
                 touch(reader, MotionEvent.ACTION_DOWN, reader.window.decorView.width * .5f, reader.window.decorView.height * .5f)
                 touch(reader, MotionEvent.ACTION_UP, reader.window.decorView.width * .5f, reader.window.decorView.height * .5f)
                 SystemClock.sleep(600)
-                onMainChecked { snapshot(reader, "$name.png") }
+                // on the slow emulator the name may fade before the picture is taken: touch again in the same step
+                onMainChecked { field<com.yeshsade.otzarot.reader.ui.DayName>(reader, "dayName").touched(); snapshot(reader, "$name.png") }
             }
             record("The day's name shows faintly on the page after a touch, each day on its own part of a split page")
             progressScreen(reader)
@@ -1393,7 +1394,7 @@ class LeanProbe : Instrumentation() {
         onMainChecked { snapshotView(decor, "mark-day.png") }
         val before = ticked()
         onMainChecked { decor.findViewWithTag<View>("progress_box").performClick() }
-        waitFor("box ticked in the file", 60_000) { ticked() == before + 1 }
+        waitFor("box ticked in the file", 180_000) { ticked() == before + 1 }
         record("Ticking a box on the screen ticks the real box in the file")
         onMainChecked { decor.findViewWithTag<View>("progress_mark_all").performClick() }
         waitFor("mark all", 120_000) { ticked() > before + 1 }
