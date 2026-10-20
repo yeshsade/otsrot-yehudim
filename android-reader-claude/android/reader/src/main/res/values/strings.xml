@@ -97,6 +97,8 @@
     <string name="menu_goto">מעבר לעמוד…</string>
     <string name="menu_bookmarks">כל הסימניות</string>
     <string name="menu_info">פרטי הקובץ</string>
+    <string name="menu_quick_mark">סימון מהיר</string>
+    <string name="menu_progress_week">השבוע: %1$d%%</string>
     <string name="reader_redo">חזרה על הפעולה שבוטלה</string>
     <!-- approved 2026-10-18 -->
     <string name="goto_title">מעבר לעמוד</string>
@@ -114,4 +116,27 @@
     <!-- approved 2026-10-18 -->
     <string name="search_hint">חיפוש לפי שם</string>
     <string name="search_none">לא נמצא קובץ בשם הזה</string>
+    <!-- Stage 2, the progress screen (2026-10-20). DRAFT: each text waits for the owner's approval -->
+    <string name="pr_title">מד התקדמות</string>
+    <string name="pr_tab_mark">סימון</string>
+    <string name="pr_tab_progress">התקדמות</string>
+    <string name="pr_topics">נושאים</string>
+    <string name="pr_close">סגירה</string>
+    <string name="pr_explain">סמן את מה שכבר למדת</string>
+    <string name="pr_mark_all">✓ סמן הכול</string>
+    <string name="pr_undo">ביטול</string>
+    <string name="pr_column">טור %1$d</string>
+    <string name="pr_count">%1$d מתוך %2$d תיבות</string>
+    <string name="pr_count_short">%1$d/%2$d</string>
+    <string name="pr_week">השבוע</string>
+    <string name="pr_by_days">לפי ימים</string>
+    <string name="pr_by_topics">לפי נושאים</string>
+    <string name="pr_whole_week">כל השבוע</string>
+    <string name="pr_no_map">בקובץ הזה אין מפה של תיבות הסימון, ולכן אין בו מד התקדמות.</string>
+    <string name="pr_nothing_chosen">לא נבחרו נושאים. אפשר לבחור ב"נושאים".</string>
+    <string name="pr_study_title">מה אתה לומד?</string>
+    <string name="pr_study_note">רק הנושאים שתבחר ייספרו בהתקדמות. אפשר לשנות בכל זמן.</string>
+    <string name="pr_select_all">בחר הכול</string>
+    <string name="pr_save">שמירה</string>
+    <string name="pr_reading">קורא…</string>
 </resources>

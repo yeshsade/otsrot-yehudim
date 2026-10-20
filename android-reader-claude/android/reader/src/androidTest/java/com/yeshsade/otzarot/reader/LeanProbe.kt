@@ -58,6 +58,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "zoom") { zoomChecks(); return }
         if (mode == "twice") { twoScreens(); return }
         if (mode == "pending") { cutOffSave(); return }
+        if (mode == "stage2") { stageTwo(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -1324,6 +1325,100 @@ class LeanProbe : Instrumentation() {
             result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
             finish(Activity.RESULT_CANCELED, result)
         }
+    }
+
+    /** Stage 2 on a real booklet (-e mode stage2 -e file …/toldot-845.pdf): the map is read, the day's name shows. */
+    private fun stageTwo() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            app.settings.whatsAppPromptDismissed = true; app.settings.bookmarkHintNever = true
+            app.settings.language = "he"
+            onMainChecked { androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags("he")) }
+            app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP
+            val reader = openDoc()
+            waitLoaded(reader)
+            waitFor("map read", 60_000) { field<Any?>(reader, "map") != null }
+            val map = field<com.yeshsade.otzarot.reader.data.ProgressMap>(reader, "map")
+            check(map.booklet.weekStart == "2026-11-08") { "week ${map.booklet.weekStart}" }
+            record("The reader reads the hidden map of a real booklet (845)")
+            for ((page, name) in listOf(19 to "day-name-mishnah", 25 to "day-name-tehillim-split")) {
+                onMainChecked { pdfView(reader).jumpTo(page) }
+                SystemClock.sleep(4000); waitForIdleSync()
+                touch(reader, MotionEvent.ACTION_DOWN, reader.window.decorView.width * .5f, reader.window.decorView.height * .5f)
+                touch(reader, MotionEvent.ACTION_UP, reader.window.decorView.width * .5f, reader.window.decorView.height * .5f)
+                SystemClock.sleep(600)
+                onMainChecked { snapshot(reader, "$name.png") }
+            }
+            record("The day's name shows faintly on the page after a touch, each day on its own part of a split page")
+            progressScreen(reader)
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /** Stage 2: the progress screen — from the drawer, choosing topics, ticking, "mark all", the gauges, and the file. */
+    private fun progressScreen(reader: ReaderActivity) {
+        fun ticked() = field<HashMap<String, Boolean>>(reader, "ticked").count { it.value }
+        fun settle() { SystemClock.sleep(2500); waitForIdleSync() }
+        onMainChecked { reader.javaClass.getDeclaredMethod("openMenu").apply { isAccessible = true }.invoke(reader) }
+        waitFor("menu", 20_000) { reader.lastMenu != null }
+        settle()
+        onMainChecked { snapshotView(reader.lastMenu!!.dialog.window!!.decorView, "drawer-progress.png") }
+        onMainChecked { check(reader.lastMenu!!.root.findViewWithTag<View>("menu_progress") != null) { "no progress button" } }
+        onMainChecked { reader.lastMenu!!.root.findViewWithTag<View>("menu_quick_mark").performClick() }
+        waitFor("what do you learn", 30_000) { reader.lastProgress?.lastStudy?.isShowing == true }
+        settle()
+        val screen = reader.lastProgress!!
+        onMainChecked { snapshotView(screen.lastStudy!!.window!!.decorView, "study-topics.png") }
+        record("The first time, the screen asks what the reader learns")
+        onMainChecked { screen.lastStudy!!.window!!.decorView.findViewWithTag<View>("study_all").performClick() }
+        onMainChecked { screen.lastStudy!!.window!!.decorView.findViewWithTag<View>("study_save").performClick() }
+        settle()
+        check(app.settings.studyTopics?.contains("tehillim") == true) { "topics not saved: ${app.settings.studyTopics}" }
+        val decor = screen.shown.window!!.decorView
+        onMainChecked { snapshotView(decor, "mark-day.png") }
+        val before = ticked()
+        onMainChecked { decor.findViewWithTag<View>("progress_box").performClick() }
+        waitFor("box ticked in the file", 60_000) { ticked() == before + 1 }
+        record("Ticking a box on the screen ticks the real box in the file")
+        onMainChecked { decor.findViewWithTag<View>("progress_mark_all").performClick() }
+        waitFor("mark all", 120_000) { ticked() > before + 1 }
+        SystemClock.sleep(3000); waitForIdleSync()
+        val afterAll = ticked()
+        onMainChecked { snapshotView(decor, "mark-all-undo.png") }
+        record("\"Mark all\" ticks the whole topic for the day, with an undo")
+        onMainChecked {
+            val card = decor.findViewWithTag<View>("progress_topic_tehillim")
+            (card?.parent?.parent as? android.widget.ScrollView)?.scrollTo(0, card.top)
+        }
+        settle()
+        onMainChecked { snapshotView(decor, "mark-tehillim.png") }
+        onMainChecked { decor.findViewWithTag<View>("progress_tab_progress").performClick() }
+        settle()
+        onMainChecked { snapshotView(decor, "progress-day.png") }
+        onMainChecked { decor.findViewWithTag<View>("progress_by_topics").performClick() }
+        settle()
+        onMainChecked { snapshotView(decor, "progress-topics.png") }
+        record("The progress tab shows the day's gauge, the week's, and the details by day or topic")
+        onMainChecked { screen.shown.dismiss() }
+        settle()
+        // the marks are in the file: open it again and count
+        val monitor = addMonitor(ReaderActivity::class.java.name, null, false)
+        onMainChecked { reader.finish() }
+        waitFor("reader closed", 120_000) { reader.isDestroyed }
+        SystemClock.sleep(8000)
+        removeMonitor(monitor)
+        val again = openDoc()
+        waitLoaded(again)
+        waitFor("map read again", 120_000) { field<Any?>(again, "map") != null }
+        val kept = field<HashMap<String, Boolean>>(again, "ticked").count { it.value }
+        check(kept == afterAll) { "file kept $kept marks, screen had $afterAll" }
+        record("After closing and opening again, the file holds what was ticked on the screen ($kept)")
+        onMainChecked { again.finish() }
     }
 
     /** Encodes off the main thread: on a slow emulator PNG encoding there makes Android think the app hangs. */

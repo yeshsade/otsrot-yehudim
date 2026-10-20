@@ -49,6 +49,13 @@ class ReaderActivity : AppCompatActivity() {
     private lateinit var ui: Ui
     private lateinit var pdfView: PDFView
     private lateinit var pageTurn: PageTurn
+    private lateinit var dayName: DayName
+    /** The booklet's hidden map (stage 2), once read; null for a file without one. */
+    private var map: com.yeshsade.otzarot.reader.data.ProgressMap? = null
+    /** The map's boxes in the file: field name → its widgets (page, annotation), and whether each field is ticked. */
+    private var widgets: Map<String, List<Pair<Int, Int>>> = emptyMap()
+    private var fieldOf: Map<Long, String> = emptyMap()
+    private val ticked = HashMap<String, Boolean>()
     private lateinit var undoButton: ImageButton
     private lateinit var redoButton: ImageButton
     private lateinit var bookmarks: Bookmarks
@@ -207,7 +214,8 @@ class ReaderActivity : AppCompatActivity() {
             undo.push(step)
             marked()
         }
-        pdfView.setOverlayDrawer { canvas -> bookmarks.draw(canvas) }
+        dayName = DayName(pdfView, Fonts.heading(this), ui.night)
+        pdfView.setOverlayDrawer { canvas -> bookmarks.draw(canvas); dayName.draw(canvas) }
         body.addView(Bookmarks.TouchLayer(this, bookmarks), FrameLayout.LayoutParams(-1, -1))
 
         val toolbar = toolbar()
@@ -278,6 +286,7 @@ class ReaderActivity : AppCompatActivity() {
     /** Touching the top bar, the toolbar or the handle keeps the frame up for its full time again. */
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (event.actionMasked == MotionEvent.ACTION_DOWN && ::pageTurn.isInitialized) pageTurn.finish()
+        if (event.actionMasked == MotionEvent.ACTION_DOWN && ::dayName.isInitialized) dayName.touched()
         if (event.actionMasked == MotionEvent.ACTION_DOWN && ::chrome.isInitialized) {
             edgeSwipe = !chrome.shown && FramePolicy.canHide(app.settings.frameMode) && fromPhoneEdge(event)
             if (chrome.shown && (inside(header, event) || inside(toolbar, event))) chrome.used()
@@ -512,6 +521,7 @@ class ReaderActivity : AppCompatActivity() {
             .onPageScroll { _, offset -> scrubber.follow(offset); scrubber.pagesMoved() }
             .onLoad { pages ->
                 pageCount = pages
+                readMap(target)
                 showPage(pdfView.currentPage)
                 bookmarks.load(pages)
                 app.io.execute { app.library.update(target.id) { it.copy(pages = pages, lastOpened = System.currentTimeMillis()) } }
@@ -525,6 +535,65 @@ class ReaderActivity : AppCompatActivity() {
             // let go of the engine only after the last capture (see onDestroy), not when the window closes
             .autoReleasingWhenDetachedFromWindow(false)
             .load()
+    }
+
+    /**
+     * Reads the booklet's hidden map, on the document's thread (the engine is not shared between threads), and
+     * hands it to what uses it. A file without a map, or with one that can't be trusted, simply has none.
+     */
+    private fun readMap(target: Doc) {
+        map = null
+        dayName.map = null
+        widgets = emptyMap(); fieldOf = emptyMap(); ticked.clear()
+        runCatching {
+            docThread.execute {
+                val bytes = runCatching { pdfView.getAttachment(com.yeshsade.otzarot.reader.data.ProgressMap.FILE_NAME) }.getOrNull()
+                val parsed = bytes?.let { com.yeshsade.otzarot.reader.data.ProgressMap.parse(String(it, Charsets.UTF_8)) }
+                var ok = (parsed as? com.yeshsade.otzarot.reader.data.ProgressMap.Result.Ok)?.map
+                // the boxes really in the file, only on the pages the map names; a box missing → no map at all
+                val found = HashMap<Int, List<com.github.barteksc.pdfviewer.model.CheckField>>()
+                if (ok != null) {
+                    val pages = ok.checks.flatMap { it.pages }.toSortedSet()
+                    for (p in pages) found[p] = pdfView.getCheckFields(p)
+                    val verified = com.yeshsade.otzarot.reader.data.ProgressMap.verify(ok) { p -> found[p].orEmpty().mapNotNull { it.name }.toSet() }
+                    if (verified !is com.yeshsade.otzarot.reader.data.ProgressMap.Result.Ok) {
+                        android.util.Log.w("OtzarotReader", "progress map refused: $verified"); ok = null
+                    }
+                }
+                val names = ok?.checks?.map { it.field }?.toSet().orEmpty()
+                val byName = HashMap<String, MutableList<Pair<Int, Int>>>()
+                val state = HashMap<String, Boolean>()
+                for (f in found.values.flatten()) {
+                    val name = f.name ?: continue
+                    if (name !in names) continue
+                    byName.getOrPut(name) { mutableListOf() } += f.page to f.annotationIndex
+                    state[name] = (state[name] ?: false) || f.checked
+                }
+                main.post {
+                    if (isDestroyed || doc?.id != target.id) return@post
+                    map = ok
+                    dayName.map = ok
+                    widgets = byName
+                    fieldOf = byName.flatMap { (n, w) -> w.map { key(it.first, it.second) to n } }.toMap()
+                    ticked.clear(); ticked.putAll(state)
+                }
+            }
+        }
+    }
+
+    private fun key(page: Int, annotation: Int) = (page.toLong() shl 32) or (annotation.toLong() and 0xffffffffL)
+
+    /** The progress screen ("מד התקדמות" / "סימון מהיר"). */
+    var lastProgress: ProgressScreen? = null
+        private set
+
+    private fun openProgress(tab: ProgressScreen.Tab) {
+        val m = map ?: return
+        chrome.hold()
+        lastProgress = ProgressScreen(this, ui, app.settings, m, ticked) { changes ->
+            for ((name, on) in changes) widgets[name]?.forEach { (page, annotation) -> mark(page, annotation, on) }
+        }.show(tab)
+        lastProgress?.shown?.setOnDismissListener { chrome.used(); pdfView.invalidate() }
     }
 
     private fun showPage(page: Int) {
@@ -566,6 +635,7 @@ class ReaderActivity : AppCompatActivity() {
                 main.post {
                     if (isDestroyed) return@post
                     pdfView.formFieldApplied(page, annotation, ok)
+                    fieldOf[key(page, annotation)]?.let { ticked[it] = if (ok) checked else !checked }
                     done(ok)
                     updateUndoButtons()
                 }
@@ -612,11 +682,15 @@ class ReaderActivity : AppCompatActivity() {
         val goTo = Drawer.Item(R.drawable.ic_goto, getString(R.string.menu_goto), "menu_goto") { goToPage() }
         val marks = Drawer.Item(R.drawable.ic_bookmark, getString(R.string.menu_bookmarks), "menu_bookmarks") { bookmarks.showList() }
         val info = Drawer.Item(R.drawable.ic_info, getString(R.string.menu_info), "menu_info") { fileDetails() }
-        // still to come, in the owner's places: "quick marking" (top, second) and "share the file" (in More)
+        val m = map
+        val quick = Drawer.Item(R.drawable.ic_check_box, getString(R.string.menu_quick_mark), "menu_quick_mark") { openProgress(ProgressScreen.Tab.MARK) }
+        val week = m?.let { com.yeshsade.otzarot.reader.data.Progress(it, app.settings.studyTopics.orEmpty()) { f -> ticked[f] == true }.week().fraction }
+        // still to come, in the owner's place: "share the file" (in More)
         lastMenu = Drawer.show(this, ui, target?.name, page,
-            top = listOfNotNull(AppMenu.rotationLock(this), files, goTo.takeIf { pageCount > 0 }),
+            top = listOfNotNull(quick.takeIf { m != null }, AppMenu.rotationLock(this), files, goTo.takeIf { pageCount > 0 }),
             more = listOfNotNull(marks.takeIf { pageCount > 0 }, info.takeIf { target != null }),
-            pinned = listOf(AppMenu.settings(this)))
+            pinned = listOf(AppMenu.settings(this)),
+            progress = week?.let { it to { openProgress(ProgressScreen.Tab.PROGRESS) } })
         lastMenu?.dialog?.setOnDismissListener { chrome.used() }
     }
 

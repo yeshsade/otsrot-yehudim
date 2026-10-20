@@ -32,6 +32,8 @@ object Drawer {
     fun show(
         context: Context, ui: Ui, title: String?, subtitle: String?,
         top: List<Item>, more: List<Item>, pinned: List<Item>,
+        /** The progress button at the head of the drawer ("מד התקדמות"), with the week's percentage; null = none. */
+        progress: Pair<Float, () -> Unit>? = null,
     ): Shown {
         val dialog = Dialog(context)
         val panel = LinearLayout(context).apply {
@@ -47,6 +49,31 @@ object Drawer {
                 setPadding(ui.dp(24), ui.dp(12), ui.dp(24), 0)
             })
             subtitle?.let { list.addView(ui.label(it, 13.5f, ui.colors.muted).apply { setPadding(ui.dp(24), ui.dp(2), ui.dp(24), ui.dp(14)) }) }
+        }
+        if (progress != null) {
+            val (fraction, open) = progress
+            val button = LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                tag = "menu_progress"
+                isClickable = true; isFocusable = true
+                background = android.graphics.drawable.RippleDrawable(ColorStateList.valueOf(0x22000000),
+                    ui.rounded(ui.colors.selection, 16f), null)
+                setPadding(ui.dp(10), ui.dp(8), ui.dp(16), ui.dp(8))
+                contentDescription = context.getString(R.string.pr_title)
+                setOnClickListener { dialog.dismiss(); open() }
+            }
+            val gauge = Gauge(context, ui, big = false).apply { this.fraction = fraction; mini = true }
+            button.addView(gauge, LinearLayout.LayoutParams(ui.dp(54), ui.dp(44)).apply { marginEnd = ui.dp(12) })
+            val words = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
+            words.addView(ui.label(context.getString(R.string.pr_title), 17f, ui.colors.ink, true))
+            words.addView(ui.label(context.getString(R.string.menu_progress_week, (fraction * 100).toInt()), 13f, ui.colors.muted))
+            button.addView(words, LinearLayout.LayoutParams(0, -2, 1f))
+            button.addView(ImageView(context).apply {
+                setImageResource(R.drawable.otzr_ic_chevron)
+                imageTintList = ColorStateList.valueOf(ui.colors.accent)
+            }, LinearLayout.LayoutParams(ui.dp(18), ui.dp(18)))
+            list.addView(button, LinearLayout.LayoutParams(-1, -2).apply { setMargins(ui.dp(16), ui.dp(2), ui.dp(16), ui.dp(10)) })
         }
         fun row(item: Item, muted: Boolean = false): View = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL

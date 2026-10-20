@@ -19,6 +19,13 @@ class Settings(context: Context) {
         set(v) = prefs.edit().putString(PAGES, v).apply()
     val singlePage get() = pages == "single"
     /** The page-turn animation in one page mode: none, slide, cover, fade, depth, book (owner, 2026-10-18). */
+    /**
+     * The topics the reader learns ("מה אתה לומד?", owner 2026-10-15): remembered from booklet to booklet; a
+     * topic not in it is off. Null until the reader chose for the first time (then the screen asks first).
+     */
+    var studyTopics: Set<String>?
+        get() = if (prefs.contains(STUDY)) prefs.getStringSet(STUDY, emptySet())!!.toSet() else null
+        set(v) { if (v == null) prefs.edit().remove(STUDY).apply() else prefs.edit().putStringSet(STUDY, v).apply() }
     var pageTurn: String
         get() = prefs.getString(TURN, "slide")!!
         set(v) = prefs.edit().putString(TURN, v).apply()
@@ -111,6 +118,7 @@ class Settings(context: Context) {
         const val SCROLL = "scroll"
         const val PAGES = "pages"
         const val TURN = "page_turn"
+        const val STUDY = "study_topics"
         const val RESUME = "resume"
         const val AWAKE = "awake"
         const val ROTATION = "rotation"

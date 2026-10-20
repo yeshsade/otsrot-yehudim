@@ -91,6 +91,8 @@
     <string name="menu_goto">Go to page…</string>
     <string name="menu_bookmarks">All bookmarks</string>
     <string name="menu_info">File details</string>
+    <string name="menu_quick_mark">Quick marking</string>
+    <string name="menu_progress_week">This week: %1$d%%</string>
     <string name="reader_redo">Redo</string>
     <string name="goto_title">Go to page</string>
     <string name="goto_hint">Page number, 1 to %1$d</string>
@@ -106,4 +108,27 @@
     <string name="search_close">Close search</string>
     <string name="search_hint">Search by name</string>
     <string name="search_none">No file with this name</string>
+    <!-- Stage 2, the progress screen (2026-10-20). Draft, translated from the Hebrew drafts -->
+    <string name="pr_title">Progress</string>
+    <string name="pr_tab_mark">Marking</string>
+    <string name="pr_tab_progress">Progress</string>
+    <string name="pr_topics">Topics</string>
+    <string name="pr_close">Close</string>
+    <string name="pr_explain">Tick what you have already learned</string>
+    <string name="pr_mark_all">✓ Mark all</string>
+    <string name="pr_undo">Undo</string>
+    <string name="pr_column">Column %1$d</string>
+    <string name="pr_count">%1$d of %2$d boxes</string>
+    <string name="pr_count_short">%1$d/%2$d</string>
+    <string name="pr_week">This week</string>
+    <string name="pr_by_days">By day</string>
+    <string name="pr_by_topics">By topic</string>
+    <string name="pr_whole_week">Whole week</string>
+    <string name="pr_no_map">This file has no map of its check boxes, so it has no progress.</string>
+    <string name="pr_nothing_chosen">No topics chosen. Choose them under "Topics".</string>
+    <string name="pr_study_title">What do you learn?</string>
+    <string name="pr_study_note">Only the topics you choose count in the progress. You can change this any time.</string>
+    <string name="pr_select_all">Select all</string>
+    <string name="pr_save">Save</string>
+    <string name="pr_reading">Reading…</string>
 </resources>
