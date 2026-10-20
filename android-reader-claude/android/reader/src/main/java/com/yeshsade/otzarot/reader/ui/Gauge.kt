@@ -44,11 +44,11 @@ class Gauge(context: Context, private val ui: Ui, private val big: Boolean) : Vi
         val w = MeasureSpec.getSize(widthMeasureSpec)
         if (mini) { setMeasuredDimension(w, MeasureSpec.getSize(heightMeasureSpec)); return }
         val size = if (big) minOf(w, ui.dp(260)) else minOf(w, ui.dp(150))
-        setMeasuredDimension(w, (size * 0.78f).toInt())
+        setMeasuredDimension(w, (size * 0.9f).toInt() + ui.dp(4))
     }
 
     override fun onDraw(canvas: Canvas) {
-        val size = if (mini) minOf(width, (height / 0.78f).toInt()) else if (big) minOf(width, ui.dp(260)) else minOf(width, ui.dp(150))
+        val size = if (mini) minOf(width, ((height - ui.dp(4)) / 0.9f).toInt()) else if (big) minOf(width, ui.dp(260)) else minOf(width, ui.dp(150))
         val stroke = size * (if (big) 0.085f else 0.1f)
         val cx = width / 2f
         val r = size / 2f - stroke
