@@ -12,16 +12,43 @@ import org.json.JSONObject
  * in android-reader-gpt/docs/PROGRESS_MAP_AND_ALL_TOPICS_CHECKBOX_PLAN.md). A map that cannot be trusted is
  * refused as a whole — never a partial or guessed marking. Pure logic; unit-tested.
  */
-data class ProgressMap(val topics: List<Topic>, val days: List<Day>, val checks: List<Check>) {
+data class ProgressMap(
+    val topics: List<Topic>,
+    val days: List<Day>,
+    val checks: List<Check>,
+    val booklet: Booklet = Booklet(null, null, null),
+    val pages: List<PageInfo> = emptyList(),
+) {
     data class Topic(val id: String, val label: String, val order: Int)
     data class Day(val id: String, val label: String, val order: Int)
+
+    /** The booklet's week: [weekStart] is the Sunday of its week (YYYY-MM-DD), so the app knows last week from this. */
+    data class Booklet(val weekStart: String?, val parsha: String?, val issue: String?)
+
+    /**
+     * What a booklet page belongs to (0-based [page]), for the day name on the page and the line at the top.
+     * A page split between two days (Tehillim) has [regions]: each part's day and where it is on the page,
+     * in points of the page as shown, from its top-left corner.
+     */
+    data class PageInfo(val page: Int, val topicId: String?, val dayId: String?, val weekOffset: Int, val regions: List<Region>)
+    data class Region(val dayId: String?, val column: Int, val left: Float, val top: Float, val right: Float, val bottom: Float)
 
     /**
      * One box. [field] is the PDF form field's name — the link to the real box. A gemara amud printed on two
      * booklet pages is one field with two widgets, so one [Check] here (owner, 2026-10-15). [pages] are where its
      * widgets are (0-based), for finding them quickly.
      */
-    data class Check(val id: String, val field: String, val topicId: String, val dayId: String?, val order: Int, val pages: List<Int>)
+    data class Check(
+        val id: String, val field: String, val topicId: String, val dayId: String?, val order: Int, val pages: List<Int>,
+        /** Which page of the day's reading of this topic (1, 2, 3) and which column on it (1 = the rightmost). */
+        val pageInDay: Int = 1, val column: Int = 1,
+        /** The box's own name ("עמוד א׳", "חלק 1") and its row's title ("עמוד 1"), where there is one. */
+        val label: String? = null, val group: String? = null,
+    )
+
+    fun pageInfo(page: Int): PageInfo? = pages.firstOrNull { it.page == page }
+    fun day(id: String?) = days.firstOrNull { it.id == id }
+    fun topic(id: String?) = topics.firstOrNull { it.id == id }
 
     fun checksOf(topicId: String? = null, dayId: String? = null) =
         checks.filter { (topicId == null || it.topicId == topicId) && (dayId == null || it.dayId == dayId) }
@@ -69,11 +96,26 @@ data class ProgressMap(val topics: List<Topic>, val days: List<Day>, val checks:
                 val pages = c.optJSONArray("pages")?.let { a -> (0 until a.length()).map { a.getInt(it) - 1 } }
                     ?: listOf(c.optInt("final_page", 0) - 1)
                 if (pages.any { it < 0 }) return Result.Refused("check '$field' has no page")
-                checks += Check(c.optString("id", field), field, topic, day, c.optInt("order"), pages)
+                checks += Check(c.optString("id", field), field, topic, day, c.optInt("order"), pages,
+                    pageInDay = c.optInt("page_in_day", 1), column = c.optInt("column", 1),
+                    label = c.optString("label_he").takeIf { it.isNotBlank() && !c.isNull("label_he") },
+                    group = c.optString("group_he").takeIf { it.isNotBlank() && !c.isNull("group_he") })
             }
             if (checks.map { it.field }.toSet().size != checks.size) return Result.Refused("a field appears twice")
             if (checks.isEmpty()) return Result.Refused("no checks for this week")
-            return Result.Ok(ProgressMap(topics.sortedBy { it.order }, days.sortedBy { it.order }, checks))
+            val b = o.optJSONObject("booklet")
+            fun text(key: String) = b?.takeIf { it.has(key) && !it.isNull(key) }?.optString(key)?.takeIf { it.isNotBlank() }
+            val booklet = Booklet(text("week_start")?.takeIf { Regex("\\d{4}-\\d{2}-\\d{2}").matches(it) }, text("parsha"), text("issue"))
+            val pages = list(o.optJSONArray("pages")) { p ->
+                val regions = list(p.optJSONArray("reading_regions")) { r ->
+                    val rect = r.getJSONArray("rect")
+                    Region(if (r.isNull("day_id")) null else r.optString("day_id"), r.optInt("column", 1),
+                        rect.getDouble(0).toFloat(), rect.getDouble(1).toFloat(), rect.getDouble(2).toFloat(), rect.getDouble(3).toFloat())
+                }
+                PageInfo(p.getInt("page") - 1, p.optString("topic_id").takeIf { it.isNotBlank() && !p.isNull("topic_id") },
+                    if (p.isNull("day_id")) null else p.optString("day_id").takeIf { it.isNotBlank() }, p.optInt("week_offset", 0), regions)
+            }
+            return Result.Ok(ProgressMap(topics.sortedBy { it.order }, days.sortedBy { it.order }, checks, booklet, pages))
         }
 
         private fun <T> list(a: JSONArray?, item: (JSONObject) -> T): List<T> =

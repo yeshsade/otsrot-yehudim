@@ -340,4 +340,61 @@ class LogicTest {
         // a box named in the map but missing from the PDF: refused, never a partial marking
         assertTrue(ProgressMap.verify(map) { (onPages - 1)[it].orEmpty() } is ProgressMap.Result.Refused)
     }
+
+    // ---------- the real map from booklet 845 (Toldot), built by GPT's Skill 7 ----------
+
+    private fun map845(): ProgressMap {
+        val text = javaClass.classLoader!!.getResource("map-845.json")!!.readText()
+        return (ProgressMap.parse(text) as ProgressMap.Result.Ok).map
+    }
+
+    @Test fun theRealMapOf845HasEverythingTheAppNeeds() {
+        val map = map845()
+        assertEquals("2026-11-08", map.booklet.weekStart)
+        assertEquals("תולדות", map.booklet.parsha)
+        assertEquals(814, map.checks.size)                           // 828 boxes, 14 of them last week's (left out)
+        assertEquals(OpenDay.IDS, map.days.map { it.id })
+        assertEquals(166, map.pages.size)
+        // a Tehillim page split between Sunday and Monday knows where each part is
+        val split = map.pageInfo(25)!!
+        assertEquals(setOf("sunday", "monday"), split.regions.map { it.dayId }.toSet())
+        // rows and names where the owner asked for them
+        assertTrue(map.checks.filter { it.topicId == "zohar" }.all { it.group == "עמוד 1" || it.group == "עמוד 2" })
+        assertEquals(setOf("עמוד א׳", "עמוד ב׳"), map.checks.filter { it.topicId == "gemara" }.mapNotNull { it.label }.toSet())
+        assertEquals(setOf("חלק 1", "חלק 2", "חלק 3", "חלק 4"), map.checks.filter { it.topicId == "nach" }.mapNotNull { it.label }.toSet())
+        // the thirds rule: 1 to 3 boxes in a column of a turned page
+        map.checks.filter { it.topicId == "mishnah" }.groupBy { Triple(it.dayId, it.pageInDay, it.column) }.values
+            .forEach { assertTrue(it.size in 1..3) }
+    }
+
+    @Test fun progressCountsOnlyChosenTopicsAndOnlyWhatWasDone() {
+        val map = map845()
+        val ticked = map.checksOf(topicId = "mishnah", dayId = "sunday").map { it.field }.toSet()
+        val all = Progress(map, map.topics.map { it.id }.toSet()) { it in ticked }
+        val mishnahOnly = Progress(map, setOf("mishnah")) { it in ticked }
+        assertEquals(Progress.Count(8, 8), mishnahOnly.day("sunday"))
+        assertTrue(mishnahOnly.day("sunday").complete)
+        assertEquals(8, all.day("sunday").done)
+        assertTrue(all.day("sunday").total > 8)
+        assertEquals(0, mishnahOnly.day("monday").done)
+        assertFalse(all.topics.any { it.id == "cover" || it.id == "parsha" })   // only topics that have boxes
+    }
+
+    @Test fun theScreenOpensOnTheRightDay() {
+        val days = OpenDay.IDS
+        // week of 845: Sunday 2026-11-08 … Shabbat 2026-11-14
+        assertEquals("sunday", OpenDay.choose(days, "2026-11-08", 2026, 11, 8, false))
+        assertEquals("friday", OpenDay.choose(days, "2026-11-08", 2026, 11, 13, false))
+        assertEquals("saturday", OpenDay.choose(days, "2026-11-08", 2026, 11, 14, true))
+        // Saturday night of the week before: the new booklet opens on Sunday
+        assertEquals("sunday", OpenDay.choose(days, "2026-11-08", 2026, 11, 7, false))
+        // Saturday night after its week: last week's booklet opens on Shabbat
+        assertEquals("saturday", OpenDay.choose(days, "2026-11-08", 2026, 11, 15, true))
+        // no week in the map: on Shabbat, by the marks
+        assertEquals("saturday", OpenDay.choose(days, null, 2026, 11, 14, true))
+        assertEquals("sunday", OpenDay.choose(days, null, 2026, 11, 14, false))
+        assertEquals("tuesday", OpenDay.choose(days, null, 2026, 11, 10, false))
+        // a booklet without a Shabbat part: the whole week
+        assertNull(OpenDay.choose(days - "saturday", "2026-11-08", 2026, 11, 14, true))
+    }
 }
