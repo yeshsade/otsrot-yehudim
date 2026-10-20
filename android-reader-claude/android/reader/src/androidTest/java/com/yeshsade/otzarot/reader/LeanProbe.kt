@@ -1385,6 +1385,10 @@ class LeanProbe : Instrumentation() {
         settle()
         check(app.settings.studyTopics?.contains("tehillim") == true) { "topics not saved: ${app.settings.studyTopics}" }
         val decor = screen.shown.window!!.decorView
+        fun has(tag: String): Boolean { var ok = false; onMain { ok = decor.findViewWithTag<View>(tag) != null }; return ok }
+        waitFor("all the day's cards", 300_000) { has("progress_topic_tehillim") }
+        settle()
+        waitFor("pictures written", 120_000) { pendingPngs.get() == 0 }
         onMainChecked { snapshotView(decor, "mark-day.png") }
         val before = ticked()
         onMainChecked { decor.findViewWithTag<View>("progress_box").performClick() }
@@ -1402,6 +1406,7 @@ class LeanProbe : Instrumentation() {
         }
         settle()
         onMainChecked { snapshotView(decor, "mark-tehillim.png") }
+        waitFor("pictures written", 120_000) { pendingPngs.get() == 0 }
         onMainChecked { decor.findViewWithTag<View>("progress_tab_progress").performClick() }
         settle()
         onMainChecked { snapshotView(decor, "progress-day.png") }

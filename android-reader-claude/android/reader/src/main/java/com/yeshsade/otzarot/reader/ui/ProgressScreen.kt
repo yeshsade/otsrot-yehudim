@@ -125,6 +125,7 @@ class ProgressScreen(
         val p = progress()
         for (d in p.days) chip(shortDay(d.label), d.id == day, "progress_day_${d.id}") { day = d.id; render() }
         chip(activity.getString(R.string.pr_whole_week), day == null, "progress_day_week") { day = null; render() }
+        ++renders; counters.clear()
         body.removeAllViews()
         if (tab == Tab.MARK) renderMarking() else renderProgress()
     }
@@ -150,9 +151,14 @@ class ProgressScreen(
             body.addView(ui.label(activity.getString(R.string.pr_nothing_chosen), 15f, colors.ink).apply { setPadding(ui.dp(6), ui.dp(16), ui.dp(6), 0) })
             return
         }
-        for (topic in topics) {
-            val checks = map.checks.filter { it.topicId == topic.id && (day == null || it.dayId == day) }
-            if (checks.isEmpty()) continue
+        // a card per turn of the main thread: a whole week has hundreds of boxes, and the first cards show at once
+        val generation = ++renders
+        val queue = topics.mapNotNull { topic ->
+            map.checks.filter { it.topicId == topic.id && (day == null || it.dayId == day) }.takeIf { it.isNotEmpty() }?.let { topic to it }
+        }.toMutableList()
+        fun next() {
+            if (generation != renders || queue.isEmpty() || !dialog.isShowing) return
+            val (topic, checks) = queue.removeAt(0)
             val card = ui.column().apply {
                 background = ui.rounded(colors.card, 18f)
                 setPadding(ui.dp(14), ui.dp(12), ui.dp(14), ui.dp(14))
@@ -160,14 +166,26 @@ class ProgressScreen(
             }
             fillCard(card, topic, checks)
             body.addView(card, LinearLayout.LayoutParams(-1, -2).apply { topMargin = ui.dp(10) })
+            body.post { next() }
         }
+        next()
     }
+
+    private var renders = 0
+    /** Each card's counters, refreshed when one box changes (without building the card again). */
+    private val counters = HashMap<LinearLayout, MutableList<() -> Unit>>()
+
+    /** Whether all of the screen is built (for tests). */
+    val built: Boolean get() = body.childCount > 0 && renders > 0
 
     private fun fillCard(card: LinearLayout, topic: ProgressMap.Topic, checks: List<ProgressMap.Check>, undo: Map<String, Boolean>? = null) {
         card.removeAllViews()
+        val refresh = mutableListOf<() -> Unit>().also { counters[card] = it }
         val head = ui.row()
         head.addView(ui.label(topic.label, 17f, colors.ink, true).apply { typeface = ui.heading })
-        head.addView(ui.label("  " + activity.getString(R.string.pr_count_short, checks.count { ticked[it.field] == true }, checks.size), 13.5f, colors.muted))
+        val count = ui.label("", 13.5f, colors.muted)
+        refresh += { count.text = "  " + activity.getString(R.string.pr_count_short, checks.count { ticked[it.field] == true }, checks.size) }
+        head.addView(count)
         head.addView(View(activity), LinearLayout.LayoutParams(0, 1, 1f))
         if (undo != null) {
             head.addView(textButton(activity.getString(R.string.pr_undo), colors.accent, "progress_undo") {
@@ -182,6 +200,7 @@ class ProgressScreen(
             })
         }
         card.addView(head)
+        refresh.forEach { it() }
         val labelled = checks.any { it.label != null }
         when {
             labelled -> card.addView(namedBoxes(card, topic, checks))
@@ -193,14 +212,16 @@ class ProgressScreen(
                     val rows = ofDay.groupBy { it.pageInDay }.toSortedMap()
                     for ((_, row) in rows) {
                         row.firstOrNull()?.group?.let { g ->
-                            card.addView(ui.label("$g  " + activity.getString(R.string.pr_count_short, row.count { ticked[it.field] == true }, row.size), 13.5f, colors.muted, true)
-                                .apply { setPadding(0, ui.dp(12), 0, 0) })
+                            val label = ui.label("", 13.5f, colors.muted, true).apply { setPadding(0, ui.dp(12), 0, 0) }
+                            refresh += { label.text = "$g  " + activity.getString(R.string.pr_count_short, row.count { ticked[it.field] == true }, row.size) }
+                            card.addView(label)
                         }
                         card.addView(columns(card, topic, checks, row))
                     }
                 }
             }
         }
+        refresh.forEach { it() }
     }
 
     private fun columns(card: LinearLayout, topic: ProgressMap.Topic, all: List<ProgressMap.Check>, row: List<ProgressMap.Check>): View {
@@ -232,19 +253,36 @@ class ProgressScreen(
     private fun boxParams() = LinearLayout.LayoutParams(ui.dp(40), ui.dp(40)).apply { topMargin = ui.dp(6); gravity = Gravity.CENTER_HORIZONTAL }
 
     /** A real check box: an empty rounded square, or filled with a ✓ — so it reads as "tick here". */
-    private fun box(card: LinearLayout, topic: ProgressMap.Topic, all: List<ProgressMap.Check>, c: ProgressMap.Check): View {
-        val on = ticked[c.field] == true
-        return ui.label(if (on) "✓" else "", 20f, Color.WHITE, true).apply {
-            gravity = Gravity.CENTER
-            tag = "progress_box"
-            contentDescription = (c.label ?: topic.label) + if (on) " ✓" else ""
-            background = GradientDrawable().apply {
-                cornerRadius = ui.dp(9).toFloat()
-                if (on) setColor(ui.colors.accent) else { setColor(ui.colors.card); setStroke(ui.dp(2), ui.colors.accent) }
-            }
+    private fun box(card: LinearLayout, topic: ProgressMap.Topic, all: List<ProgressMap.Check>, c: ProgressMap.Check): View =
+        Box(activity, ui, ticked[c.field] == true, c.label ?: topic.label).apply {
             setOnClickListener {
-                change(mapOf(c.field to !on))
-                fillCard(card, topic, all)
+                val now = !checked
+                change(mapOf(c.field to now))
+                checked = now
+                counters[card]?.forEach { it() }
+            }
+        }
+
+    /** A check box drawn by hand (hundreds of them in a week): an empty rounded square, or filled with a ✓. */
+    private class Box(context: Context, private val ui: Ui, on: Boolean, private val name: String) : View(context) {
+        var checked = on
+            set(v) { field = v; contentDescription = name + if (v) " ✓" else ""; invalidate() }
+        private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { strokeCap = Paint.Cap.ROUND; strokeJoin = Paint.Join.ROUND }
+        private val tick = android.graphics.Path()
+        init { tag = "progress_box"; isClickable = true; isFocusable = true; contentDescription = name + if (on) " ✓" else "" }
+        override fun onDraw(canvas: Canvas) {
+            val w = width.toFloat(); val h = height.toFloat(); val r = ui.dp(9).toFloat(); val line = ui.dp(2).toFloat()
+            if (checked) {
+                paint.style = Paint.Style.FILL; paint.color = ui.colors.accent
+                canvas.drawRoundRect(0f, 0f, w, h, r, r, paint)
+                paint.style = Paint.Style.STROKE; paint.color = Color.WHITE; paint.strokeWidth = line * 1.4f
+                tick.reset(); tick.moveTo(w * .27f, h * .52f); tick.lineTo(w * .44f, h * .68f); tick.lineTo(w * .74f, h * .35f)
+                canvas.drawPath(tick, paint)
+            } else {
+                paint.style = Paint.Style.FILL; paint.color = ui.colors.card
+                canvas.drawRoundRect(0f, 0f, w, h, r, r, paint)
+                paint.style = Paint.Style.STROKE; paint.color = ui.colors.accent; paint.strokeWidth = line
+                canvas.drawRoundRect(line / 2, line / 2, w - line / 2, h - line / 2, r, r, paint)
             }
         }
     }
