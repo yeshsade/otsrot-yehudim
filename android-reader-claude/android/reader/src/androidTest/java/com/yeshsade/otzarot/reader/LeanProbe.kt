@@ -1342,7 +1342,7 @@ class LeanProbe : Instrumentation() {
             val map = field<com.yeshsade.otzarot.reader.data.ProgressMap>(reader, "map")
             check(map.booklet.weekStart == "2026-11-08") { "week ${map.booklet.weekStart}" }
             record("The reader reads the hidden map of a real booklet (845)")
-            for ((page, name) in listOf(19 to "day-name-mishnah", 25 to "day-name-tehillim-split")) {
+            for ((page, name) in listOf(19 to "day-name-mishnah", 24 to "day-name-tehillim-split")) {
                 onMainChecked { pdfView(reader).jumpTo(page) }
                 SystemClock.sleep(4000); waitForIdleSync()
                 touch(reader, MotionEvent.ACTION_DOWN, reader.window.decorView.width * .5f, reader.window.decorView.height * .5f)

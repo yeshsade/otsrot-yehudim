@@ -118,7 +118,7 @@ class ProgressScreen(
                 tag = tagName
                 minimumHeight = ui.dp(40)
                 background = if (on) ui.rounded(colors.card, 11f) else null
-                setOnClickListener { tab = t; render() }
+                setOnClickListener { if (tab != t) { tab = t; render(); scroll.scrollTo(0, 0) } }
             }, LinearLayout.LayoutParams(0, -2, 1f))
         }
         dayChips.removeAllViews()
@@ -136,7 +136,7 @@ class ProgressScreen(
             gravity = Gravity.CENTER
             setPadding(ui.dp(14), ui.dp(7), ui.dp(14), ui.dp(7))
             background = if (on) ui.rounded(colors.accent, 18f) else ui.rounded(colors.card, 18f, colors.border)
-            setOnClickListener { action() }
+            setOnClickListener { action(); scroll.scrollTo(0, 0) }
         }, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = ui.dp(6) })
     }
 
