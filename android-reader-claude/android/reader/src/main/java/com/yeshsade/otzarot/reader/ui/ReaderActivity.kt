@@ -544,40 +544,60 @@ class ReaderActivity : AppCompatActivity() {
     private fun readMap(target: Doc) {
         map = null
         dayName.map = null
-        widgets = emptyMap(); fieldOf = emptyMap(); ticked.clear()
+        widgets = emptyMap(); fieldOf = emptyMap(); ticked.clear(); beforeMap.clear()
+        val generation = ++mapGeneration
         runCatching {
             docThread.execute {
                 val bytes = runCatching { pdfView.getAttachment(com.yeshsade.otzarot.reader.data.ProgressMap.FILE_NAME) }.getOrNull()
                 val parsed = bytes?.let { com.yeshsade.otzarot.reader.data.ProgressMap.parse(String(it, Charsets.UTF_8)) }
-                var ok = (parsed as? com.yeshsade.otzarot.reader.data.ProgressMap.Result.Ok)?.map
-                // the boxes really in the file, only on the pages the map names; a box missing → no map at all
+                val read = (parsed as? com.yeshsade.otzarot.reader.data.ProgressMap.Result.Ok)?.map ?: return@execute
+                // the day's name needs only which page is which day: it shows at once
+                main.post { if (!isDestroyed && doc?.id == target.id && generation == mapGeneration) dayName.map = read }
+                // the boxes really in the file, a page per turn of the document's thread, so a tap on a box
+                // never waits for the whole booklet; a box missing → no marking screen at all
+                val pages = read.checks.flatMap { it.pages }.toSortedSet().toList()
                 val found = HashMap<Int, List<com.github.barteksc.pdfviewer.model.CheckField>>()
-                if (ok != null) {
-                    val pages = ok.checks.flatMap { it.pages }.toSortedSet()
-                    for (p in pages) found[p] = pdfView.getCheckFields(p)
-                    val verified = com.yeshsade.otzarot.reader.data.ProgressMap.verify(ok) { p -> found[p].orEmpty().mapNotNull { it.name }.toSet() }
-                    if (verified !is com.yeshsade.otzarot.reader.data.ProgressMap.Result.Ok) {
-                        android.util.Log.w("OtzarotReader", "progress map refused: $verified"); ok = null
+                fun next(i: Int) {
+                    if (generation != mapGeneration || destroyed) return
+                    if (i < pages.size) {
+                        found[pages[i]] = pdfView.getCheckFields(pages[i])
+                        runCatching { docThread.execute { next(i + 1) } }
+                        return
                     }
+                    finishMap(target, generation, read, found)
                 }
-                val names = ok?.checks?.map { it.field }?.toSet().orEmpty()
-                val byName = HashMap<String, MutableList<Pair<Int, Int>>>()
-                val state = HashMap<String, Boolean>()
-                for (f in found.values.flatten()) {
-                    val name = f.name ?: continue
-                    if (name !in names) continue
-                    byName.getOrPut(name) { mutableListOf() } += f.page to f.annotationIndex
-                    state[name] = (state[name] ?: false) || f.checked
-                }
-                main.post {
-                    if (isDestroyed || doc?.id != target.id) return@post
-                    map = ok
-                    dayName.map = ok
-                    widgets = byName
-                    fieldOf = byName.flatMap { (n, w) -> w.map { key(it.first, it.second) to n } }.toMap()
-                    ticked.clear(); ticked.putAll(state)
-                }
+                next(0)
             }
+        }
+    }
+
+    @Volatile private var mapGeneration = 0
+    private val beforeMap = HashMap<Long, Boolean>()
+
+    private fun finishMap(target: Doc, generation: Int, read: com.yeshsade.otzarot.reader.data.ProgressMap,
+                          found: Map<Int, List<com.github.barteksc.pdfviewer.model.CheckField>>) {
+        val verified = com.yeshsade.otzarot.reader.data.ProgressMap.verify(read) { p -> found[p].orEmpty().mapNotNull { it.name }.toSet() }
+        if (verified !is com.yeshsade.otzarot.reader.data.ProgressMap.Result.Ok) {
+            android.util.Log.w("OtzarotReader", "progress map refused: $verified"); return
+        }
+        val names = read.checks.map { it.field }.toSet()
+        val byName = HashMap<String, MutableList<Pair<Int, Int>>>()
+        val state = HashMap<String, Boolean>()
+        for (f in found.values.flatten()) {
+            val name = f.name ?: continue
+            if (name !in names) continue
+            byName.getOrPut(name) { mutableListOf() } += f.page to f.annotationIndex
+            state[name] = (state[name] ?: false) || f.checked
+        }
+        main.post {
+            if (isDestroyed || doc?.id != target.id || generation != mapGeneration) return@post
+            map = read
+            widgets = byName
+            fieldOf = byName.flatMap { (n, w) -> w.map { key(it.first, it.second) to n } }.toMap()
+            ticked.clear(); ticked.putAll(state)
+            // a box ticked on the page while the map was being read: what the screen shows now wins
+            for ((k, on) in beforeMap) fieldOf[k]?.let { ticked[it] = on }
+            beforeMap.clear()
         }
     }
 
@@ -635,7 +655,8 @@ class ReaderActivity : AppCompatActivity() {
                 main.post {
                     if (isDestroyed) return@post
                     pdfView.formFieldApplied(page, annotation, ok)
-                    fieldOf[key(page, annotation)]?.let { ticked[it] = if (ok) checked else !checked }
+                    val now = if (ok) checked else !checked
+                    fieldOf[key(page, annotation)]?.let { ticked[it] = now } ?: run { if (map == null) beforeMap[key(page, annotation)] = now }
                     done(ok)
                     updateUndoButtons()
                 }

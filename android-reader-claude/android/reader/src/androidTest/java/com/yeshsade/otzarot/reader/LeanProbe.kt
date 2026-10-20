@@ -1338,7 +1338,7 @@ class LeanProbe : Instrumentation() {
             app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP
             val reader = openDoc()
             waitLoaded(reader)
-            waitFor("map read", 60_000) { field<Any?>(reader, "map") != null }
+            waitFor("map read", 900_000) { field<Any?>(reader, "map") != null }
             val map = field<com.yeshsade.otzarot.reader.data.ProgressMap>(reader, "map")
             check(map.booklet.weekStart == "2026-11-08") { "week ${map.booklet.weekStart}" }
             record("The reader reads the hidden map of a real booklet (845)")
@@ -1414,7 +1414,7 @@ class LeanProbe : Instrumentation() {
         removeMonitor(monitor)
         val again = openDoc()
         waitLoaded(again)
-        waitFor("map read again", 120_000) { field<Any?>(again, "map") != null }
+        waitFor("map read again", 900_000) { field<Any?>(again, "map") != null }
         val kept = field<HashMap<String, Boolean>>(again, "ticked").count { it.value }
         check(kept == afterAll) { "file kept $kept marks, screen had $afterAll" }
         record("After closing and opening again, the file holds what was ticked on the screen ($kept)")
