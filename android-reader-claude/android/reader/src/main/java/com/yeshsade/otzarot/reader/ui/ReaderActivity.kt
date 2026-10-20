@@ -158,9 +158,15 @@ class ReaderActivity : AppCompatActivity() {
         val pages = pageCount
         val target = doc
         val view = pdfView
-        val takeOver = handedOff
-        handedOff = null
-        if (target != null && app.readers[target.id] === this) app.readers.remove(target.id)
+        // the screen stays in the list of open documents until its last marks are queued for saving: a screen
+        // opening the same booklet in the meantime waits for that (closing and opening again quickly lost marks)
+        fun release() {
+            view.release()
+            released = true
+            if (target != null && app.readers[target.id] === this) app.readers.remove(target.id)
+            afterRelease.toList().forEach { it() }
+            afterRelease.clear()
+        }
         val finished = runCatching {
             docThread.execute {
                 synchronized(captureLock) {
@@ -171,11 +177,11 @@ class ReaderActivity : AppCompatActivity() {
                     destroyed = true
                 }
                 // the last capture's write is queued on the saves' thread now; the screen taking over loads after it
-                main.post { view.release(); takeOver?.invoke() }
+                main.post { release() }
             }
             docThread.shutdown()
         }.isSuccess
-        if (!finished) { view.release(); takeOver?.invoke() }
+        if (!finished) release()
         super.onDestroy()
     }
 
@@ -426,7 +432,7 @@ class ReaderActivity : AppCompatActivity() {
         readers.entries.removeAll { it.value === this && it.key != target.id }
         val previous = readers[target.id]
         readers[target.id] = this
-        if (previous == null || previous === this || previous.isDestroyed) { then(); return }
+        if (previous == null || previous === this || previous.released) { then(); return }
         var started = false
         val go = { if (!started) { started = true; then() } }
         previous.handOff(go)
@@ -435,12 +441,13 @@ class ReaderActivity : AppCompatActivity() {
     }
 
     /** Another screen opens this document: close, and say when its last marks are queued for saving. */
-    private var handedOff: (() -> Unit)? = null
+    private var released = false
+    private val afterRelease = mutableListOf<() -> Unit>()
 
     fun handOff(done: () -> Unit) {
-        handedOff = done
-        if (isDestroyed) { done(); return }
-        finish()
+        if (released) { done(); return }
+        afterRelease += done
+        if (!isFinishing && !isDestroyed) finish()
     }
 
     /**

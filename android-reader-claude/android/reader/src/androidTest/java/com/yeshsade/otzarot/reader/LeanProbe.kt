@@ -1425,7 +1425,13 @@ class LeanProbe : Instrumentation() {
         val again = openDoc()
         waitLoaded(again)
         waitFor("map read again", 900_000) { field<Any?>(again, "map") != null }
-        val kept = field<HashMap<String, Boolean>>(again, "ticked").count { it.value }
+        var kept = field<HashMap<String, Boolean>>(again, "ticked").count { it.value }
+        if (kept != afterAll) {
+            android.util.Log.w("ProbeMain", "kept $kept of $afterAll; map=${field<Any?>(again, "map") != null} widgets=${field<Map<*, *>>(again, "widgets").size}")
+            SystemClock.sleep(20_000)
+            kept = field<HashMap<String, Boolean>>(again, "ticked").count { it.value }
+            android.util.Log.w("ProbeMain", "after 20s: kept $kept")
+        }
         check(kept == afterAll) { "file kept $kept marks, screen had $afterAll" }
         record("After closing and opening again, the file holds what was ticked on the screen ($kept)")
         onMainChecked { again.finish() }
