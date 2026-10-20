@@ -1301,7 +1301,8 @@ class LeanProbe : Instrumentation() {
             tapUnchecked(reader, null)
             waitFor("mark saved", 90_000) { checkedIn(doc.uri) == before + 1 }
             val pending = com.yeshsade.otzarot.reader.data.Files.pendingFile(targetContext, doc.id)
-            SystemClock.sleep(500)
+            // the safety copy goes right after the document is written (on a slow emulator, a moment later)
+            runCatching { waitFor("pending copy gone", 30_000) { !pending.exists() } }
             check(!pending.exists()) { "a finished save left its pending copy behind" }
             record("A normal save writes the document and lets its safety copy go")
             onMainChecked { reader.finish() }
