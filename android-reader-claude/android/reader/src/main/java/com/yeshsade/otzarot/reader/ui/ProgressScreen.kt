@@ -69,7 +69,8 @@ class ProgressScreen(
         val (y, m, d) = OpenDay.today()
         day = OpenDay.choose(days, map.booklet.weekStart, y, m, d, ticked.values.any { it })
         build()
-        if (settings.studyTopics == null) chooseTopics(first = true)
+        // the first time: "what do you learn?" — on the next turn of the main thread, so neither window waits for the other
+        if (settings.studyTopics == null) dialog.window?.decorView?.post { if (dialog.isShowing) chooseTopics(first = true) }
         return this
     }
 
@@ -339,7 +340,7 @@ class ProgressScreen(
         root.addView(ui.label(activity.getString(R.string.pr_study_title), 30f, colors.ink, true).apply { typeface = ui.heading })
         root.addView(ui.label(activity.getString(R.string.pr_study_note), 14f, colors.muted).apply { setPadding(0, ui.dp(4), 0, ui.dp(12)) })
         val group = ui.column().apply { background = ui.rounded(colors.card, 16f) }
-        val switches = mutableListOf<android.widget.Switch>()
+        val switches = mutableListOf<Toggle>()
         val all = textButton(activity.getString(R.string.pr_select_all), colors.accent, "study_all") {
             switches.forEach { it.isChecked = true }
         }
@@ -348,13 +349,11 @@ class ProgressScreen(
             if (i > 0) group.addView(View(activity).apply { setBackgroundColor(colors.border) }, LinearLayout.LayoutParams(-1, 1).apply { marginStart = ui.dp(16) })
             val row = ui.row().apply { setPadding(ui.dp(16), ui.dp(4), ui.dp(12), ui.dp(4)); minimumHeight = ui.dp(54) }
             row.addView(ui.label(t.label, 16.5f, colors.ink), LinearLayout.LayoutParams(0, -2, 1f))
-            val sw = android.widget.Switch(activity).apply {
-                isChecked = t.id in selected
-                tag = "study_${t.id}"
-                setOnCheckedChangeListener { _, on -> if (on) selected += t.id else selected -= t.id }
+            val sw = Toggle(activity, ui, t.id in selected) { on -> if (on) selected += t.id else selected -= t.id }.apply {
+                tag = "study_${t.id}"; contentDescription = t.label
             }
             switches += sw
-            row.addView(sw)
+            row.addView(sw, LinearLayout.LayoutParams(ui.dp(51), ui.dp(31)))
             row.setOnClickListener { sw.toggle() }
             group.addView(row)
         }
@@ -390,6 +389,37 @@ class ProgressScreen(
         setPadding(ui.dp(12), ui.dp(8), ui.dp(12), ui.dp(8))
         background = android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(0x22000000), null, ui.rounded(Color.WHITE, 12f))
         setOnClickListener { action() }
+    }
+
+    /**
+     * A switch like the iPhone's (the approved sketch), drawn by hand: the system's switch is built from dozens
+     * of pictures and opening a list of them is slow on weak phones.
+     */
+    class Toggle(context: Context, private val ui: Ui, on: Boolean, private val changed: (Boolean) -> Unit) : View(context) {
+        var isChecked = on
+            set(v) { if (field != v) { field = v; invalidate(); changed(v); sendAccessibilityEvent(android.view.accessibility.AccessibilityEvent.TYPE_VIEW_CLICKED) } }
+        private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        init {
+            isClickable = true; isFocusable = true
+            setOnClickListener { toggle() }
+        }
+        fun toggle() { isChecked = !isChecked }
+        override fun onInitializeAccessibilityNodeInfo(info: android.view.accessibility.AccessibilityNodeInfo) {
+            super.onInitializeAccessibilityNodeInfo(info)
+            info.className = android.widget.Switch::class.java.name
+            info.isCheckable = true; info.isChecked = isChecked
+        }
+        override fun onDraw(canvas: Canvas) {
+            val h = height.toFloat(); val w = width.toFloat(); val r = h / 2
+            paint.color = if (isChecked) Color.parseColor("#34C759") else ui.colors.border
+            canvas.drawRoundRect(0f, 0f, w, h, r, r, paint)
+            val pad = ui.dp(2).toFloat()
+            val cx = if (isChecked) w - r else r
+            paint.color = Color.WHITE
+            paint.setShadowLayer(pad, 0f, pad / 2, 0x33000000)
+            canvas.drawCircle(cx, r, r - pad, paint)
+            paint.clearShadowLayer()
+        }
     }
 
     /** A place a column does not have: greyed out, not tappable, not counted. */
