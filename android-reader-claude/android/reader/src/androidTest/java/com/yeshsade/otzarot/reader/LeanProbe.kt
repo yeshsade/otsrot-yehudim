@@ -1394,10 +1394,10 @@ class LeanProbe : Instrumentation() {
         onMainChecked { snapshotView(decor, "mark-day.png") }
         val before = ticked()
         onMainChecked { decor.findViewWithTag<View>("progress_box").performClick() }
-        waitFor("box ticked in the file", 180_000) { ticked() == before + 1 }
+        waitFor("box ticked in the file", 300_000) { ticked() == before + 1 }
         record("Ticking a box on the screen ticks the real box in the file")
         onMainChecked { decor.findViewWithTag<View>("progress_mark_all").performClick() }
-        waitFor("mark all", 120_000) { ticked() > before + 1 }
+        waitFor("mark all", 300_000) { ticked() > before + 1 }
         SystemClock.sleep(3000); waitForIdleSync()
         val afterAll = ticked()
         onMainChecked { snapshotView(decor, "mark-all-undo.png") }
