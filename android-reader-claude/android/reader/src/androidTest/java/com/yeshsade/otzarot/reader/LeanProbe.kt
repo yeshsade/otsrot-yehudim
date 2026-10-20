@@ -1367,7 +1367,7 @@ class LeanProbe : Instrumentation() {
             val main = Looper.getMainLooper().thread
             try { while (true) { Thread.sleep(500); android.util.Log.i("ProbeMain", main.stackTrace.take(14).joinToString(" | ")) } } catch (_: InterruptedException) {}
         }.apply { isDaemon = true; start() }
-        fun ticked() = field<HashMap<String, Boolean>>(reader, "ticked").count { it.value }
+        fun ticked(): Int { var n = 0; onMain { n = field<HashMap<String, Boolean>>(reader, "ticked").count { it.value } }; return n }
         fun settle() { SystemClock.sleep(2500); waitForIdleSync() }
         onMainChecked { reader.javaClass.getDeclaredMethod("openMenu").apply { isAccessible = true }.invoke(reader) }
         waitFor("menu", 20_000) { reader.lastMenu != null }
@@ -1425,13 +1425,9 @@ class LeanProbe : Instrumentation() {
         val again = openDoc()
         waitLoaded(again)
         waitFor("map read again", 900_000) { field<Any?>(again, "map") != null }
-        var kept = field<HashMap<String, Boolean>>(again, "ticked").count { it.value }
-        if (kept != afterAll) {
-            android.util.Log.w("ProbeMain", "kept $kept of $afterAll; map=${field<Any?>(again, "map") != null} widgets=${field<Map<*, *>>(again, "widgets").size}")
-            SystemClock.sleep(20_000)
-            kept = field<HashMap<String, Boolean>>(again, "ticked").count { it.value }
-            android.util.Log.w("ProbeMain", "after 20s: kept $kept")
-        }
+        // read on the main thread: the screen fills the map and the marks in one step there
+        var kept = 0
+        onMain { kept = field<HashMap<String, Boolean>>(again, "ticked").count { it.value } }
         check(kept == afterAll) { "file kept $kept marks, screen had $afterAll" }
         record("After closing and opening again, the file holds what was ticked on the screen ($kept)")
         onMainChecked { again.finish() }
