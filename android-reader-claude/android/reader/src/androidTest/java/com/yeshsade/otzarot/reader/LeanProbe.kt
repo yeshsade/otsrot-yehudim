@@ -1362,6 +1362,11 @@ class LeanProbe : Instrumentation() {
 
     /** Stage 2: the progress screen — from the drawer, choosing topics, ticking, "mark all", the gauges, and the file. */
     private fun progressScreen(reader: ReaderActivity) {
+        // where the main thread is, each half second (to find what makes it slow on the emulator)
+        val sampler = Thread {
+            val main = Looper.getMainLooper().thread
+            try { while (true) { Thread.sleep(500); android.util.Log.i("ProbeMain", main.stackTrace.take(14).joinToString(" | ")) } } catch (_: InterruptedException) {}
+        }.apply { isDaemon = true; start() }
         fun ticked() = field<HashMap<String, Boolean>>(reader, "ticked").count { it.value }
         fun settle() { SystemClock.sleep(2500); waitForIdleSync() }
         onMainChecked { reader.javaClass.getDeclaredMethod("openMenu").apply { isAccessible = true }.invoke(reader) }
