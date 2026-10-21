@@ -1386,6 +1386,9 @@ class LeanProbe : Instrumentation() {
                 }
             }
             val p = point ?: error("no button on page ${start + 1}")
+            // the frame floats over the page's top: out of the way first, as a reader would tap the page itself
+            onMainChecked { field<Any>(reader, "chrome").let { it.javaClass.getMethod("hide").invoke(it) } }
+            SystemClock.sleep(1500); waitForIdleSync()
             touch(reader, MotionEvent.ACTION_DOWN, p.x, p.y)
             touch(reader, MotionEvent.ACTION_UP, p.x, p.y)
             SystemClock.sleep(3000); waitForIdleSync()
