@@ -124,7 +124,7 @@
     <string name="pr_tab_progress">התקדמות</string>
     <string name="pr_topics">נושאים</string>
     <string name="pr_close">סגירה</string>
-    <string name="pr_explain">סמן את מה שכבר למדת</string>
+    <string name="pr_explain">סמנו את הנלמד</string>
     <string name="pr_mark_all">✓ סמן הכול</string>
     <string name="pr_undo">ביטול</string>
     <string name="pr_column">טור %1$d</string>
