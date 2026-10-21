@@ -215,7 +215,8 @@ class ProgressScreen(
         tabs.removeAllViews()
         bottomItem(Tab.MARK, R.drawable.ic_check_box, R.string.pr_tab_mark, "progress_tab_mark")
         bottomItem(Tab.PROGRESS, R.drawable.ic_gauge, R.string.pr_tab_progress, "progress_tab_progress")
-        topicsBadge.text = chosen.size.toString()
+        // only this booklet's topics: the choice is remembered across booklets, which have other topics too
+        topicsBadge.text = progress().topics.count { it.id in chosen }.toString()
         topicsBadge.visibility = if (settings.studyTopics == null) View.GONE else View.VISIBLE
         dayChips.removeAllViews()
         val p = progress()

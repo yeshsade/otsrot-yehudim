@@ -1379,6 +1379,7 @@ class LeanProbe : Instrumentation() {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
             app.settings.whatsAppPromptDismissed = true; app.settings.bookmarkHintNever = true
             app.settings.language = "he"
+            onMainChecked { androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags("he")) }
             app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP
             val reader = openDoc()
             waitLoaded(reader)
