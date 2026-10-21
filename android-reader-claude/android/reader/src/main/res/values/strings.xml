@@ -117,11 +117,11 @@
     <string name="search_hint">חיפוש לפי שם</string>
     <string name="search_none">לא נמצא קובץ בשם הזה</string>
     <!-- Stage 2, the progress screen (2026-10-20). DRAFT: each text waits for the owner's approval -->
-    <string name="tool_progress">התקדמות</string>
+    <string name="tool_progress">הספק</string>
     <string name="pr_my_topics">הנושאים שלי</string>
     <string name="pr_title">מד התקדמות</string>
     <string name="pr_tab_mark">סימון</string>
-    <string name="pr_tab_progress">התקדמות</string>
+    <string name="pr_tab_progress">הספק</string>
     <string name="pr_topics">נושאים</string>
     <string name="pr_close">סגירה</string>
     <string name="pr_explain">סמנו את הנלמד</string>
