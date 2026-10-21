@@ -72,6 +72,7 @@ class ReaderActivity : AppCompatActivity() {
      * notifications) or from the bottom starts on the page. Such a swipe belongs to the phone, not to the
      * pages: without this the booklet flew back pages every time the notifications were pulled down.
      */
+    private var edgeStart: android.graphics.PointF? = null
     private var edgeTop = 0
     private var edgeBottom = 0
     private var edgeSwipe = false
@@ -294,13 +295,27 @@ class ReaderActivity : AppCompatActivity() {
         if (event.actionMasked == MotionEvent.ACTION_DOWN && ::pageTurn.isInitialized) pageTurn.finish()
         if (event.actionMasked == MotionEvent.ACTION_DOWN && ::dayName.isInitialized) dayName.touched()
         if (event.actionMasked == MotionEvent.ACTION_DOWN && ::chrome.isInitialized) {
-            edgeSwipe = !chrome.shown && FramePolicy.canHide(app.settings.frameMode) && fromPhoneEdge(event)
+            edgeSwipe = false
+            edgeStart = if (!chrome.shown && FramePolicy.canHide(app.settings.frameMode) && fromPhoneEdge(event))
+                android.graphics.PointF(event.rawX, event.rawY) else null
             if (chrome.shown && (inside(header, event) || inside(toolbar, event))) chrome.used()
         }
+        // A drag that starts at the top or bottom edge belongs to the phone (its notifications, its home gesture):
+        // the pages don't move. But a tap there is the reader's — a booklet's "העמוד הבא" often sits right at the
+        // top of the page (owner, 2026-10-20: the buttons "felt strange").
+        val start = edgeStart
+        if (!edgeSwipe && start != null && event.actionMasked == MotionEvent.ACTION_MOVE &&
+            kotlin.math.hypot(event.rawX - start.x, event.rawY - start.y) > android.view.ViewConfiguration.get(this).scaledTouchSlop) {
+            edgeSwipe = true
+            val cancel = MotionEvent.obtain(event).apply { action = MotionEvent.ACTION_CANCEL }
+            super.dispatchTouchEvent(cancel)
+            cancel.recycle()
+        }
         if (edgeSwipe) {
-            if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) edgeSwipe = false
+            if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) { edgeSwipe = false; edgeStart = null }
             return true
         }
+        if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) edgeStart = null
         return super.dispatchTouchEvent(event)
     }
 
