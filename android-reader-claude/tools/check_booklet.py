@@ -14,6 +14,8 @@
      תהילים לא נבדק בינתיים (נדחה).
   5. לכל עמוד בחוברת יש רשומה ב־pages.
   6. תיבה לא מכסה טקסט, קישור או תיבה אחרת.
+  7. בעמוד מסובב של נושא בטורים, טור מלא בטקסט לימוד שחור לא נשאר בלי אף תיבה
+     (כך נתפס הבאג של שולחן ערוך בסקיל 7, 2026-10-21). טקסט אפור, או טקסט על רקע אפור (השבוע הבא), לא נחשב.
 דורש PyMuPDF (pip install pymupdf).
 """
 import json
@@ -172,6 +174,23 @@ def main(path):
     counts = Counter(t for t, _ in per_day)
     notes.append("תיבות לפי נושא: " + ", ".join(f"{t} {sum(n for (tt, _), n in per_day.items() if tt == t)}" for t in sorted(counts)))
 
+    # 7. a full column of study text with no box at all
+    widget_cols = Counter()
+    for page in doc:
+        for w in page.widgets() or []:
+            if (w.field_name or "").startswith("vcheck_"):
+                r = w.rect * page.rotation_matrix
+                widget_cols[(page.number + 1, column_of(r, page))] += 1
+    for row in data.get("pages", []):
+        if row.get("topic_id") not in PER_COLUMN_ROTATED or row.get("week_offset", 0) != 0 or not row.get("page"):
+            continue
+        page = doc[row["page"] - 1]
+        if page.rect.width <= page.rect.height:
+            continue
+        for column, chars in study_text_by_column(page).items():
+            if chars > EMPTY_COLUMN_CHARS and widget_cols[(row["page"], column)] == 0:
+                problems.append(f"עמוד {row['page']} ({row.get('topic_id')}, {row.get('day_id')}): בטור {column} יש טקסט לימוד ({chars} אותיות) ואין אף תיבה")
+
     # 5. pages
     page_rows = {p.get("page") for p in data.get("pages", [])}
     missing_pages = [n for n in range(1, doc.page_count + 1) if n not in page_rows]
@@ -179,6 +198,44 @@ def main(path):
         problems.append(f"ב־pages חסרים {len(missing_pages)} עמודים (למשל {missing_pages[:5]})")
 
     return report(problems, notes)
+
+
+EMPTY_COLUMN_CHARS = 150
+
+
+def column_of(rect, page):
+    """1 = the rightmost of four columns of a page as seen."""
+    w = page.rect.width
+    x = (rect.x0 + rect.x1) / 2
+    return 1 if x >= w * .75 else 2 if x >= w * .5 else 3 if x >= w * .25 else 4
+
+
+def study_text_by_column(page):
+    """Letters of dark body text (size 9+) per column, leaving out text on a grey background (next week)."""
+    pix = page.get_pixmap(matrix=fitz.Matrix(.5, .5), colorspace=fitz.csGRAY, alpha=False)
+    width = pix.width
+
+    def background(r):
+        x0, y0 = max(0, int(r.x0 * .5) - 3), max(0, int(r.y0 * .5) - 3)
+        x1, y1 = min(pix.width - 1, int(r.x1 * .5) + 3), min(pix.height - 1, int(r.y1 * .5) + 3)
+        values = sorted(pix.samples[y * width + x] for y in range(y0, y1 + 1, 2) for x in range(x0, x1 + 1, 2))
+        return values[len(values) * 3 // 4] if values else 255   # the light part around the letters
+
+    chars = Counter()
+    h = page.rect.height
+    for block in page.get_text("dict")["blocks"]:
+        for line in block.get("lines", []):
+            for span in line["spans"]:
+                r = fitz.Rect(span["bbox"]) * page.rotation_matrix
+                if span["size"] < 9 or r.y0 < h * .08 or r.y1 > h * .97:
+                    continue
+                c = span["color"]
+                if sum((c >> k) & 255 for k in (16, 8, 0)) / 3 > 125:
+                    continue          # grey letters
+                if background(r) < 240:
+                    continue          # on a grey background
+                chars[column_of(r, page)] += len(span["text"].strip())
+    return chars
 
 
 def report(problems, notes):
