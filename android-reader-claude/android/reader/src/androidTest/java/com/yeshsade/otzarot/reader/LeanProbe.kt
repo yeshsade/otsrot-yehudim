@@ -1376,7 +1376,12 @@ class LeanProbe : Instrumentation() {
             SystemClock.sleep(4000); waitForIdleSync()
             var point: android.graphics.PointF? = null
             var dest = -1
+            var why = ""
+            for (attempt in 1..6) {
+            if (point != null) break
+            if (attempt > 1) { SystemClock.sleep(2000); waitForIdleSync() }
             onMainChecked {
+                why = "links ${v.getLinks(start).map { it.destPageIdx }} current ${v.currentPage} height ${v.height}"
                 for (link in v.getLinks(start)) {
                     val to = link.destPageIdx ?: continue
                     if (to == 2 || to == start) continue      // the contents page, or itself
@@ -1385,7 +1390,8 @@ class LeanProbe : Instrumentation() {
                     point = android.graphics.PointF(r.centerX(), r.centerY()); dest = to; break
                 }
             }
-            val p = point ?: error("no button on page ${start + 1}")
+            }
+            val p = point ?: error("no button on page ${start + 1}: $why")
             // the frame floats over the page's top: out of the way first, as a reader would tap the page itself
             onMainChecked { field<Any>(reader, "chrome").let { it.javaClass.getMethod("hide").invoke(it) } }
             SystemClock.sleep(1500); waitForIdleSync()
