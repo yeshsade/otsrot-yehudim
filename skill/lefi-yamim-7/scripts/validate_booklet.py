@@ -6,6 +6,25 @@ from pathlib import Path
 import fitz
 
 from source_model import sha256
+from placement import button_rect
+from shulchan import audit_shulchan_coverage
+
+
+def validate_source_dimensions(page, original):
+    # Physical normalization may swap width and height but may not add margins.
+    if max(abs(a - b) for a, b in zip(sorted((page.rect.width, page.rect.height)),
+           sorted((original.rect.width, original.rect.height)))) > .02:
+        raise ValueError("Source page dimensions changed; added margins are forbidden")
+
+
+def validate_internal_destination(doc, link):
+    if link.get("kind") != fitz.LINK_GOTO:
+        return
+    if not 0 <= link.get("page", -1) < len(doc):
+        raise ValueError("Invalid internal link target")
+    point = link.get("to")
+    if point is None or abs(point.x) > .02 or abs(point.y) > .02:
+        raise ValueError("Internal link must land at the target page's top, not outside it")
 
 
 def validate(path, source, source_model, placements, rows, navigation, before_hashes, interior, cover):
@@ -19,14 +38,27 @@ def validate(path, source, source_model, placements, rows, navigation, before_ha
     for item in placements:
         planned[item["field"]].append(item["pages"][0])
     widget_count = link_count = 0
+    shulchan_coverage = []
     for row, page in zip(rows, doc):
         if page.rotation:
             raise ValueError("Mixed annotation coordinate systems")
         n = row.get("source_page")
         if n:
+            validate_source_dimensions(page, source[n - 1])
             original = "".join(source[n - 1].get_text().split())
             if "".join(page.get_text().split()) != original:
                 raise ValueError(f"Source text changed on page {page.number + 1}")
+        if row["topic_id"] == "shulchan_aruch":
+            page_checks = [item for item in placements if item["pages"] == [page.number + 1]]
+            regions = {}
+            for item in page_checks:
+                col = item["column"]
+                region = item.get("learning_rect")
+                if region is None or (col in regions and regions[col]["rect"] != region):
+                    raise ValueError("Inconsistent Shulchan Aruch learning regions")
+                regions[col] = {"column": col, "rect": region}
+            coverage = audit_shulchan_coverage(page, list(regions.values()), page_checks)
+            shulchan_coverage.append({"page": page.number + 1, "source_page": n, **coverage})
         words = [fitz.Rect(word[:4]) for word in page.get_text("words")]
         widgets = list(page.widgets() or [])
         links = page.get_links()
@@ -47,12 +79,23 @@ def validate(path, source, source_model, placements, rows, navigation, before_ha
                 raise ValueError("Widget differs from canonical placement list")
         for link in links:
             link_count += 1
-            if link.get("kind") == fitz.LINK_GOTO and not 0 <= link.get("page", -1) < len(doc):
-                raise ValueError("Invalid internal link target")
+            validate_internal_destination(doc, link)
             if not page.rect.contains(link["from"]):
                 raise ValueError("Link is outside the page")
         source_links = [item for item in navigation if item["source"] == page.number + 1]
         for expected in source_links:
+            if not any(max(abs(a - b) for a, b in zip(expected["rect"],
+                       button_rect(page, expected["kind"], scale))) < .02
+                       for scale in (1, .875, .75)):
+                raise ValueError("Navigation control moved from its approved anchor")
+            original = button_rect(page, expected["kind"])
+            actual_rect = fitz.Rect(expected["rect"])
+            if max(abs(a - b) for a, b in zip(actual_rect, original)) >= .02:
+                if not any(original.intersects(widget.rect) for widget in widgets):
+                    raise ValueError("Navigation shrink was not required by a checkbox collision")
+            if any(actual_rect.intersects(fitz.Rect(other["rect"]))
+                   for other in source_links if other is not expected):
+                raise ValueError("Navigation controls overlap each other")
             matches = [link for link in links if link.get("page") == expected["target"] - 1
                 and max(abs(a - b) for a, b in zip(link["from"], expected["rect"])) < .02]
             if len(matches) != 1:
@@ -87,7 +130,10 @@ def validate(path, source, source_model, placements, rows, navigation, before_ha
         "output_sha256": sha256(path), "output_to_source_size_ratio": ratio,
         "source_text_preserved": True, "source_coverage_verified": True,
         "zero_text_overlaps": True, "zero_widget_overlaps": True,
-        "zero_widget_link_overlaps": True, "navigation_matches_manifest": True,
-        "progress_map_matches_widgets": True, "source_files_unchanged": True}
+        "zero_widget_link_overlaps": True, "navigation_matches_manifest": True, "navigation_uses_fixed_anchors": True,
+        "all_internal_links_land_at_target_top": True,
+        "transparent_navigation_over_source_text_allowed": True,
+        "progress_map_matches_widgets": True, "source_files_unchanged": True,
+        "shulchan_source_coverage": shulchan_coverage}
     doc.close()
     return result

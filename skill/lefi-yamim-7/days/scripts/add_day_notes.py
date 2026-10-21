@@ -795,30 +795,12 @@ def derive_palette(hex_color):
     }
 
 
-import glob as _glob
-_LINUX_DAVIDBD = (
-    _glob.glob("/sessions/*/mnt/**/davidbd.ttf", recursive=True) +
-    _glob.glob("/sessions/*/mnt/**/DAVIDBD.TTF", recursive=True) +
-    _glob.glob("/sessions/*/mnt/**/david.ttf", recursive=True) +
-    _glob.glob("/sessions/*/mnt/**/DAVID.TTF", recursive=True)
-)
-LINUX_FONTS = [
-    *_LINUX_DAVIDBD,
-    "/usr/share/fonts/truetype/culmus/davidbd.ttf",
-    "/usr/share/fonts/truetype/culmus/david.ttf",
-    "/usr/share/fonts/truetype/noto/NotoSansHebrew-Bold.ttf",
-    "/usr/share/fonts/opentype/noto/NotoSansHebrew-Bold.otf",
-    "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-]
+from typography import font_file
 
 
 def font_path(candidates):
-    for candidate in list(candidates) + LINUX_FONTS:
-        path = Path(candidate)
-        if path.exists():
-            return str(path)
-    return None
+    """Legacy helper: the approved bold UI face is independent of OS aliases."""
+    return font_file("bold")
 
 
 def rtl(text):
@@ -827,7 +809,7 @@ def rtl(text):
 
 def fit_font(ImageFont, font_file, text, start_size, max_width):
     if not font_file:
-        return ImageFont.load_default()
+        raise ValueError("The original UI font is required")
     size = start_size
     while size > 24:
         font = ImageFont.truetype(font_file, size)
@@ -855,17 +837,8 @@ def make_note_pdf(day_text, subtitle, color, out_dir, slug):
 
     out_dir.mkdir(parents=True, exist_ok=True)
     palette = derive_palette(color)
-    title_font_file = font_path([
-        r"C:\Windows\Fonts\DAVIDB.TTF",
-        r"C:\Windows\Fonts\davidbd.ttf",
-        r"C:\Windows\Fonts\arialbd.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-    ])
-    subtitle_font_file = font_path([
-        r"C:\Windows\Fonts\davidbd.ttf",
-        r"C:\Windows\Fonts\arialbd.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-    ])
+    title_font_file = font_file("day_title")
+    subtitle_font_file = font_file("bold")
 
     note_w, note_h = 380, 200
     margin = 22

@@ -1,0 +1,43 @@
+{
+  "source_sha256": "f31ed42057619a2db53c56e1ebd566defe21bb781bd6c2a7fefc0ddaf4fcba16",
+  "cover_sha256": "a2f87fdd4c311cfd3c0c3154dc3b04676fe51d74fb5e556538f751ee617ece6c",
+  "booklet": {
+    "issue": "843",
+    "parsha": "וירא",
+    "week_start": "2026-10-25",
+    "date_label": "י״ד חשון – כ׳ חשון תשפ״ז"
+  },
+  "previous_week": {
+    "mishnah_berurah": 158,
+    "likutey_moharan": 105,
+    "likutey_halakhot": 159,
+    "gemara": 157
+  },
+  "tehillim": {
+    "boundaries_reviewed": true,
+    "exclude_after_psalms": [],
+    "review_provenance": "Reviewed source 97–104, all seven weekly black tabs, current Psalms 72–103; previous gray portions on 97 and future Psalm104 on 104 excluded. No Psalm150 or post-Psalm150 prayers occur in this weekly source."
+  },
+  "owner_answers_provenance": {
+    "mishnah_berurah": {
+      "source_page": 158,
+      "confirmed_by_owner": true,
+      "date": "2026-10-21"
+    },
+    "likutey_moharan": {
+      "source_page": 105,
+      "confirmed_by_owner": true,
+      "date": "2026-10-21"
+    },
+    "likutey_halakhot": {
+      "source_page": 159,
+      "confirmed_by_owner": true,
+      "date": "2026-10-21"
+    },
+    "gemara": {
+      "source_page": 157,
+      "confirmed_by_owner": true,
+      "date": "2026-10-21"
+    }
+  }
+}

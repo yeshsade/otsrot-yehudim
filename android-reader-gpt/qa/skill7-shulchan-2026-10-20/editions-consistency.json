@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "same_logical_progress_ids_and_metadata_across_editions": true,
+  "logical_fields": 849,
+  "embedded_maps_equal_saved_maps": true,
+  "topic_order_unique_and_contiguous": true,
+  "context_navigation_pairs": [
+    {
+      "previous_source": 67,
+      "current_source": 68,
+      "previous_pdf_page": 69,
+      "current_pdf_page": 70
+    },
+    {
+      "previous_source": 99,
+      "current_source": 100,
+      "previous_pdf_page": 101,
+      "current_pdf_page": 102
+    },
+    {
+      "previous_source": 152,
+      "current_source": 107,
+      "previous_pdf_page": 154,
+      "current_pdf_page": 109
+    },
+    {
+      "previous_source": 151,
+      "current_source": 3,
+      "previous_pdf_page": 153,
+      "current_pdf_page": 5
+    }
+  ]
+}

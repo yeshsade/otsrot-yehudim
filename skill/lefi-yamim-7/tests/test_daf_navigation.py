@@ -11,6 +11,7 @@ from types import SimpleNamespace
 import unittest
 
 import fitz
+from PIL import ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "days" / "scripts"))
@@ -49,7 +50,9 @@ def generated_analysis(folder, case):
         for index, (_slug, day) in enumerate(notes.DAYS):
             headings[start + index * (2 if length == 14 else 1)] = day
     source = folder / f"{case}-synthetic-source.pdf"
-    font = notes.font_path([r"C:\Windows\Fonts\arial.ttf"])
+    # The synthetic SOURCE decoder fixture has its own known cmap. Changing
+    # generated UI typography must not also change the test's source font.
+    font = ImageFont.truetype("DejaVuSans.ttf", 12).path
     with fitz.open() as doc:
         for number in range(1, 161):
             page = doc.new_page(width=468, height=680.25)

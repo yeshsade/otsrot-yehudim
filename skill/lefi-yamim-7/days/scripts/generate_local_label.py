@@ -62,46 +62,19 @@ def rtl(text):
     return str(text)
 
 
-import glob as _glob
-_FONTS_MOUNT = next(iter(_glob.glob("/sessions/*/mnt/Fonts") + _glob.glob("/sessions/*/mnt/*/Fonts")), None)
-LINUX_FONTS = [
-    *([f"{_FONTS_MOUNT}/davidbd.ttf", f"{_FONTS_MOUNT}/DAVIDB.TTF",
-       f"{_FONTS_MOUNT}/david.ttf"] if _FONTS_MOUNT else []),
-    "/usr/share/fonts/truetype/culmus/davidbd.ttf",
-    "/usr/share/fonts/truetype/culmus/david.ttf",
-    "/usr/share/fonts/truetype/noto/NotoSansHebrew-Bold.ttf",
-    "/usr/share/fonts/opentype/noto/NotoSansHebrew-Bold.otf",
-    "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-]
+from typography import load_font, ensure_text
 
 
 def get_font(size, scale, candidates):
-    from PIL import ImageFont
-
-    for candidate in list(candidates) + LINUX_FONTS:
-        path = Path(candidate)
-        if path.exists():
-            return ImageFont.truetype(str(path), size * scale)
-    return ImageFont.load_default()
+    # Compatibility for callers of the original cover-label helper.
+    role = "heading" if any("hatzvi" in str(p).lower() for p in candidates) else "bold"
+    return load_font(role, size * scale)
 
 
 def font_set(scale):
-    title = [
-        r"C:\Windows\Fonts\Guttman Hatzvi-Bold.TTF",
-        r"C:\Windows\Fonts\davidbd.ttf",
-        r"C:\Windows\Fonts\arialbd.ttf",
-    ]
-    brand = [
-        r"C:\Windows\Fonts\Guttman Hatzvi-Bold.TTF",
-        r"C:\Windows\Fonts\davidbd.ttf",
-        r"C:\Windows\Fonts\arialbd.ttf",
-    ]
-    return {
-        "title": get_font(105, scale, title),
-        "date": get_font(47, scale, title),
-        "brand": get_font(38, scale, brand),
-    }
+    return {"title": load_font("heading", 105 * scale),
+            "date": load_font("heading", 47 * scale),
+            "brand": load_font("heading", 38 * scale)}
 
 
 def draw_center(draw, width, text, font, y, fill, scale, stroke=None, stroke_width=0):
@@ -147,27 +120,16 @@ def draw_clean_ornament(draw, width, y, color, scale):
 
 
 def fit_font_to_width(draw, text, font, max_width, scale, min_size, candidates):
-    from PIL import ImageFont
-
+    ensure_text(font.path, text)
     shaped = rtl(text)
     current = font
-    # Some Hebrew-only fonts omit the en dash in real cover date ranges.
-    import fitz
-    if getattr(font, "path", None):
-        face = fitz.Font(fontfile=str(font.path))
-        if any(not face.has_glyph(ord(c)) for c in text if not c.isspace()):
-            fallback = Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
-            if not fallback.exists():
-                raise ValueError("The selected font cannot render the complete cover label")
-            candidates = [str(fallback)] + list(candidates)
-            current = get_font(font.size // scale, scale, candidates)
-    size = getattr(font, "size", 0) // scale
+    size = font.size // scale
     while size > min_size:
         bbox = draw.textbbox((0, 0), shaped, font=current, stroke_width=scale)
         if bbox[2] - bbox[0] <= max_width * scale:
             return current
         size -= 2
-        current = get_font(size, scale, candidates)
+        current = font.font_variant(size=size * scale)
     return current
 
 

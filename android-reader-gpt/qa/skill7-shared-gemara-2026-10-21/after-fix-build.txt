@@ -1,0 +1,6 @@
+test_build_split_amud_preserves_occurrences_and_validates_saved_pdf (test_build_shared_gemara.SharedGemaraBuildTests.test_build_split_amud_preserves_occurrences_and_validates_saved_pdf) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 5.649s
+
+OK

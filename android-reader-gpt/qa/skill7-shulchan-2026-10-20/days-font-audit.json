@@ -1,0 +1,30 @@
+{
+  "profile_id": "owner-original-fonts-2026-10-20",
+  "roles": {
+    "regular": {
+      "file": "david.ttf",
+      "family": "David",
+      "style": "Regular",
+      "sha256": "02106cfb319ebdb7d3db30d5d8ecbd5def0225d4445932b56b00e6b509a39308"
+    },
+    "bold": {
+      "file": "davidbd.ttf",
+      "family": "David",
+      "style": "Bold",
+      "sha256": "60232ab659a84fd42931b2e799d18892788e3b7132259f4c593b92780a4b3545"
+    },
+    "heading": {
+      "file": "Guttman Hatzvi-Bold.TTF",
+      "family": "Guttman Hatzvi",
+      "style": "Bold",
+      "sha256": "ca66b104995d2fa32d27c1ba5bfe43c7c04213b8b624fd2055a2bb17d15cb01d"
+    },
+    "day_title": {
+      "file": "DAVIDB.TTF",
+      "family": "Guttman David",
+      "style": "Bold",
+      "sha256": "98d54cc0305f7b1520274a164aae9a17678c81d5cb1bab51dc81093a2f7d01b0"
+    }
+  },
+  "passed": true
+}

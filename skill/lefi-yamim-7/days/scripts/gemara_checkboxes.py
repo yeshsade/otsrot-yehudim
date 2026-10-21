@@ -50,8 +50,19 @@ def join_shared_fields(doc):
     names = [w.field_name for page in doc for w in page.widgets() or ()]
     if len(names) == len(set(names)):
         return doc
+    # insert_pdf reads page link caches. Reopen a snapshot so newly inserted
+    # links are visible without reloading pages still held by placement canvases.
     clone = fitz.open()
-    clone.insert_pdf(doc, widgets=True, join_duplicates=True)
+    with fitz.open(stream=doc.tobytes(), filetype="pdf") as snapshot:
+        # PyMuPDF's link copier shifts destination Y when source and target
+        # page heights differ (for example a full TOC and a short day card).
+        # Copy the pages/widgets, then recreate links in the completed document
+        # from the snapshot's resolved coordinates.
+        links = [page.get_links() for page in snapshot]
+        clone.insert_pdf(snapshot, links=False, widgets=True, join_duplicates=True)
+        for number, page_links in enumerate(links):
+            for link in page_links:
+                clone[number].insert_link({k: v for k, v in link.items() if k not in {"xref", "id"}})
     clone.set_metadata(doc.metadata)
     doc.close()
     # PyMuPDF joins the names but leaves a separate /V in each child. Those

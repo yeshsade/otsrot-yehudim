@@ -8,14 +8,60 @@ import fitz
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "days/scripts"))
-from placement import Canvas, box_count, measured_regions
+from placement import Canvas, box_count, measured_regions, button_rect, zohar_translation_heading
 from source_model import column_of, validate_answers, gray_backgrounds
 from add_vcheck_boxes import CandidateBox, make_checkbox_appearances, add_checkbox
 from gemara_checkboxes import join_shared_fields, set_checkbox_state
 from build_booklet import map_topics
+from validate_booklet import validate_source_dimensions, validate_internal_destination
 
 
 class Skill7GeometryTests(unittest.TestCase):
+    def test_internal_link_cannot_land_outside_correct_page(self):
+        with fitz.open() as doc:
+            doc.new_page(width=468, height=680)
+            doc.new_page(width=468, height=244)
+            link = {"kind": fitz.LINK_GOTO, "page": 1, "to": fitz.Point(0, -436)}
+            with self.assertRaisesRegex(ValueError, "target page's top"):
+                validate_internal_destination(doc, link)
+            link["to"] = fitz.Point(0, 0)
+            validate_internal_destination(doc, link)
+
+    def test_zohar_translation_heading_encodings(self):
+        for text in ("תרגום לשון הזוהר", "רהוזה ןושל םוגרת", "øäåæä ïåùì íåâøú"):
+            self.assertTrue(zohar_translation_heading(text), text)
+        self.assertFalse(zohar_translation_heading("תוספתא"))
+
+    def test_zohar_mixed_study_styles_cover_every_column_before_translation(self):
+        with fitz.open() as doc:
+            page = doc.new_page(width=680, height=468)
+            for col, x in enumerate((45, 190, 360, 505)):
+                for y in range(60, 251, 15):
+                    font = "hebo" if col in (0, 3) and y < 120 else "heit"
+                    page.insert_text((x, y), "study text", fontname=font,
+                                     fontsize=11 if font == "hebo" else 10.5)
+                for y in range(310, 421, 15):
+                    page.insert_text((x, y), "translation", fontsize=8)
+            for x in (150, 465):
+                page.insert_text((x, 285), "øäåæä ïåùì íåâøú", fontsize=9)
+            regions = measured_regions(page, "zohar")
+            self.assertEqual([r["column"] for r in regions], [1, 2, 3, 4])
+            for r in regions:
+                self.assertGreater(r["rect"].y1, 240)
+                self.assertLess(r["rect"].y1, 275)
+                self.assertGreater(r["full_rect"].y1, 410)
+                self.assertEqual(box_count(r["rect"].height, r["full_rect"].height, True), 2)
+            page.draw_rect(fitz.Rect(40, 40, 135, 260), color=None,
+                           fill=(.9, .9, .9), overlay=False)
+            self.assertEqual([r["column"] for r in measured_regions(page, "zohar")], [1, 2, 3])
+
+    def test_zohar_missing_translation_boundary_stops(self):
+        with fitz.open() as doc:
+            page = doc.new_page(width=680, height=468)
+            page.insert_text((510, 70), "study text", fontsize=11)
+            with self.assertRaisesRegex(ValueError, "Zohar translation boundary"):
+                measured_regions(page, "zohar")
+
     def test_split_subjects_keep_unique_order_before_tefilot(self):
         topics = map_topics()
         ids = [t["id"] for t in topics]
@@ -88,35 +134,97 @@ class Skill7GeometryTests(unittest.TestCase):
             self.assertGreater(rect.x0, 40)
             self.assertFalse(canvas.clear(rect))
 
-    def test_crowded_header_keeps_continuation_and_return_clear(self):
+    def test_low_source_line_uses_blank_space_in_same_lower_corner(self):
+        for right in (False, True):
+            with self.subTest(right=right), fitz.open() as doc:
+                page = doc.new_page(width=468, height=680)
+                # A raster/vector line across the entire original search row.
+                page.draw_rect(fitz.Rect(0, 648, 468, 651), fill=(0, 0, 0))
+                canvas = Canvas(page)
+                rect = canvas.lower_corner(right=right)
+                self.assertEqual(rect.x0, 428 if right else 28)
+                self.assertGreater(rect.y0, 651)
+                self.assertLess(rect.y1, 680)
+                self.assertEqual(page.rect, fitz.Rect(0, 0, 468, 680))
+                self.assertFalse(canvas.clear(rect))
+
+    def test_fully_occupied_corner_still_stops(self):
         with fitz.open() as doc:
             page = doc.new_page(width=468, height=680)
-            for rect in ((327, 15, 445, 25), (70, 14, 115, 25), (30, 34, 440, 627)):
-                page.draw_rect(fitz.Rect(rect), fill=(0, 0, 0))
-            canvas = Canvas(page)
-            previous = canvas.button("previous")
-            back = canvas.button("return")
-            self.assertFalse(previous.intersects(back))
-            self.assertGreaterEqual(previous.width, 150 * .75)
-            self.assertGreater(back.y0, 627)
+            page.draw_rect(fitz.Rect(0, 640, 110, 680), fill=(0, 0, 0))
+            with self.assertRaisesRegex(ValueError, "No safe lower left corner"):
+                Canvas(page).lower_corner()
 
-    def test_dense_footer_moves_next_to_clear_top_margin(self):
+    def test_source_dimensions_allow_orientation_only_not_added_margins(self):
+        with fitz.open() as source, fitz.open() as result:
+            original = source.new_page(width=468, height=680)
+            rotated = result.new_page(width=680, height=468)
+            validate_source_dimensions(rotated, original)
+            enlarged = result.new_page(width=468, height=776)
+            with self.assertRaisesRegex(ValueError, "added margins are forbidden"):
+                validate_source_dimensions(enlarged, original)
+
+    def test_controls_keep_approved_anchors_and_full_size_without_collision(self):
+        cases = [
+            (468, 680, {"previous": (308, 8, 458, 44), "next": (10, 636, 160, 672),
+                        "return": (171.5, 5, 296.5, 37)}),
+            (680, 468, {"previous": (520, 8, 670, 44), "next": (10, 424, 160, 460),
+                        "return": (277.5, 5, 402.5, 37)}),
+        ]
+        for width, height, expected in cases:
+            with self.subTest(width=width), fitz.open() as doc:
+                page = doc.new_page(width=width, height=height)
+                canvas = Canvas(page)
+                for kind, coordinates in expected.items():
+                    self.assertEqual(canvas.button(kind), fitz.Rect(coordinates))
+
+    def test_checkbox_collision_shrinks_at_same_corner_and_reserves_click_area(self):
+        with fitz.open() as doc:
+            page = doc.new_page(width=468, height=680)
+            for kind, checkbox in (("previous", (310, 12, 319, 21)),
+                                   ("next", (12, 640, 21, 649))):
+                with self.subTest(kind=kind):
+                    canvas = Canvas(page)
+                    canvas.reserve(fitz.Rect(checkbox), checkbox=True)
+                    rect = canvas.button(kind)
+                    self.assertEqual(rect, button_rect(page, kind, .875))
+                    self.assertFalse(rect.intersects(fitz.Rect(checkbox)))
+                    self.assertFalse(canvas.clear(rect))
+
+    def test_source_ink_alone_cannot_trigger_shrinking_or_relocation(self):
+        with fitz.open() as doc:
+            page = doc.new_page(width=468, height=680)
+            # The source remains visible through the original translucent asset.
+            page.draw_rect(fitz.Rect(310, 12, 319, 21), fill=(0, 0, 0))
+            self.assertEqual(Canvas(page).button("previous"), fitz.Rect(308, 8, 458, 44))
+
+    def test_dense_footer_cannot_move_next_to_top_or_side(self):
         with fitz.open() as doc:
             page = doc.new_page(width=680, height=468)
             page.draw_rect(fitz.Rect(10, 420, 670, 467), fill=(0, 0, 0))
-            rect = Canvas(page).button("next")
-            self.assertLess(rect.y1, 40)
-            self.assertGreaterEqual(rect.width, 150 * .75)
+            self.assertEqual(Canvas(page).button("next"), fitz.Rect(10, 424, 160, 460))
 
-    def test_landscape_with_full_edges_uses_rotated_side_control(self):
+    def test_crowded_header_keeps_transparent_return_at_top_center(self):
         with fitz.open() as doc:
-            page = doc.new_page(width=680, height=468)
-            for rect in ((0, 0, 680, 35), (0, 433, 680, 468), (45, 35, 635, 433)):
-                page.draw_rect(fitz.Rect(rect), fill=(0, 0, 0))
-            rect = Canvas(page).button("next")
-            self.assertGreater(rect.height, rect.width)
-            self.assertGreaterEqual(rect.height, 150 * .75)
-            self.assertLess(rect.x1, 45)
+            page = doc.new_page(width=468, height=680)
+            page.draw_rect(button_rect(page, "return"), fill=(0, 0, 0))
+            self.assertEqual(Canvas(page).button("return"), fitz.Rect(171.5, 5, 296.5, 37))
+
+    def test_transparency_does_not_permit_covering_other_navigation(self):
+        with fitz.open() as doc:
+            page = doc.new_page(width=468, height=680)
+            canvas = Canvas(page)
+            canvas.reserve(fitz.Rect(310, 12, 319, 21))
+            with self.assertRaisesRegex(ValueError, "review required"):
+                canvas.button("previous")
+
+    def test_checkbox_at_corner_cannot_force_more_than_25_percent_shrink(self):
+        with fitz.open() as doc:
+            page = doc.new_page(width=468, height=680)
+            canvas = Canvas(page)
+            canvas.reserve(fitz.Rect(449, 10, 457, 18), checkbox=True)
+            with self.assertRaisesRegex(ValueError, "review required"):
+                canvas.button("previous")
 
     def test_nach_font_is_recognized_per_page_not_previous_subset_name(self):
         with fitz.open() as doc:

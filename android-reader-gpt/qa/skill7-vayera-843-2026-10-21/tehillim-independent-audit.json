@@ -1,0 +1,348 @@
+{
+  "method": "Independent raw glyph bounds; manually reviewed black weekly tabs and gray source rectangles; body face verified visually. No production region measurement called.",
+  "regions": [
+    {
+      "day": "sunday",
+      "source_page": 97,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 440.1135559082031,
+      "H": 394.9584655761719,
+      "expected_boxes": 3
+    },
+    {
+      "day": "sunday",
+      "source_page": 97,
+      "column": 4,
+      "y0": 45.158294677734375,
+      "y1": 440.11639404296875,
+      "H": 394.9584655761719,
+      "expected_boxes": 3
+    },
+    {
+      "day": "sunday",
+      "source_page": 97,
+      "column": 2,
+      "y0": 264.67254638671875,
+      "y1": 440.11676025390625,
+      "H": 394.9584655761719,
+      "expected_boxes": 2
+    },
+    {
+      "day": "sunday",
+      "source_page": 98,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 179.86224365234375,
+      "H": 394.9586181640625,
+      "expected_boxes": 2
+    },
+    {
+      "day": "sunday",
+      "source_page": 98,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 440.1169128417969,
+      "H": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day": "sunday",
+      "source_page": 98,
+      "column": 2,
+      "y0": 45.158294677734375,
+      "y1": 440.1162109375,
+      "H": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day": "monday",
+      "source_page": 98,
+      "column": 3,
+      "y0": 196.763671875,
+      "y1": 440.1135559082031,
+      "H": 394.9586181640625,
+      "expected_boxes": 2
+    },
+    {
+      "day": "monday",
+      "source_page": 98,
+      "column": 4,
+      "y0": 45.158294677734375,
+      "y1": 440.1135559082031,
+      "H": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day": "monday",
+      "source_page": 99,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 410.7341003417969,
+      "H": 394.9589538574219,
+      "expected_boxes": 3
+    },
+    {
+      "day": "monday",
+      "source_page": 99,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 440.1169128417969,
+      "H": 394.9589538574219,
+      "expected_boxes": 3
+    },
+    {
+      "day": "monday",
+      "source_page": 99,
+      "column": 2,
+      "y0": 45.159271240234375,
+      "y1": 440.1135559082031,
+      "H": 394.9589538574219,
+      "expected_boxes": 3
+    },
+    {
+      "day": "tuesday",
+      "source_page": 99,
+      "column": 3,
+      "y0": 427.65936279296875,
+      "y1": 440.1135559082031,
+      "H": 394.9589538574219,
+      "expected_boxes": 1
+    },
+    {
+      "day": "tuesday",
+      "source_page": 99,
+      "column": 4,
+      "y0": 45.157958984375,
+      "y1": 440.11639404296875,
+      "H": 394.9589538574219,
+      "expected_boxes": 3
+    },
+    {
+      "day": "tuesday",
+      "source_page": 100,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 84.78836059570312,
+      "H": 394.96124267578125,
+      "expected_boxes": 1
+    },
+    {
+      "day": "tuesday",
+      "source_page": 100,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 433.7832336425781,
+      "H": 394.96124267578125,
+      "expected_boxes": 3
+    },
+    {
+      "day": "tuesday",
+      "source_page": 100,
+      "column": 2,
+      "y0": 45.158355712890625,
+      "y1": 433.7832336425781,
+      "H": 394.96124267578125,
+      "expected_boxes": 3
+    },
+    {
+      "day": "wednesday",
+      "source_page": 100,
+      "column": 3,
+      "y0": 101.68685913085938,
+      "y1": 440.1195983886719,
+      "H": 394.96124267578125,
+      "expected_boxes": 3
+    },
+    {
+      "day": "wednesday",
+      "source_page": 100,
+      "column": 4,
+      "y0": 45.159271240234375,
+      "y1": 440.1135559082031,
+      "H": 394.96124267578125,
+      "expected_boxes": 3
+    },
+    {
+      "day": "wednesday",
+      "source_page": 101,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 440.11639404296875,
+      "H": 394.96173095703125,
+      "expected_boxes": 3
+    },
+    {
+      "day": "wednesday",
+      "source_page": 101,
+      "column": 2,
+      "y0": 45.159271240234375,
+      "y1": 289.41693115234375,
+      "H": 394.96173095703125,
+      "expected_boxes": 2
+    },
+    {
+      "day": "thursday",
+      "source_page": 101,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 440.1200256347656,
+      "H": 394.96173095703125,
+      "expected_boxes": 3
+    },
+    {
+      "day": "thursday",
+      "source_page": 101,
+      "column": 4,
+      "y0": 45.158294677734375,
+      "y1": 440.1169128417969,
+      "H": 394.96173095703125,
+      "expected_boxes": 3
+    },
+    {
+      "day": "thursday",
+      "source_page": 101,
+      "column": 2,
+      "y0": 306.22314453125,
+      "y1": 440.1135559082031,
+      "H": 394.96173095703125,
+      "expected_boxes": 2
+    },
+    {
+      "day": "thursday",
+      "source_page": 102,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 440.1169128417969,
+      "H": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day": "thursday",
+      "source_page": 102,
+      "column": 2,
+      "y0": 45.158294677734375,
+      "y1": 84.80892944335938,
+      "H": 394.9586181640625,
+      "expected_boxes": 1
+    },
+    {
+      "day": "friday",
+      "source_page": 102,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 440.1162109375,
+      "H": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day": "friday",
+      "source_page": 102,
+      "column": 4,
+      "y0": 45.158294677734375,
+      "y1": 440.1162109375,
+      "H": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day": "friday",
+      "source_page": 102,
+      "column": 2,
+      "y0": 115.06787109375,
+      "y1": 440.11676025390625,
+      "H": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day": "friday",
+      "source_page": 103,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 111.59906005859375,
+      "H": 394.9580993652344,
+      "expected_boxes": 1
+    },
+    {
+      "day": "friday",
+      "source_page": 103,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 440.11639404296875,
+      "H": 394.9580993652344,
+      "expected_boxes": 3
+    },
+    {
+      "day": "friday",
+      "source_page": 103,
+      "column": 2,
+      "y0": 45.158294677734375,
+      "y1": 440.11639404296875,
+      "H": 394.9580993652344,
+      "expected_boxes": 3
+    },
+    {
+      "day": "saturday",
+      "source_page": 103,
+      "column": 3,
+      "y0": 128.40206909179688,
+      "y1": 440.1162109375,
+      "H": 394.9580993652344,
+      "expected_boxes": 3
+    },
+    {
+      "day": "saturday",
+      "source_page": 103,
+      "column": 4,
+      "y0": 45.159271240234375,
+      "y1": 440.1162109375,
+      "H": 394.9580993652344,
+      "expected_boxes": 3
+    },
+    {
+      "day": "saturday",
+      "source_page": 104,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 440.11639404296875,
+      "H": 394.9571228027344,
+      "expected_boxes": 3
+    },
+    {
+      "day": "saturday",
+      "source_page": 104,
+      "column": 4,
+      "y0": 45.159271240234375,
+      "y1": 98.360595703125,
+      "H": 394.9571228027344,
+      "expected_boxes": 1
+    },
+    {
+      "day": "saturday",
+      "source_page": 104,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 436.2125244140625,
+      "H": 394.9571228027344,
+      "expected_boxes": 3
+    },
+    {
+      "day": "saturday",
+      "source_page": 104,
+      "column": 2,
+      "y0": 45.159271240234375,
+      "y1": 436.2149353027344,
+      "H": 394.9571228027344,
+      "expected_boxes": 3
+    }
+  ],
+  "counts_by_day": {
+    "sunday": 16,
+    "monday": 14,
+    "tuesday": 11,
+    "wednesday": 11,
+    "thursday": 12,
+    "friday": 16,
+    "saturday": 16
+  },
+  "passed": true
+}

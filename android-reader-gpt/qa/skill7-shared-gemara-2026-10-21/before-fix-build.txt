@@ -1,0 +1,29 @@
+test_build_split_amud_preserves_occurrences_and_validates_saved_pdf (test_build_shared_gemara.SharedGemaraBuildTests.test_build_split_amud_preserves_occurrences_and_validates_saved_pdf) ... ERROR
+
+======================================================================
+ERROR: test_build_split_amud_preserves_occurrences_and_validates_saved_pdf (test_build_shared_gemara.SharedGemaraBuildTests.test_build_split_amud_preserves_occurrences_and_validates_saved_pdf)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/otsrot-yehudim/skill/lefi-yamim-7/tests/test_build_shared_gemara.py", line 69, in test_build_split_amud_preserves_occurrences_and_validates_saved_pdf
+    output = builder.build(interior, cover, answers, folder / 'output', checker)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/otsrot-yehudim/skill/lefi-yamim-7/scripts/build_booklet.py", line 404, in build
+    audit = validate(final, source, src, checks, rows, links, inputs_before, interior, cover)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/mock.py", line 1139, in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/mock.py", line 1143, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/mock.py", line 1216, in _execute_mock_call
+    return self._mock_wraps(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/otsrot-yehudim/skill/lefi-yamim-7/scripts/validate_booklet.py", line 93, in validate
+    raise ValueError("Navigation target or clickable area changed")
+ValueError: Navigation target or clickable area changed
+
+----------------------------------------------------------------------
+Ran 1 test in 6.173s
+
+FAILED (errors=1)

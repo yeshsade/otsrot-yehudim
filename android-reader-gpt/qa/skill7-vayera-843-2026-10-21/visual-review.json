@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "tehillim_pages_pixel_identical_to_visually_reviewed_build": [
+    32,
+    33,
+    55,
+    56,
+    76,
+    77,
+    97,
+    98,
+    118,
+    119,
+    139,
+    140,
+    160,
+    161
+  ],
+  "all_seven_daily_tehillim_sequences_reviewed": true,
+  "final_zohar_gray_edges_and_mixed_styles_reviewed_sources": [
+    83,
+    91,
+    95,
+    96
+  ],
+  "representative_nach_mishnah_shulchan_berurah_gemara_covers_contents_reviewed": true,
+  "note": "Intentional transparent controls overlay source ink as approved; checker warnings are not hidden. PDF viewer-specific interactive behavior has not been tested in the Android app."
+}

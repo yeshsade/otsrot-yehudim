@@ -1,0 +1,4504 @@
+{
+  "passed": false,
+  "policy": "fixed-anchors-checkbox-shrink-only",
+  "planned_controls": 9,
+  "conflicts": [
+    {
+      "page": 4,
+      "source_page": 2,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          282.744384765625,
+          33.182926177978516,
+          296.6859130859375,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 4; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 5,
+      "source_page": 3,
+      "topic_id": "gemara",
+      "kind": "previous",
+      "target": 153,
+      "original_rect": [
+        307.7170104980469,
+        8.0,
+        457.7170104980469,
+        44.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          398.1622009277344,
+          38.69374084472656,
+          412.0205078125,
+          47.70068359375
+        ],
+        [
+          414.9203186035156,
+          38.69374084472656,
+          430.6829528808594,
+          47.70068359375
+        ],
+        [
+          415.9948425292969,
+          15.771224975585938,
+          429.5388488769531,
+          25.771224975585938
+        ],
+        [
+          400.1468505859375,
+          15.771224975585938,
+          414.5068359375,
+          25.771224975585938
+        ],
+        [
+          380.4668273925781,
+          15.771224975585938,
+          398.6588439941406,
+          25.771224975585938
+        ],
+        [
+          365.3468017578125,
+          15.771224975585938,
+          378.97882080078125,
+          25.771224975585938
+        ],
+        [
+          342.2587890625,
+          15.771224975585938,
+          363.8587951660156,
+          25.771224975585938
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed previous button has no safe placement on final page 5; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 5,
+      "source_page": 3,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          161.16700744628906,
+          31.280590057373047,
+          231.91770935058594,
+          48.5666389465332
+        ],
+        [
+          237.36651611328125,
+          31.280590057373047,
+          255.97354125976562,
+          48.5666389465332
+        ],
+        [
+          266.90234375,
+          31.280590057373047,
+          306.48211669921875,
+          48.5666389465332
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 5; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 6,
+      "source_page": 4,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          158.83290100097656,
+          31.755817413330078,
+          231.5487823486328,
+          49.52203369140625
+        ],
+        [
+          237.14892578125,
+          31.755817413330078,
+          256.2727966308594,
+          49.52203369140625
+        ],
+        [
+          267.5051574707031,
+          31.755817413330078,
+          308.1842956542969,
+          49.52203369140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 6; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 7,
+      "source_page": 5,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          283.36358642578125,
+          33.182926177978516,
+          296.63433837890625,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 7; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 8,
+      "source_page": 6,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          283.36358642578125,
+          33.182926177978516,
+          297.30511474609375,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 8; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 9,
+      "source_page": 7,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          158.83290100097656,
+          31.755817413330078,
+          231.5487823486328,
+          49.52203369140625
+        ],
+        [
+          237.14892578125,
+          31.755817413330078,
+          256.2727966308594,
+          49.52203369140625
+        ],
+        [
+          267.5051574707031,
+          31.755817413330078,
+          308.1842956542969,
+          49.52203369140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 9; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 10,
+      "source_page": 8,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          158.83290100097656,
+          31.755817413330078,
+          231.5487823486328,
+          49.52203369140625
+        ],
+        [
+          237.14892578125,
+          31.755817413330078,
+          256.2727966308594,
+          49.52203369140625
+        ],
+        [
+          267.5051574707031,
+          31.755817413330078,
+          308.1842956542969,
+          49.52203369140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 10; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 11,
+      "source_page": 9,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          284.0343933105469,
+          33.182926177978516,
+          297.3051452636719,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 11; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 12,
+      "source_page": 10,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          284.7567138671875,
+          33.182926177978516,
+          298.6982421875,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 12; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 13,
+      "source_page": 11,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          145.5128936767578,
+          31.755817413330078,
+          221.52914428710938,
+          49.52203369140625
+        ],
+        [
+          227.11410522460938,
+          31.755817413330078,
+          246.23797607421875,
+          49.52203369140625
+        ],
+        [
+          257.4855041503906,
+          31.755817413330078,
+          321.4256591796875,
+          49.52203369140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 13; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 14,
+      "source_page": 12,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          145.5128936767578,
+          31.755817413330078,
+          221.52914428710938,
+          49.52203369140625
+        ],
+        [
+          227.11410522460938,
+          31.755817413330078,
+          246.23797607421875,
+          49.52203369140625
+        ],
+        [
+          257.4855041503906,
+          31.755817413330078,
+          321.4239807128906,
+          49.52203369140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 14; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 15,
+      "source_page": 13,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          285.4276123046875,
+          33.182926177978516,
+          298.6983642578125,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 15; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 16,
+      "source_page": 14,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          283.36358642578125,
+          33.182926177978516,
+          297.30511474609375,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 16; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 17,
+      "source_page": 15,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          145.5128936767578,
+          31.755817413330078,
+          221.52914428710938,
+          49.52203369140625
+        ],
+        [
+          227.11410522460938,
+          31.755817413330078,
+          246.23797607421875,
+          49.52203369140625
+        ],
+        [
+          257.4855041503906,
+          31.755817413330078,
+          321.4256591796875,
+          49.52203369140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 17; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 18,
+      "source_page": 16,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          145.5128936767578,
+          31.755817413330078,
+          221.52914428710938,
+          49.52203369140625
+        ],
+        [
+          227.11410522460938,
+          31.755817413330078,
+          246.23797607421875,
+          49.52203369140625
+        ],
+        [
+          257.4855041503906,
+          31.755817413330078,
+          321.4239807128906,
+          49.52203369140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 18; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 19,
+      "source_page": 17,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          284.0343933105469,
+          33.182926177978516,
+          297.3051452636719,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 19; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 20,
+      "source_page": 18,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          282.744384765625,
+          33.182926177978516,
+          296.6859130859375,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 20; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 21,
+      "source_page": 19,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          145.5128936767578,
+          31.755817413330078,
+          221.52914428710938,
+          49.52203369140625
+        ],
+        [
+          227.11410522460938,
+          31.755817413330078,
+          246.23797607421875,
+          49.52203369140625
+        ],
+        [
+          257.4855041503906,
+          31.755817413330078,
+          321.4256591796875,
+          49.52203369140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 21; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 22,
+      "source_page": 20,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          145.5128936767578,
+          31.755817413330078,
+          221.52914428710938,
+          49.52203369140625
+        ],
+        [
+          227.11410522460938,
+          31.755817413330078,
+          246.23797607421875,
+          49.52203369140625
+        ],
+        [
+          257.4855041503906,
+          31.755817413330078,
+          321.4239807128906,
+          49.52203369140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 22; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 23,
+      "source_page": 21,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          283.36358642578125,
+          33.182926177978516,
+          296.63433837890625,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 23; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 24,
+      "source_page": 22,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          285.4276123046875,
+          33.182926177978516,
+          299.369140625,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 24; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 25,
+      "source_page": 23,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          145.5128936767578,
+          31.755817413330078,
+          221.52914428710938,
+          49.52203369140625
+        ],
+        [
+          227.11410522460938,
+          31.755817413330078,
+          246.23797607421875,
+          49.52203369140625
+        ],
+        [
+          257.4855041503906,
+          31.755817413330078,
+          321.4256591796875,
+          49.52203369140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 25; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 26,
+      "source_page": 24,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          148.2071075439453,
+          31.280590057373047,
+          222.16900634765625,
+          48.5666389465332
+        ],
+        [
+          227.60302734375,
+          31.280590057373047,
+          246.21005249023438,
+          48.5666389465332
+        ],
+        [
+          257.15362548828125,
+          31.280590057373047,
+          319.3642272949219,
+          48.5666389465332
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 26; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 27,
+      "source_page": 25,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          286.04681396484375,
+          33.182926177978516,
+          299.31756591796875,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 27; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 28,
+      "source_page": 26,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          285.7372131347656,
+          33.182926177978516,
+          299.6787414550781,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 28; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 29,
+      "source_page": 27,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          145.5128936767578,
+          31.755817413330078,
+          221.52914428710938,
+          49.52203369140625
+        ],
+        [
+          227.11410522460938,
+          31.755817413330078,
+          246.23797607421875,
+          49.52203369140625
+        ],
+        [
+          257.4855041503906,
+          31.755817413330078,
+          321.4256591796875,
+          49.52203369140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 29; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 30,
+      "source_page": 28,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          145.5128936767578,
+          31.755817413330078,
+          221.52914428710938,
+          49.52203369140625
+        ],
+        [
+          227.11410522460938,
+          31.755817413330078,
+          246.23797607421875,
+          49.52203369140625
+        ],
+        [
+          257.4855041503906,
+          31.755817413330078,
+          321.4239807128906,
+          49.52203369140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 30; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 31,
+      "source_page": 29,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          286.4079895019531,
+          33.182926177978516,
+          299.6787414550781,
+          45.78860092163086
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 31; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 32,
+      "source_page": 30,
+      "topic_id": "parsha",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          386.08062744140625,
+          25.688539505004883,
+          416.8845520019531,
+          36.92673873901367
+        ],
+        [
+          356.1195983886719,
+          25.688539505004883,
+          371.9205017089844,
+          36.92673873901367
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 32; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 33,
+      "source_page": 31,
+      "topic_id": "parsha",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          386.08062744140625,
+          25.688539505004883,
+          416.8845520019531,
+          36.92673873901367
+        ],
+        [
+          356.1195983886719,
+          25.688539505004883,
+          369.4368591308594,
+          36.92673873901367
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 33; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 34,
+      "source_page": 32,
+      "topic_id": "parsha",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          386.08001708984375,
+          25.688539505004883,
+          416.8839416503906,
+          36.92673873901367
+        ],
+        [
+          356.1189880371094,
+          25.688539505004883,
+          372.2795104980469,
+          36.92673873901367
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 34; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 35,
+      "source_page": 33,
+      "topic_id": "parsha",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          386.08001708984375,
+          25.688539505004883,
+          416.8839416503906,
+          36.92673873901367
+        ],
+        [
+          356.1189880371094,
+          25.688539505004883,
+          365.8962097167969,
+          36.92673873901367
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 35; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 36,
+      "source_page": 34,
+      "topic_id": "parsha",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          386.079833984375,
+          25.688539505004883,
+          416.8837585449219,
+          36.92673873901367
+        ],
+        [
+          356.1188049316406,
+          25.688539505004883,
+          371.2791442871094,
+          36.92673873901367
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 36; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 37,
+      "source_page": 35,
+      "topic_id": "parsha",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          386.079833984375,
+          25.688539505004883,
+          416.8837585449219,
+          36.92673873901367
+        ],
+        [
+          356.1188049316406,
+          25.688539505004883,
+          371.3802795410156,
+          36.92673873901367
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 37; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 38,
+      "source_page": 36,
+      "topic_id": "parsha",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          386.079833984375,
+          25.688539505004883,
+          416.8837585449219,
+          36.92673873901367
+        ],
+        [
+          356.1188049316406,
+          25.688539505004883,
+          368.8966369628906,
+          36.92673873901367
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 38; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 39,
+      "source_page": 37,
+      "topic_id": "parsha",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          386.079833984375,
+          25.688539505004883,
+          416.8837585449219,
+          36.92673873901367
+        ],
+        [
+          356.1188049316406,
+          25.688539505004883,
+          371.7398986816406,
+          36.92673873901367
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 39; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 40,
+      "source_page": 38,
+      "topic_id": "parsha",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          386.08062744140625,
+          25.688539505004883,
+          416.8845520019531,
+          36.92673873901367
+        ],
+        [
+          356.1195983886719,
+          25.688539505004883,
+          367.166748046875,
+          36.92673873901367
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 40; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 41,
+      "source_page": 39,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.2519836425781,
+          25.69842529296875,
+          364.4221496582031,
+          36.93662643432617
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 41; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 42,
+      "source_page": 40,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.2519836425781,
+          25.698516845703125,
+          367.2654113769531,
+          36.93671798706055
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 42; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 43,
+      "source_page": 41,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.2519226074219,
+          25.69842529296875,
+          364.2478942871094,
+          36.93662643432617
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 43; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 44,
+      "source_page": 42,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.2519226074219,
+          25.698516845703125,
+          369.6141662597656,
+          36.93671798706055
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 44; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 45,
+      "source_page": 43,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.2519226074219,
+          25.69842529296875,
+          369.7153015136719,
+          36.93662643432617
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 45; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 46,
+      "source_page": 44,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          307.3327941894531,
+          36.40056610107422,
+          322.67706298828125,
+          53.269432067871094
+        ],
+        [
+          356.2519226074219,
+          26.073827743530273,
+          370.8053894042969,
+          37.31202697753906
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 46; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 47,
+      "source_page": 45,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.25762939453125,
+          25.69842529296875,
+          370.08062744140625,
+          36.93662643432617
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 47; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 48,
+      "source_page": 46,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.25762939453125,
+          25.698516845703125,
+          366.5967712402344,
+          36.93671798706055
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 48; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 49,
+      "source_page": 47,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.25762939453125,
+          26.0737361907959,
+          371.9573974609375,
+          37.31193542480469
+        ],
+        [
+          313.0621032714844,
+          36.331199645996094,
+          322.63739013671875,
+          53.6151008605957
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 49; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 50,
+      "source_page": 48,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.25079345703125,
+          26.073827743530273,
+          361.6114196777344,
+          37.31202697753906
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 50; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 51,
+      "source_page": 49,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.25079345703125,
+          26.0737361907959,
+          361.7125549316406,
+          37.31193542480469
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 51; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 52,
+      "source_page": 50,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.251220703125,
+          26.073827743530273,
+          359.2293395996094,
+          37.31202697753906
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 52; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 53,
+      "source_page": 51,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.25579833984375,
+          26.0737361907959,
+          362.0771789550781,
+          37.31193542480469
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 53; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 54,
+      "source_page": 52,
+      "topic_id": "nach",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          356.25579833984375,
+          26.050148010253906,
+          359.08782958984375,
+          37.28834915161133
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 54; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 55,
+      "source_page": 53,
+      "topic_id": "mishnah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.3153991699219,
+          25.538433074951172,
+          373.37078857421875,
+          36.76543426513672
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 55; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 56,
+      "source_page": 54,
+      "topic_id": "mishnah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.3152160644531,
+          25.538433074951172,
+          373.4716491699219,
+          36.76543426513672
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 56; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 57,
+      "source_page": 55,
+      "topic_id": "mishnah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.3152160644531,
+          25.538433074951172,
+          370.990478515625,
+          36.76543426513672
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 57; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 58,
+      "source_page": 56,
+      "topic_id": "mishnah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.3152160644531,
+          25.909400939941406,
+          373.8309326171875,
+          37.13639831542969
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 58; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 59,
+      "source_page": 57,
+      "topic_id": "mishnah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.3158874511719,
+          25.909400939941406,
+          369.2509765625,
+          37.13639831542969
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 59; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 60,
+      "source_page": 58,
+      "topic_id": "mishnah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.3158874511719,
+          25.909400939941406,
+          374.62872314453125,
+          37.13639831542969
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 60; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 61,
+      "source_page": 59,
+      "topic_id": "mishnah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.3158874511719,
+          23.205101013183594,
+          374.7185363769531,
+          34.43210220336914
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 61; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 62,
+      "source_page": 60,
+      "topic_id": "shulchan_aruch",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          355.25390625,
+          27.446413040161133,
+          377.40130615234375,
+          38.54231262207031
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 62; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 63,
+      "source_page": 61,
+      "topic_id": "shulchan_aruch",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          355.25390625,
+          27.05600357055664,
+          378.8992919921875,
+          38.15190505981445
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 63; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 64,
+      "source_page": 62,
+      "topic_id": "shulchan_aruch",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          355.25390625,
+          27.357601165771484,
+          376.491455078125,
+          38.4535026550293
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 64; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 65,
+      "source_page": 63,
+      "topic_id": "shulchan_aruch",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          355.25390625,
+          27.140277862548828,
+          378.47760009765625,
+          38.23617935180664
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 65; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 66,
+      "source_page": 64,
+      "topic_id": "shulchan_aruch",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          355.25390625,
+          27.05600357055664,
+          376.21405029296875,
+          38.15190505981445
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 66; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 67,
+      "source_page": 65,
+      "topic_id": "shulchan_aruch",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          355.25390625,
+          27.446413040161133,
+          378.47760009765625,
+          38.54231262207031
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 67; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 68,
+      "source_page": 66,
+      "topic_id": "shulchan_aruch",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          355.25390625,
+          27.05600357055664,
+          378.3444519042969,
+          38.15190505981445
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 68; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 70,
+      "source_page": 68,
+      "topic_id": "mishnah_berurah",
+      "kind": "previous",
+      "target": 69,
+      "original_rect": [
+        307.7170104980469,
+        8.0,
+        457.7170104980469,
+        44.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          359.3335876464844,
+          32.989776611328125,
+          380.83038330078125,
+          45.41567611694336
+        ],
+        [
+          394.5331115722656,
+          36.06856155395508,
+          412.8310852050781,
+          44.60306167602539
+        ],
+        [
+          415.80963134765625,
+          36.06856155395508,
+          428.8161926269531,
+          44.60306167602539
+        ],
+        [
+          409.65625,
+          36.06856155395508,
+          410.9364318847656,
+          44.60306167602539
+        ],
+        [
+          399.9525146484375,
+          36.06856155395508,
+          401.25830078125,
+          44.60306167602539
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed previous button has no safe placement on final page 70; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 70,
+      "source_page": 68,
+      "topic_id": "mishnah_berurah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          151.07730102539062,
+          34.955047607421875,
+          174.49801635742188,
+          46.607147216796875
+        ],
+        [
+          181.2445831298828,
+          34.955047607421875,
+          199.7481231689453,
+          46.607147216796875
+        ],
+        [
+          206.5413055419922,
+          34.955047607421875,
+          225.5342254638672,
+          46.607147216796875
+        ],
+        [
+          232.33905029296875,
+          34.955047607421875,
+          259.4767761230469,
+          46.607147216796875
+        ],
+        [
+          213.462646484375,
+          34.955047607421875,
+          215.25706481933594,
+          46.607147216796875
+        ],
+        [
+          196.74188232421875,
+          34.955047607421875,
+          197.51092529296875,
+          46.607147216796875
+        ],
+        [
+          186.66281127929688,
+          34.955047607421875,
+          188.4572296142578,
+          46.607147216796875
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 70; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 71,
+      "source_page": 69,
+      "topic_id": "mishnah_berurah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          207.23739624023438,
+          34.955108642578125,
+          230.65811157226562,
+          46.607208251953125
+        ],
+        [
+          237.40467834472656,
+          34.955108642578125,
+          255.90821838378906,
+          46.607208251953125
+        ],
+        [
+          262.7013854980469,
+          34.955108642578125,
+          281.6943359375,
+          46.607208251953125
+        ],
+        [
+          288.4991760253906,
+          34.955108642578125,
+          315.6369323730469,
+          46.607208251953125
+        ],
+        [
+          269.62274169921875,
+          34.955108642578125,
+          271.41717529296875,
+          46.607208251953125
+        ],
+        [
+          252.9019775390625,
+          34.955108642578125,
+          253.6710205078125,
+          46.607208251953125
+        ],
+        [
+          242.82290649414062,
+          34.955108642578125,
+          244.61732482910156,
+          46.607208251953125
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 71; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 72,
+      "source_page": 70,
+      "topic_id": "mishnah_berurah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          151.54150390625,
+          34.955108642578125,
+          174.0417022705078,
+          46.607208251953125
+        ],
+        [
+          180.78826904296875,
+          34.955108642578125,
+          199.29180908203125,
+          46.607208251953125
+        ],
+        [
+          206.08499145507812,
+          34.955108642578125,
+          225.07791137695312,
+          46.607208251953125
+        ],
+        [
+          231.8827362060547,
+          34.955108642578125,
+          259.0204772949219,
+          46.607208251953125
+        ],
+        [
+          212.9946746826172,
+          34.955108642578125,
+          214.78909301757812,
+          46.607208251953125
+        ],
+        [
+          196.27391052246094,
+          34.955108642578125,
+          197.04295349121094,
+          46.607208251953125
+        ],
+        [
+          186.19483947753906,
+          34.955108642578125,
+          187.9892578125,
+          46.607208251953125
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 72; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 73,
+      "source_page": 71,
+      "topic_id": "mishnah_berurah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          179.2458038330078,
+          34.955108642578125,
+          201.83921813964844,
+          46.607208251953125
+        ],
+        [
+          208.58578491210938,
+          34.955108642578125,
+          229.45469665527344,
+          46.607208251953125
+        ],
+        [
+          236.20126342773438,
+          34.955108642578125,
+          258.67816162109375,
+          46.607208251953125
+        ],
+        [
+          265.42474365234375,
+          34.955108642578125,
+          283.9375915527344,
+          46.607208251953125
+        ],
+        [
+          290.73077392578125,
+          34.955108642578125,
+          309.7237243652344,
+          46.607208251953125
+        ],
+        [
+          280.9103698730469,
+          34.955108642578125,
+          281.6794128417969,
+          46.607208251953125
+        ],
+        [
+          270.831298828125,
+          34.955108642578125,
+          272.625732421875,
+          46.607208251953125
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 73; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 74,
+      "source_page": 72,
+      "topic_id": "mishnah_berurah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          151.3206024169922,
+          34.955108642578125,
+          174.31019592285156,
+          46.607208251953125
+        ],
+        [
+          181.0567626953125,
+          34.955108642578125,
+          199.560302734375,
+          46.607208251953125
+        ],
+        [
+          206.35348510742188,
+          34.955108642578125,
+          225.34640502929688,
+          46.607208251953125
+        ],
+        [
+          232.15122985839844,
+          34.955108642578125,
+          259.2889709472656,
+          46.607208251953125
+        ],
+        [
+          213.22821044921875,
+          34.955108642578125,
+          215.0226287841797,
+          46.607208251953125
+        ],
+        [
+          196.5074462890625,
+          34.955108642578125,
+          197.2764892578125,
+          46.607208251953125
+        ],
+        [
+          186.42837524414062,
+          34.955108642578125,
+          188.22279357910156,
+          46.607208251953125
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 74; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 75,
+      "source_page": 73,
+      "topic_id": "mishnah_berurah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          208.9176025390625,
+          34.955108642578125,
+          228.94757080078125,
+          46.607208251953125
+        ],
+        [
+          235.6941375732422,
+          34.955108642578125,
+          254.11610412597656,
+          46.607208251953125
+        ],
+        [
+          260.9209289550781,
+          34.955108642578125,
+          279.9255065917969,
+          46.607208251953125
+        ],
+        [
+          286.75360107421875,
+          34.955108642578125,
+          313.91461181640625,
+          46.607208251953125
+        ],
+        [
+          267.9471435546875,
+          34.955108642578125,
+          269.7415771484375,
+          46.607208251953125
+        ],
+        [
+          251.22637939453125,
+          34.955108642578125,
+          251.99542236328125,
+          46.607208251953125
+        ],
+        [
+          241.14730834960938,
+          34.955108642578125,
+          242.9417266845703,
+          46.607208251953125
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 75; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 76,
+      "source_page": 74,
+      "topic_id": "mishnah_berurah",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          180.83770751953125,
+          33.82644271850586,
+          200.86767578125,
+          45.42285919189453
+        ],
+        [
+          207.61424255371094,
+          33.82644271850586,
+          226.0362091064453,
+          45.42285919189453
+        ],
+        [
+          232.84103393554688,
+          33.82644271850586,
+          251.84561157226562,
+          45.42285919189453
+        ],
+        [
+          258.6737365722656,
+          33.82644271850586,
+          285.8347473144531,
+          45.42285919189453
+        ],
+        [
+          239.8672332763672,
+          33.82644271850586,
+          241.66165161132812,
+          45.42285919189453
+        ],
+        [
+          223.14646911621094,
+          33.82644271850586,
+          223.91551208496094,
+          45.42285919189453
+        ],
+        [
+          213.06739807128906,
+          33.82644271850586,
+          214.86181640625,
+          45.42285919189453
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 76; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 77,
+      "source_page": 75,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          389.6417236328125,
+          26.79075813293457,
+          404.35797119140625,
+          35.122737884521484
+        ],
+        [
+          358.0885925292969,
+          22.152069091796875,
+          382.1888427734375,
+          33.24797058105469
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 77; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 78,
+      "source_page": 76,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          389.6417236328125,
+          26.79088020324707,
+          404.35797119140625,
+          35.122859954833984
+        ],
+        [
+          358.0885925292969,
+          22.07448959350586,
+          383.2984619140625,
+          33.17039108276367
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 78; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 79,
+      "source_page": 77,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          389.95123291015625,
+          26.59109115600586,
+          404.0240783691406,
+          34.923072814941406
+        ],
+        [
+          358.0885925292969,
+          22.152069091796875,
+          382.58831787109375,
+          33.24797058105469
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 79; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 80,
+      "source_page": 78,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          391.2786865234375,
+          26.79088020324707,
+          406.0193176269531,
+          35.122859954833984
+        ],
+        [
+          358.0885925292969,
+          22.07448959350586,
+          379.10418701171875,
+          33.17039108276367
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 80; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 81,
+      "source_page": 79,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          391.2786865234375,
+          26.79075813293457,
+          406.0193176269531,
+          35.122737884521484
+        ],
+        [
+          358.0885925292969,
+          22.07436752319336,
+          384.4191589355469,
+          33.17026901245117
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 81; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 82,
+      "source_page": 80,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          391.5881652832031,
+          26.79088020324707,
+          405.6854553222656,
+          35.122859954833984
+        ],
+        [
+          358.0885925292969,
+          22.152191162109375,
+          384.4967956542969,
+          33.24809265136719
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 82; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 83,
+      "source_page": 81,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          389.0472412109375,
+          26.79075813293457,
+          403.7878723144531,
+          35.122737884521484
+        ],
+        [
+          358.0885925292969,
+          22.151613235473633,
+          382.04461669921875,
+          33.24751281738281
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 83; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 84,
+      "source_page": 82,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          389.34857177734375,
+          26.79088020324707,
+          403.44586181640625,
+          35.122859954833984
+        ],
+        [
+          358.0885925292969,
+          22.152191162109375,
+          384.85186767578125,
+          33.24809265136719
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 84; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 85,
+      "source_page": 83,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          389.34857177734375,
+          26.79075813293457,
+          404.0892028808594,
+          35.122737884521484
+        ],
+        [
+          358.0885925292969,
+          22.045347213745117,
+          378.5605163574219,
+          33.1412467956543
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 85; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 86,
+      "source_page": 84,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          389.34857177734375,
+          26.79088020324707,
+          404.0892028808594,
+          35.122859954833984
+        ],
+        [
+          358.0885925292969,
+          22.045469284057617,
+          383.8754577636719,
+          33.1413688659668
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 86; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 87,
+      "source_page": 85,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          389.65802001953125,
+          26.79075813293457,
+          403.75531005859375,
+          35.122737884521484
+        ],
+        [
+          358.0885925292969,
+          22.159198760986328,
+          383.9753112792969,
+          33.255096435546875
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 87; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 88,
+      "source_page": 86,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          389.9267578125,
+          26.79088020324707,
+          404.6673889160156,
+          35.122859954833984
+        ],
+        [
+          358.0885925292969,
+          22.11081886291504,
+          381.52313232421875,
+          33.20671844482422
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 88; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 89,
+      "source_page": 87,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          390.23626708984375,
+          26.79075813293457,
+          404.33355712890625,
+          35.122737884521484
+        ],
+        [
+          358.0885925292969,
+          22.11069679260254,
+          384.3303527832031,
+          33.20659637451172
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 89; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 90,
+      "source_page": 88,
+      "topic_id": "zohar",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          390.23626708984375,
+          26.79088020324707,
+          404.33355712890625,
+          35.122859954833984
+        ],
+        [
+          358.0885925292969,
+          22.07448959350586,
+          379.8254699707031,
+          33.17039108276367
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 90; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 91,
+      "source_page": 89,
+      "topic_id": "tehillim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.37249755859375,
+          25.33308219909668,
+          363.299072265625,
+          36.42898178100586
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 91; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 92,
+      "source_page": 90,
+      "topic_id": "tehillim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.37249755859375,
+          22.987720489501953,
+          368.5807189941406,
+          34.0836181640625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 92; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 93,
+      "source_page": 91,
+      "topic_id": "tehillim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.37249755859375,
+          25.33308219909668,
+          368.6805725097656,
+          36.42898178100586
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 93; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 95,
+      "source_page": 93,
+      "topic_id": "tehillim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.37249755859375,
+          25.33308219909668,
+          364.5196228027344,
+          36.42898178100586
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 95; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 96,
+      "source_page": 94,
+      "topic_id": "tehillim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.37249755859375,
+          25.33320426940918,
+          362.11181640625,
+          36.42910385131836
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 96; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 97,
+      "source_page": 95,
+      "topic_id": "tehillim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.37249755859375,
+          25.33320426940918,
+          364.1312561035156,
+          36.42910385131836
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 97; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 98,
+      "source_page": 96,
+      "topic_id": "tehillim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.37249755859375,
+          25.33320426940918,
+          361.8677062988281,
+          36.42910385131836
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 98; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 99,
+      "source_page": 97,
+      "topic_id": "tehillim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.37249755859375,
+          25.33308219909668,
+          364.1312561035156,
+          36.42898178100586
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 99; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 100,
+      "source_page": 98,
+      "topic_id": "tehillim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          358.37249755859375,
+          25.33320426940918,
+          367.3046875,
+          36.42910385131836
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 100; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 102,
+      "source_page": 100,
+      "topic_id": "likutey_moharan",
+      "kind": "previous",
+      "target": 101,
+      "original_rect": [
+        307.7170104980469,
+        8.0,
+        457.7170104980469,
+        44.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          320.7835998535156,
+          30.982669830322266,
+          351.58416748046875,
+          50.31114196777344
+        ],
+        [
+          325.5118103027344,
+          33.15324783325195,
+          331.7854919433594,
+          49.95639419555664
+        ],
+        [
+          428.9695129394531,
+          38.27866744995117,
+          438.50836181640625,
+          48.56247329711914
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed previous button has no safe placement on final page 102; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 102,
+      "source_page": 100,
+      "topic_id": "likutey_moharan",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          202.6988067626953,
+          35.87098693847656,
+          264.88958740234375,
+          49.582725524902344
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 102; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 103,
+      "source_page": 101,
+      "topic_id": "likutey_moharan",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          202.6988067626953,
+          35.87110900878906,
+          264.88958740234375,
+          49.582847595214844
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 103; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 104,
+      "source_page": 102,
+      "topic_id": "likutey_moharan",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          202.6988067626953,
+          35.87110900878906,
+          264.88958740234375,
+          49.582847595214844
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 104; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 105,
+      "source_page": 103,
+      "topic_id": "likutey_moharan",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          202.6988067626953,
+          35.87110900878906,
+          264.88958740234375,
+          49.582847595214844
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 105; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 106,
+      "source_page": 104,
+      "topic_id": "likutey_moharan",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          202.6988067626953,
+          35.87110900878906,
+          264.88958740234375,
+          49.582847595214844
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 106; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 107,
+      "source_page": 105,
+      "topic_id": "likutey_moharan",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          201.73519897460938,
+          35.87110900878906,
+          265.881103515625,
+          49.582847595214844
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 107; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 108,
+      "source_page": 106,
+      "topic_id": "likutey_moharan",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          201.73519897460938,
+          35.87110900878906,
+          265.881103515625,
+          49.582847595214844
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 108; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 109,
+      "source_page": 107,
+      "topic_id": "likutey_halakhot",
+      "kind": "previous",
+      "target": 154,
+      "original_rect": [
+        307.7170104980469,
+        8.0,
+        457.7170104980469,
+        44.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          341.702880859375,
+          30.013263702392578,
+          346.1763610839844,
+          49.72279357910156
+        ],
+        [
+          314.0384216308594,
+          30.013263702392578,
+          327.7770690917969,
+          49.72279357910156
+        ],
+        [
+          427.1011047363281,
+          15.771224975585938,
+          440.6451110839844,
+          25.771224975585938
+        ],
+        [
+          407.7731018066406,
+          15.771224975585938,
+          425.61309814453125,
+          25.771224975585938
+        ],
+        [
+          389.0530700683594,
+          15.771224975585938,
+          406.28509521484375,
+          25.771224975585938
+        ],
+        [
+          369.373046875,
+          15.771224975585938,
+          387.5650634765625,
+          25.771224975585938
+        ],
+        [
+          354.2530212402344,
+          15.771224975585938,
+          367.8850402832031,
+          25.771224975585938
+        ],
+        [
+          331.1650085449219,
+          15.771224975585938,
+          352.7650146484375,
+          25.771224975585938
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed previous button has no safe placement on final page 109; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 109,
+      "source_page": 107,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 109; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 110,
+      "source_page": 108,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 110; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 111,
+      "source_page": 109,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 111; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 112,
+      "source_page": 110,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 112; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 113,
+      "source_page": 111,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 113; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 114,
+      "source_page": 112,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 114; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 115,
+      "source_page": 113,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 115; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 116,
+      "source_page": 114,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 116; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 117,
+      "source_page": 115,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 117; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 118,
+      "source_page": 116,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 118; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 119,
+      "source_page": 117,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 119; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 120,
+      "source_page": 118,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 120; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 121,
+      "source_page": 119,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 121; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 122,
+      "source_page": 120,
+      "topic_id": "likutey_halakhot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          291.3528137207031,
+          30.013263702392578,
+          368.4315185546875,
+          49.72279357910156
+        ],
+        [
+          118.64642333984375,
+          29.713764190673828,
+          173.95663452148438,
+          49.72279357910156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 122; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 123,
+      "source_page": 121,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          400.1140441894531,
+          23.464176177978516,
+          433.31805419921875,
+          35.55560302734375
+        ],
+        [
+          358.5195007324219,
+          23.464176177978516,
+          375.1033020019531,
+          35.55560302734375
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 123; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 124,
+      "source_page": 122,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          400.1141357421875,
+          23.464176177978516,
+          433.31817626953125,
+          35.55560302734375
+        ],
+        [
+          358.51959228515625,
+          23.464176177978516,
+          367.35943603515625,
+          35.55560302734375
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 124; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 125,
+      "source_page": 123,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          400.1141357421875,
+          23.464176177978516,
+          433.31817626953125,
+          35.55560302734375
+        ],
+        [
+          358.51959228515625,
+          23.464176177978516,
+          372.62249755859375,
+          35.55560302734375
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 125; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 126,
+      "source_page": 124,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          400.1141357421875,
+          23.464176177978516,
+          433.31817626953125,
+          35.55560302734375
+        ],
+        [
+          358.51959228515625,
+          23.464176177978516,
+          372.7262268066406,
+          35.55560302734375
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 126; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 127,
+      "source_page": 125,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          400.1141357421875,
+          23.464176177978516,
+          433.31817626953125,
+          35.55560302734375
+        ],
+        [
+          358.51959228515625,
+          23.464176177978516,
+          370.2508850097656,
+          35.55560302734375
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 127; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 128,
+      "source_page": 126,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          400.1141357421875,
+          23.464176177978516,
+          433.31817626953125,
+          35.55560302734375
+        ],
+        [
+          358.51959228515625,
+          23.464176177978516,
+          373.1390075683594,
+          35.55560302734375
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 128; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 129,
+      "source_page": 127,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          400.1141357421875,
+          23.464176177978516,
+          433.31817626953125,
+          35.55560302734375
+        ],
+        [
+          358.51959228515625,
+          23.464176177978516,
+          368.49615478515625,
+          35.55560302734375
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 129; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 130,
+      "source_page": 128,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          400.1141357421875,
+          23.464176177978516,
+          433.31817626953125,
+          35.55560302734375
+        ],
+        [
+          358.51959228515625,
+          23.464176177978516,
+          373.7591857910156,
+          35.55560302734375
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 130; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 131,
+      "source_page": 129,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          400.1141357421875,
+          23.464176177978516,
+          433.31817626953125,
+          35.55560302734375
+        ],
+        [
+          358.51959228515625,
+          23.464176177978516,
+          373.8574523925781,
+          35.55560302734375
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 131; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 132,
+      "source_page": 130,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          400.1141357421875,
+          23.464176177978516,
+          433.31817626953125,
+          35.55560302734375
+        ],
+        [
+          358.51959228515625,
+          23.464176177978516,
+          371.3864440917969,
+          35.55560302734375
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 132; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 133,
+      "source_page": 131,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          400.1141357421875,
+          23.464176177978516,
+          433.31817626953125,
+          35.55560302734375
+        ],
+        [
+          358.51959228515625,
+          23.464176177978516,
+          374.27569580078125,
+          35.55560302734375
+        ],
+        [
+          237.26260375976562,
+          25.92490005493164,
+          279.1077880859375,
+          38.016326904296875
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 133; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 134,
+      "source_page": 132,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          237.26260375976562,
+          25.92490005493164,
+          279.1077880859375,
+          38.016326904296875
+        ],
+        [
+          358.5663146972656,
+          25.92490005493164,
+          363.8194580078125,
+          38.016326904296875
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 134; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 135,
+      "source_page": 133,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          237.26260375976562,
+          25.92490005493164,
+          279.1077880859375,
+          38.016326904296875
+        ],
+        [
+          358.5663146972656,
+          25.92490005493164,
+          363.9298095703125,
+          38.016326904296875
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 135; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 136,
+      "source_page": 134,
+      "topic_id": "sifrei_rabeinu",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          237.26260375976562,
+          25.92490005493164,
+          279.1077880859375,
+          38.016326904296875
+        ],
+        [
+          358.5663146972656,
+          25.92490005493164,
+          361.4798278808594,
+          38.016326904296875
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 136; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 137,
+      "source_page": 135,
+      "topic_id": "combined_midot_tzadikim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          357.05450439453125,
+          25.294921875,
+          368.311279296875,
+          37.24575424194336
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 137; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 138,
+      "source_page": 136,
+      "topic_id": "combined_midot_tzadikim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          357.05450439453125,
+          25.294921875,
+          370.5549621582031,
+          37.24575424194336
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 138; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 139,
+      "source_page": 137,
+      "topic_id": "combined_midot_tzadikim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          357.05450439453125,
+          25.294921875,
+          363.0973815917969,
+          37.24575424194336
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 139; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 140,
+      "source_page": 138,
+      "topic_id": "combined_midot_tzadikim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          357.05450439453125,
+          25.294921875,
+          362.24658203125,
+          37.24575424194336
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 140; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 141,
+      "source_page": 139,
+      "topic_id": "combined_midot_tzadikim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          357.05450439453125,
+          25.294921875,
+          360.73040771484375,
+          37.24575424194336
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 141; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 142,
+      "source_page": 140,
+      "topic_id": "combined_midot_tzadikim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          357.05450439453125,
+          25.294921875,
+          362.35565185546875,
+          37.24575424194336
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 142; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 143,
+      "source_page": 141,
+      "topic_id": "combined_midot_tzadikim",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          357.05450439453125,
+          25.294921875,
+          362.7156066894531,
+          37.24575424194336
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 143; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 144,
+      "source_page": 142,
+      "topic_id": "likutey_tefilot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          399.96685791015625,
+          27.143192291259766,
+          430.7583923339844,
+          39.234619140625
+        ],
+        [
+          356.00689697265625,
+          27.143192291259766,
+          372.8588562011719,
+          39.234619140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 144; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 145,
+      "source_page": 143,
+      "topic_id": "likutey_tefilot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          399.96685791015625,
+          27.14310073852539,
+          430.7583923339844,
+          39.234527587890625
+        ],
+        [
+          356.00689697265625,
+          27.14310073852539,
+          370.3890075683594,
+          39.234527587890625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 145; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 146,
+      "source_page": 144,
+      "topic_id": "likutey_tefilot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          399.96685791015625,
+          27.143192291259766,
+          430.7583923339844,
+          39.234619140625
+        ],
+        [
+          356.00689697265625,
+          27.143192291259766,
+          373.27490234375,
+          39.234619140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 146; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 147,
+      "source_page": 145,
+      "topic_id": "likutey_tefilot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          399.96685791015625,
+          27.14310073852539,
+          430.7583923339844,
+          39.234527587890625
+        ],
+        [
+          356.00689697265625,
+          27.14310073852539,
+          366.9766845703125,
+          39.234527587890625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 147; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 148,
+      "source_page": 146,
+      "topic_id": "likutey_tefilot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          399.96685791015625,
+          27.143192291259766,
+          430.7583923339844,
+          39.234619140625
+        ],
+        [
+          356.00689697265625,
+          27.143192291259766,
+          372.246337890625,
+          39.234619140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 148; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 149,
+      "source_page": 147,
+      "topic_id": "likutey_tefilot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          399.96685791015625,
+          27.14310073852539,
+          430.7583923339844,
+          39.234527587890625
+        ],
+        [
+          356.00689697265625,
+          27.14310073852539,
+          372.3446044921875,
+          39.234527587890625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 149; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 150,
+      "source_page": 148,
+      "topic_id": "likutey_tefilot",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          399.96685791015625,
+          27.143192291259766,
+          430.7583923339844,
+          39.234619140625
+        ],
+        [
+          356.00689697265625,
+          27.143192291259766,
+          369.87359619140625,
+          39.234619140625
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 150; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 151,
+      "source_page": 149,
+      "topic_id": "tikkun_haklali",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          357.69342041015625,
+          27.991958618164062,
+          382.40252685546875,
+          40.125953674316406
+        ],
+        [
+          385.8879699707031,
+          27.991958618164062,
+          409.1998596191406,
+          40.125953674316406
+        ],
+        [
+          391.4779968261719,
+          27.991958618164062,
+          393.554931640625,
+          40.125953674316406
+        ],
+        [
+          367.8388366699219,
+          27.991958618164062,
+          381.8360595703125,
+          40.125953674316406
+        ],
+        [
+          317.6781921386719,
+          27.996780395507812,
+          338.5481262207031,
+          40.130775451660156
+        ],
+        [
+          304.28619384765625,
+          30.357986450195312,
+          310.24847412109375,
+          37.24509048461914
+        ],
+        [
+          280.1268005371094,
+          27.996780395507812,
+          301.0470886230469,
+          40.130775451660156
+        ],
+        [
+          328.7795715332031,
+          27.996780395507812,
+          337.1753845214844,
+          40.130775451660156
+        ],
+        [
+          286.25933837890625,
+          27.996780395507812,
+          300.73486328125,
+          40.130775451660156
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 151; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 152,
+      "source_page": 150,
+      "topic_id": "tikkun_haklali",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        277.6575012207031,
+        5.0,
+        402.6575012207031,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          357.6697082519531,
+          27.287887573242188,
+          378.18719482421875,
+          39.42188262939453
+        ],
+        [
+          386.365234375,
+          27.287887573242188,
+          403.7736511230469,
+          39.42188262939453
+        ],
+        [
+          395.1046142578125,
+          27.287887573242188,
+          403.6514587402344,
+          39.42188262939453
+        ],
+        [
+          361.39556884765625,
+          27.287887573242188,
+          377.89764404296875,
+          39.42188262939453
+        ],
+        [
+          259.41448974609375,
+          27.287887573242188,
+          280.964111328125,
+          39.42188262939453
+        ],
+        [
+          286.92803955078125,
+          27.287887573242188,
+          310.2399597167969,
+          39.42188262939453
+        ],
+        [
+          316.22021484375,
+          27.287887573242188,
+          338.49993896484375,
+          39.42188262939453
+        ],
+        [
+          321.1701354980469,
+          27.287887573242188,
+          336.0736389160156,
+          39.42188262939453
+        ],
+        [
+          294.623291015625,
+          27.287887573242188,
+          311.0750427246094,
+          39.42188262939453
+        ],
+        [
+          269.7254333496094,
+          27.287887573242188,
+          280.7394104003906,
+          39.42188262939453
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 152; relocation and side rotation are forbidden; review required"
+    },
+    {
+      "page": 153,
+      "source_page": 151,
+      "topic_id": "gemara",
+      "kind": "return",
+      "target": 2,
+      "original_rect": [
+        171.35850524902344,
+        5.0,
+        296.35850524902344,
+        37.0
+      ],
+      "source_word_rectangles_overlapping_anchor": [
+        [
+          161.16720581054688,
+          31.280590057373047,
+          231.91790771484375,
+          48.5666389465332
+        ],
+        [
+          237.36671447753906,
+          31.280590057373047,
+          255.97373962402344,
+          48.5666389465332
+        ],
+        [
+          266.90087890625,
+          31.280590057373047,
+          306.47900390625,
+          48.5666389465332
+        ]
+      ],
+      "checkbox_rectangles_overlapping_anchor": [],
+      "reason": "Fixed return button has no safe placement on final page 153; relocation and side rotation are forbidden; review required"
+    }
+  ],
+  "summary": {
+    "return": 147,
+    "previous": 4
+  }
+}

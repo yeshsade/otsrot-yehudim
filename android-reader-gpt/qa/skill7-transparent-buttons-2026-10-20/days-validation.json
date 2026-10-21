@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "pages": 166,
+  "checkbox_widgets": 828,
+  "logical_fields": 828,
+  "links": 314,
+  "source_sha256": "896db8b7cc07a749744d9ec7627a84b58399ca3f35537f78ecd7016a26f246b3",
+  "cover_sha256": "ad39325c7454d96f98dd0601a707953162dce3a539e52dcb0c98717ad1404d9e",
+  "output_sha256": "f6d37d60a295761163ce482fc7e859da3320db01eea1c6ff7930ba82a63c1ad8",
+  "output_to_source_size_ratio": 0.6855937090643599,
+  "source_text_preserved": true,
+  "source_coverage_verified": true,
+  "zero_text_overlaps": true,
+  "zero_widget_overlaps": true,
+  "zero_widget_link_overlaps": true,
+  "navigation_matches_manifest": true,
+  "navigation_uses_fixed_anchors": true,
+  "transparent_navigation_over_source_text_allowed": true,
+  "progress_map_matches_widgets": true,
+  "source_files_unchanged": true,
+  "independent_checker": {
+    "path": "/tmp/check_booklet-latest.py",
+    "sha256": "df435488db2b86a44633068285264b8c45d54123aa6202e16d6ebf9fcbc29e98",
+    "passed": true
+  }
+}

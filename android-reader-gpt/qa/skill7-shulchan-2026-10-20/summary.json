@@ -1,0 +1,38 @@
+{
+  "days": {
+    "pages": 166,
+    "checkboxes": 849,
+    "shulchan_checkboxes": 79,
+    "links": 314,
+    "shulchan_by_day": {
+      "sunday": 11,
+      "monday": 12,
+      "tuesday": 12,
+      "wednesday": 12,
+      "thursday": 12,
+      "friday": 12,
+      "saturday": 8
+    },
+    "other_topics_unchanged": true,
+    "navigation_unchanged": true,
+    "source_glyph_coverage_passed_for_all_seven_pages": true
+  },
+  "topics": {
+    "pages": 155,
+    "checkboxes": 849,
+    "shulchan_checkboxes": 79,
+    "links": 178,
+    "shulchan_by_day": {
+      "sunday": 11,
+      "monday": 12,
+      "tuesday": 12,
+      "wednesday": 12,
+      "thursday": 12,
+      "friday": 12,
+      "saturday": 8
+    },
+    "other_topics_unchanged": true,
+    "navigation_unchanged": true,
+    "source_glyph_coverage_passed_for_all_seven_pages": true
+  }
+}

@@ -57,29 +57,13 @@ def skill_root():
 
 
 def font_candidates(kind):
-    if kind == "bold":
-        return [
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-            "/usr/share/fonts/truetype/noto/NotoSansHebrew-Bold.ttf",
-            r"C:\Windows\Fonts\davidbd.ttf",
-            r"C:\Windows\Fonts\DAVIDBD.TTF",
-            r"C:\Windows\Fonts\arialbd.ttf",
-        ]
-    return [
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-        "/usr/share/fonts/truetype/noto/NotoSansHebrew-Regular.ttf",
-        r"C:\Windows\Fonts\david.ttf",
-        r"C:\Windows\Fonts\DAVID.TTF",
-        r"C:\Windows\Fonts\arial.ttf",
-    ]
+    from typography import font_file
+    return [font_file("bold" if kind == "bold" else "regular")]
 
 
 def get_font(ImageFont, kind, size):
-    for candidate in font_candidates(kind):
-        path = Path(candidate)
-        if path.exists():
-            return ImageFont.truetype(str(path), size)
-    return ImageFont.load_default()
+    from typography import load_font
+    return load_font("bold" if kind == "bold" else "regular", size)
 
 
 def text_bbox(draw, text, fnt):
@@ -601,7 +585,7 @@ def make_continuation_button_images(out_dir, color=DEFAULT_ACCENT, labels=None, 
                 raise RuntimeError("A Hebrew font is required for named navigation labels.")
             # Use the same bidi engine as rtl(): Windows uses explicit
             # reversal, while Linux uses Pillow's natural Hebrew shaping.
-            for size in range(64, 23, -1):
+            for size in range(29, 23, -1):
                 engine = ImageFont.Layout.BASIC if sys.platform.startswith("win") else ImageFont.Layout.RAQM
                 label_font = ImageFont.truetype(font_file, size, layout_engine=engine)
                 if text_width(draw, text, label_font) <= width - 32:

@@ -1,0 +1,1 @@
+Old source page 63 / days PDF page 83: expected active columns [1, 2, 3, 4], got [2, 4]. The new source-glyph coverage check rejects the old result even though its widgets and map match each other.

@@ -8,6 +8,9 @@ import fitz
 from PIL import Image, ImageDraw, ImageFont
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "days/scripts"))
+from typography import load_font
+
 def rtl(text):
     return text[::-1] if sys.platform.startswith('win') else text
 
@@ -61,10 +64,7 @@ def main():
     draw.rectangle((80, 151, 1320, 157), fill=line_rgb)
 
     def hebrew_font(size):
-        for candidate in ('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', '/usr/share/fonts/truetype/noto/NotoSansHebrew-Bold.ttf', r'C:\Windows\Fonts\Guttman Hatzvi-Bold.TTF', r'C:\Windows\Fonts\davidbd.ttf', r'C:\Windows\Fonts\arialbd.ttf'):
-            if Path(candidate).exists():
-                return ImageFont.truetype(candidate, size)
-        return ImageFont.load_default()
+        return load_font("heading", size)
 
     title_font = hebrew_font(78)
     subtitle_font = hebrew_font(31)

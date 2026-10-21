@@ -6,6 +6,7 @@ Usage: python scripts/build_booklet.py --help
 import argparse
 from collections import Counter, defaultdict
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -14,7 +15,9 @@ import fitz
 
 from source_model import (ROOT, DAYS, TOPICS, IDS, NAME_IDS, discover, model, sha256,
                           spans, column_of)
-from placement import Canvas, box_count, measured_regions
+from typography import audit_profile
+from shulchan import measure_shulchan, audit_shulchan_coverage
+from placement import Canvas, box_count, measured_regions, button_rect
 from layout_rules import gemara_identity
 from add_vcheck_boxes import CandidateBox, make_checkbox_appearances, add_checkbox
 from gemara_checkboxes import join_shared_fields
@@ -63,9 +66,12 @@ def build(interior, cover, answers, output, checker, edition="days"):
         raise ValueError("Output already exists; choose a fresh output path")
     if output.resolve() in {Path(interior).resolve(), Path(cover).resolve()}:
         raise ValueError("Never overwrite sources")
+    fonts = audit_profile([answers.get("booklet", {}).get("parsha", ""),
+                           answers.get("booklet", {}).get("date_label", "")])
     output.mkdir(parents=True)
     work = output / "qa"
     work.mkdir()
+    write_json(work / "font-audit.json", fonts)
     base = discover(interior, cover)
     write_json(work / "discovery.json", base)
     inputs_before = [sha256(interior), sha256(cover)]
@@ -170,6 +176,7 @@ def build(interior, cover, answers, output, checker, edition="days"):
                 if "source_page" in row or row["topic_id"] == "day_note"}
     checks = []
     measurements = []
+    shulchan_coverage = []
     page_indices = Counter()
     for row in rows:
         n = row.get("source_page")
@@ -219,8 +226,14 @@ def build(interior, cover, answers, output, checker, edition="days"):
             if topic == "mishnah_berurah":
                 add(canvas.lower_corner(right=True), 1, 1)
                 continue
-            regions = measured_regions(page, topic,
-                       tehillim=[r for r in src["tehillim"].get(day, []) if r["source_page"] == n])
+            if topic == "shulchan_aruch":
+                regions = measure_shulchan(page)["regions"]
+                coverage = audit_shulchan_coverage(page, regions)
+                shulchan_coverage.append({"page": page_number, "source_page": n,
+                                          "day_id": day, **coverage})
+            else:
+                regions = measured_regions(page, topic,
+                           tehillim=[r for r in src["tehillim"].get(day, []) if r["source_page"] == n])
             for region in regions:
                 col = region["column"]
                 rect = region["rect"]
@@ -236,18 +249,27 @@ def build(interior, cover, answers, output, checker, edition="days"):
         if page_number % 20 == 0:
             print(f"PLACED_THROUGH_PAGE={page_number}", flush=True)
     write_json(work / "measurements.json", measurements)
+    write_json(work / "shulchan-coverage.json", shulchan_coverage)
 
     images = make_continuation_button_images(work / "buttons", color=color,
         labels={"previous": "העמוד הקודם", "next": "העמוד הבא"},
         font_file=font_path(font_candidates("bold")))
     images["return"] = make_return_button_image(work / "return.png", color=color)
     links = []
+    button_conflicts = []
 
     def link(source_page, target_page, kind):
         page = doc[source_page - 1]
-        rect = canvases[source_page].button(kind)
-        image_rotation = 90 if rect.height > rect.width else 0
-        page.insert_image(rect, filename=str(images[kind]), overlay=True, rotate=image_rotation)
+        try:
+            rect = canvases[source_page].button(kind)
+        except ValueError as exc:
+            row = rows[source_page - 1]
+            button_conflicts.append({"page": source_page, "source_page": row.get("source_page"),
+                "topic_id": row["topic_id"], "kind": kind, "target": target_page,
+                "original_rect": list(button_rect(page, kind)),
+                "reason": str(exc)})
+            return
+        page.insert_image(rect, filename=str(images[kind]), overlay=True)
         page.insert_link({"kind": fitz.LINK_GOTO, "from": rect,
                           "page": target_page - 1, "to": fitz.Point(0, 0)})
         links.append({"source": source_page, "target": target_page, "kind": kind, "rect": list(rect)})
@@ -316,6 +338,17 @@ def build(interior, cover, answers, output, checker, edition="days"):
                           (default_toc_config()["archive_url"], (264.1,600.9,414.5,627.1))]:
             doc[toc_number - 1].insert_link({"kind": fitz.LINK_URI, "from": fitz.Rect(rect), "uri": uri})
 
+    write_json(work / "navigation-placement-audit.json", {
+        "passed": not button_conflicts, "policy": "fixed-anchors-checkbox-shrink-only",
+        "planned_controls": len(links), "conflicts": button_conflicts})
+    write_json(work / "placement-manifest.json", checks)
+    write_json(work / "navigation-manifest.json", links)
+    if button_conflicts:
+        doc.close()
+        source.close()
+        raise ValueError(f"{len(button_conflicts)} controls conflict at their approved anchors; "
+                         f"see {work / 'navigation-placement-audit.json'}. No delivery PDF created.")
+
     print(f"NAVIGATION_LINKS={len(links)} CHECKBOX_WIDGETS={len(checks)}", flush=True)
     appearances = make_checkbox_appearances(doc)
     for item in checks:
@@ -329,6 +362,8 @@ def build(interior, cover, answers, output, checker, edition="days"):
             grouped[item["field"]]["pages"] += item["pages"]
         else:
             grouped[item["field"]] = {k: v for k, v in item.items() if k != "rect"}
+            # Logical aggregation must not mutate the physical occurrence list.
+            grouped[item["field"]]["pages"] = list(item["pages"])
     doc = join_shared_fields(doc)
 
     topic_rows = map_topics()
@@ -390,8 +425,11 @@ def main():
     parser.add_argument("--answers", required=True, help="Source-hash-bound review and owner answers JSON")
     parser.add_argument("--output-dir", required=True, help="A fresh directory; existing outputs are never patched")
     parser.add_argument("--checker", required=True, help="Reviewed independent check_booklet.py from Claude")
+    parser.add_argument("--fonts-dir", help="Directory containing the four owner-supplied original fonts")
     parser.add_argument("--edition", choices=["days", "topics"], default="days")
     args = parser.parse_args()
+    if args.fonts_dir:
+        os.environ["OTZAROT_FONTS_DIR"] = args.fonts_dir
     answers = json.loads(Path(args.answers).read_text(encoding="utf-8"))
     build(args.interior, args.cover, answers, args.output_dir, args.checker, args.edition)
 

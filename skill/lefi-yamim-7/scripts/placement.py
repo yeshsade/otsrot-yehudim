@@ -5,7 +5,59 @@ import math
 import fitz
 import numpy as np
 
-from source_model import spans, union, column_of, learning_font_from_spans
+from source_model import spans, union, column_of, learning_font_from_spans, gray_backgrounds
+
+
+def zohar_translation_heading(text):
+    """Recognize the semantic boundary, including legacy Hebrew PDF encoding."""
+    candidates = [text]
+    for encoding in ("cp1252", "latin1"):
+        try:
+            candidates.append(text.encode(encoding).decode("cp1255"))
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            pass
+    target = "תרגוםלשוןהזוהר"
+    return any(target in "".join(c.split()) or target in "".join(c[::-1].split())
+               for c in candidates)
+
+
+def zohar_regions(page):
+    """Study includes every style before each half's translation heading.
+
+    Regular, bold and Tosefta text can alternate inside a column. A single
+    font subset cannot represent this study portion.
+    """
+    items = list(spans(page))
+    landscape = page.rect.width > page.rect.height
+    halves = (1, 2) if landscape else (1,)
+    boundaries = {}
+    for half in halves:
+        headings = [s["rect"].y0 for s in items if zohar_translation_heading(s["text"])
+                    and (not landscape or (1 if s["rect"].x0 >= page.rect.width / 2 else 2) == half)]
+        if len(headings) != 1:
+            raise ValueError(f"Expected one Zohar translation boundary in half {half}, page {page.number + 1}")
+        boundaries[half] = headings[0]
+    full, learned = defaultdict(list), defaultdict(list)
+    gray = gray_backgrounds(page)
+    for item in items:
+        if item["size"] < 5:
+            continue
+        r = item["rect"]
+        col = column_of(r, page.rect.width, 4 if landscape else 2)
+        full[col].append(r)
+        half = (1 if r.x0 >= page.rect.width / 2 else 2) if landscape else 1
+        if r.y1 <= boundaries[half] and not any(bg.contains((r.tl + r.br) / 2) for bg in gray):
+            learned[col].append(r)
+    reference = union([r for rs in full.values() for r in rs])
+    result = []
+    for col, rects in sorted(learned.items()):
+        complete = union(full[col])
+        if landscape:
+            complete.y0, complete.y1 = reference.y0, reference.y1
+        result.append({"column": col, "rect": union(rects), "full_rect": complete})
+    if not result:
+        raise ValueError(f"No Zohar study before translation, page {page.number + 1}")
+    return result
 
 
 def box_count(learning_height, full_height, landscape):
@@ -17,6 +69,11 @@ def box_count(learning_height, full_height, landscape):
 
 
 def measured_regions(page, topic, tehillim=None, font=None):
+    if topic == "shulchan_aruch":
+        from shulchan import measure_shulchan
+        return measure_shulchan(page)["regions"]
+    if topic == "zohar":
+        return zohar_regions(page)
     landscape = page.rect.width > page.rect.height
     columns = 4 if landscape else 2
     items = list(spans(page))
@@ -24,13 +81,11 @@ def measured_regions(page, topic, tehillim=None, font=None):
     learned = defaultdict(list)
     # Font subsets can differ even between the two halves of one page.
     selected = {}
-    if topic in {"mishnah", "shulchan_aruch", "zohar", "nach"}:
+    if topic in {"mishnah", "nach"}:
         for half in (1, 2):
             half_items = [s for s in items if (1 if s["rect"].x0 >= page.rect.width / 2 else 2) == half]
             if half_items:
                 selected[half] = learning_font_from_spans(half_items)
-    from source_model import gray_backgrounds
-    gray = gray_backgrounds(page) if topic == "shulchan_aruch" else []
     if topic == "tehillim":
         return [{"column": r["column"], "rect": fitz.Rect(r["rect"]),
                  "full_rect": fitz.Rect(r["full_rect"])} for r in tehillim or []]
@@ -43,12 +98,6 @@ def measured_regions(page, topic, tehillim=None, font=None):
         half = 1 if r.x0 >= page.rect.width / 2 else 2
         active_font = selected.get(half, font)
         if active_font and item["font"] != active_font:
-            continue
-        if gray and any(bg.contains((r.tl + r.br) / 2) for bg in gray):
-            continue
-        # Grey future-week letters can also be text rather than background.
-        rgb = [(item["color"] >> shift) & 255 for shift in (16, 8, 0)]
-        if topic == "shulchan_aruch" and sum(rgb) / 3 > 125:
             continue
         learned[col].append(r)
     if topic == "nach":
@@ -78,6 +127,18 @@ def measured_regions(page, topic, tehillim=None, font=None):
     return regions
 
 
+def button_rect(page, kind, scale=1):
+    """Owner-approved visual anchors; resizing never changes edge or orientation."""
+    w, h = page.rect.width, page.rect.height
+    if kind == "previous":
+        return fitz.Rect(w - 10 - 150 * scale, 8, w - 10, 8 + 36 * scale)
+    if kind == "next":
+        return fitz.Rect(160 - 150 * scale, h - 8 - 36 * scale, 160, h - 8)
+    if kind == "return":
+        return fitz.Rect(w / 2 - 62.5 * scale, 5, w / 2 + 62.5 * scale, 5 + 32 * scale)
+    raise ValueError(f"Unknown navigation control: {kind}")
+
+
 class Canvas:
     """All rectangles are in the physically normalized final PDF coordinates.
 
@@ -97,6 +158,7 @@ class Canvas:
         pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), colorspace=fitz.csGRAY, alpha=False)
         self.pixels = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.height, pix.width)
         self.reserved = [fitz.Rect(link["from"]) for link in page.get_links()]
+        self.checkbox_rects = []
 
     def clear(self, rect, gap=1):
         r = fitz.Rect(rect) + (-gap, -gap, gap, gap)
@@ -116,8 +178,10 @@ class Canvas:
         area = self.pixels[y0:y1 + 1, x0:x1 + 1]
         return area.size > 0 and not np.any(area < 220)
 
-    def reserve(self, rect):
+    def reserve(self, rect, *, checkbox=False):
         self.reserved.append(fitz.Rect(rect))
+        if checkbox:
+            self.checkbox_rects.append(fitz.Rect(rect))
         return rect
 
     def checkbox(self, region, fraction, size=9):
@@ -143,17 +207,22 @@ class Canvas:
                 if rect.y0 < r.y0 or rect.y1 > r.y1 + .01:
                     continue
                 if self.clear(rect):
-                    return self.reserve(rect)
+                    return self.reserve(rect, checkbox=True)
         raise ValueError(f"No safe checkbox position, final page {self.page.number + 1}, column {region['column']}")
 
     def lower_corner(self, right=False, size=12):
         width, height = self.page.rect.width, self.page.rect.height
         x0 = width - 40 if right else 28
-        for step in range(0, 60, 2):
-            x = x0 - step if right else x0 + step
-            rect = fitz.Rect(x, height - 31, x + size, height - 31 + size)
-            if self.clear(rect):
-                return self.reserve(rect)
+        # Preserve the established row when it fits. A low final source line
+        # can occupy that whole row while leaving blank space just below it.
+        # Search that space within the same lower corner, without moving ink,
+        # changing the page, or using a different corner.
+        for dy in range(0, 13, 2):
+            for step in range(0, 60, 2):
+                x = x0 - step if right else x0 + step
+                rect = fitz.Rect(x, height - 31 + dy, x + size, height - 31 + dy + size)
+                if self.clear(rect):
+                    return self.reserve(rect, checkbox=True)
         raise ValueError(f"No safe lower {'right' if right else 'left'} corner, page {self.page.number + 1}")
 
     def nach(self, region, size=9):
@@ -162,46 +231,27 @@ class Canvas:
             for dx in range(0, int(r.width) - int(size), 3):
                 rect = fitz.Rect(r.x0 + dx, r.y1 + dy, r.x0 + dx + size, r.y1 + dy + size)
                 if self.clear(rect, gap=.5):
-                    return self.reserve(rect)
+                    return self.reserve(rect, checkbox=True)
         raise ValueError(f"No safe space between verses and commentary, page {self.page.number + 1}")
 
+    def button_clear(self, rect):
+        """Transparent controls may overlay source ink; their click areas may
+        never cover a checkbox or another navigation control.
+        """
+        return self.page.rect.contains(rect) and not any(
+            rect.intersects(other) for other in self.reserved)
+
     def button(self, kind):
-        w, h = self.page.rect.width, self.page.rect.height
-        if kind == "return":
-            candidates = [fitz.Rect(w / 2 - 62.5, 2, w / 2 + 62.5, 23)]
-            # Compact day cards have a frame at y=21. Keep a proportional
-            # 90% control entirely in their white top margin.
-            candidates += [fitz.Rect(w / 2 - 56.25, 1, w / 2 + 56.25, 19.9)]
-            candidates += [fitz.Rect(x, 2, x + 105, 23) for x in range(80, int(w) - 110, 10)]
-            candidates += [fitz.Rect(w / 2 - 62.5, h - 23, w / 2 + 62.5, h - 2)]
-        else:
-            original = fitz.Rect(w - 160, 8, w - 10, 44) if kind == "previous" else fitz.Rect(10, h - 44, 160, h - 8)
-            candidates = []
-            for scale in (1, .875, .75):
-                bw, bh = original.width * scale, original.height * scale
-                top = original.y0 if kind == "previous" else original.y1 - bh
-                candidates.append(fitz.Rect(original.x1 - bw, top, original.x1, top + bh))
-            # Same readable 75% button, shifted within the page's end margin.
-            # Never cover text just to keep a legacy coordinate.
-            bw, bh = original.width * .75, original.height * .75
-            for y in ([2, 5, 8] if kind == "previous" else [h - bh - 2, h - bh - 5, h - bh - 8]):
-                for x in range(12, int(w - bw - 8), 8):
-                    candidates.append(fitz.Rect(x, y, x + bw, y + bh))
-            # Dense source pages can have no clear strip at the preferred
-            # edge. Keep the readable size and destination at the other edge.
-            opposite_y = h - bh - 2 if kind == "previous" else 2
-            for x in range(12, int(w - bw - 8), 8):
-                candidates.append(fitz.Rect(x, opposite_y, x + bw, opposite_y + bh))
-            if w > h:
-                # Rotated book spreads often have only narrow side margins.
-                # Rotate the whole control, including its clickable rectangle.
-                for scale in (1, .875, .75):
-                    side_w, side_h = original.height * scale, original.width * scale
-                    sides = [w - side_w - 1, 1] if kind == "previous" else [1, w - side_w - 1]
-                    for x in sides:
-                        for y in range(40, int(h - side_h - 8), 8):
-                            candidates.append(fitz.Rect(x, y, x + side_w, y + side_h))
-        for rect in candidates:
-            if self.clear(rect, gap=.5):
-                return self.reserve(rect)
-        raise ValueError(f"No safe readable {kind} button on final page {self.page.number + 1}")
+        original = button_rect(self.page, kind)
+        if self.button_clear(original):
+            return self.reserve(original)
+        # Only an actual checkbox collision authorizes proportional shrinking.
+        # Text/ink or other controls alone never authorize resizing or relocation.
+        if any(original.intersects(rect) for rect in self.checkbox_rects):
+            for scale in (.875, .75):
+                rect = button_rect(self.page, kind, scale)
+                if self.button_clear(rect):
+                    return self.reserve(rect)
+        raise ValueError(
+            f"Fixed {kind} button has no safe placement on final page {self.page.number + 1}; "
+            "relocation and side rotation are forbidden; review required")

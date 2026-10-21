@@ -1,0 +1,26 @@
+{
+  "days/progress-map.json": {
+    "unchanged": true,
+    "sha256": "d3d783d255f522a4e8df44fea8564278eccabc79c702c023216a09ede73be542"
+  },
+  "days/placement-manifest.json": {
+    "unchanged": true,
+    "sha256": "673430a52b890148de2958e75e8ae0c3c4e424c047c6c1716812538091a30fde"
+  },
+  "days/navigation-manifest.json": {
+    "unchanged": true,
+    "sha256": "352d4a5e1c94e61284cf9b433268a7b468761cb6e47002d6fa7b009f80cb8679"
+  },
+  "topics/progress-map.json": {
+    "unchanged": true,
+    "sha256": "42bb3a7836c7d0cd45b9b24a1107390b4d0db5bddf3dbab72c5aca1504f11eeb"
+  },
+  "topics/placement-manifest.json": {
+    "unchanged": true,
+    "sha256": "5a8fba36ca00d9680043e748298f567ded9f65775d9133e3fdf71f66b4fef5ec"
+  },
+  "topics/navigation-manifest.json": {
+    "unchanged": true,
+    "sha256": "6d9681cbd3b56a691dd0c2e20436fc750c0a5d3ac377ff09328cbdd263de95e3"
+  }
+}

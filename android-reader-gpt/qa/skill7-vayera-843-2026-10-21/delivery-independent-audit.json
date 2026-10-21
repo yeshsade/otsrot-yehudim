@@ -1,0 +1,114 @@
+{
+  "editions": {
+    "days": {
+      "pdf": "/workspace/outputs/skill7-vayera-843-days-04/843_וירא_לפי_ימים.pdf",
+      "pages": 175,
+      "logical_checks": 862,
+      "physical_widgets": 863,
+      "tehillim_checks": 96,
+      "tehillim_regions": 37,
+      "zohar_checks": 109,
+      "zohar_active_columns": 55,
+      "all_internal_links_land_at_top": 320,
+      "external_links_preserved": 3,
+      "shared_gemara": {
+        "source_pages": [
+          8,
+          10
+        ],
+        "final_pages": [
+          44,
+          46
+        ],
+        "field": "vcheck_gemara_843_monday_adda8f4e9b64a2e9",
+        "saved_states": [
+          "Yes",
+          "Yes"
+        ]
+      },
+      "reciprocal_context_links": [
+        {
+          "prior_source": 158,
+          "sunday_source": 76,
+          "prior_final": 173,
+          "sunday_final": 29
+        },
+        {
+          "prior_source": 105,
+          "sunday_source": 106,
+          "prior_final": 171,
+          "sunday_final": 34
+        },
+        {
+          "prior_source": 159,
+          "sunday_source": 113,
+          "prior_final": 174,
+          "sunday_final": 35
+        },
+        {
+          "prior_source": 157,
+          "sunday_source": 3,
+          "prior_final": 172,
+          "sunday_final": 22
+        }
+      ],
+      "passed": true
+    },
+    "topics": {
+      "pdf": "/workspace/outputs/skill7-vayera-843-topics-04/843_וירא_לפי_נושאים.pdf",
+      "pages": 162,
+      "logical_checks": 862,
+      "physical_widgets": 863,
+      "tehillim_checks": 96,
+      "tehillim_regions": 37,
+      "zohar_checks": 109,
+      "zohar_active_columns": 55,
+      "all_internal_links_land_at_top": 182,
+      "external_links_preserved": 3,
+      "shared_gemara": {
+        "source_pages": [
+          8,
+          10
+        ],
+        "final_pages": [
+          10,
+          12
+        ],
+        "field": "vcheck_gemara_843_monday_adda8f4e9b64a2e9",
+        "saved_states": [
+          "Yes",
+          "Yes"
+        ]
+      },
+      "reciprocal_context_links": [
+        {
+          "prior_source": 158,
+          "sunday_source": 76,
+          "prior_final": 160,
+          "sunday_final": 78
+        },
+        {
+          "prior_source": 105,
+          "sunday_source": 106,
+          "prior_final": 107,
+          "sunday_final": 108
+        },
+        {
+          "prior_source": 159,
+          "sunday_source": 113,
+          "prior_final": 161,
+          "sunday_final": 115
+        },
+        {
+          "prior_source": 157,
+          "sunday_source": 3,
+          "prior_final": 159,
+          "sunday_final": 5
+        }
+      ],
+      "passed": true
+    }
+  },
+  "cross_edition_logical_fields_equal": true,
+  "passed": true
+}
