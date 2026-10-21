@@ -820,7 +820,13 @@ class ReaderActivity : AppCompatActivity() {
                     if (isDestroyed) return@post
                     pdfView.formFieldApplied(page, annotation, ok)
                     val now = if (ok) checked else !checked
-                    fieldOf[key(page, annotation)]?.let { ticked[it] = now; refreshProgressViews() }
+                    fieldOf[key(page, annotation)]?.let { name ->
+                        ticked[name] = now
+                        // one box shown on two pages (a Gemara amud that runs over two pages): the engine changed
+                        // the field, so the other page shows it too
+                        if (ok) widgets[name]?.forEach { (p, a) -> if (p != page || a != annotation) pdfView.formFieldApplied(p, a, true) }
+                        refreshProgressViews()
+                    }
                     done(ok)
                     updateUndoButtons()
                 }

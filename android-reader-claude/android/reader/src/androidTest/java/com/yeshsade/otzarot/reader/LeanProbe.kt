@@ -59,6 +59,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "twice") { twoScreens(); return }
         if (mode == "pending") { cutOffSave(); return }
         if (mode == "stage2") { stageTwo(); return }
+        if (mode == "s843") { vayera843(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -1361,6 +1362,56 @@ class LeanProbe : Instrumentation() {
             bookletButtons(reader)
             progressScreen(reader)
             result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /**
+     * Booklet 843 (skill 7, 2026-10-22): the progress screen shows its boxes when the topics were chosen before
+     * (it opened empty), and a Gemara amud on two pages is one box: ticking it on one page ticks the field.
+     */
+    private fun vayera843() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            app.settings.whatsAppPromptDismissed = true; app.settings.bookmarkHintNever = true
+            app.settings.language = "he"
+            app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP
+            val reader = openDoc()
+            waitLoaded(reader)
+            waitFor("map read", 900_000) { field<Any?>(reader, "map") != null }
+            val map = field<com.yeshsade.otzarot.reader.data.ProgressMap>(reader, "map")
+            app.settings.studyTopics = map.topics.map { it.id }.toSet()
+            record("843's map is read and verified (${map.checks.size} boxes)")
+            // the screen, opened with the topics already chosen
+            onMainChecked { reader.javaClass.getDeclaredMethod("openMenu").apply { isAccessible = true }.invoke(reader) }
+            waitFor("menu", 20_000) { reader.lastMenu != null }
+            SystemClock.sleep(1500); waitForIdleSync()
+            onMainChecked { reader.lastMenu!!.root.findViewWithTag<View>("menu_quick_mark").performClick() }
+            waitFor("screen", 30_000) { reader.lastProgress != null }
+            val decor = reader.lastProgress!!.shown.window!!.decorView
+            waitFor("cards on the screen", 60_000) { var ok = false; onMain { ok = decor.findViewWithTag<View>("progress_topic_gemara") != null }; ok }
+            SystemClock.sleep(2000); waitForIdleSync()
+            onMainChecked { snapshotView(decor, "843-mark.png") }
+            record("With the topics already chosen, the screen shows the boxes at once")
+            onMainChecked { reader.lastProgress!!.shown.dismiss() }
+            SystemClock.sleep(1500)
+            // the shared Gemara box: ticked on one of its pages
+            val widgets = field<Map<String, List<Pair<Int, Int>>>>(reader, "widgets")
+            val (name, places) = widgets.entries.first { it.value.size > 1 }.let { it.key to it.value }
+            val mark = ReaderActivity::class.java.getDeclaredMethod("mark", Int::class.java, Int::class.java, Boolean::class.java, Function1::class.java)
+                .apply { isAccessible = true }
+            onMainChecked { mark.invoke(reader, places[0].first, places[0].second, true, { _: Boolean -> Unit }) }
+            waitFor("shared box ticked", 120_000) { var on = false; onMain { on = field<HashMap<String, Boolean>>(reader, "ticked")[name] == true }; on }
+            record("A Gemara amud on two pages (${places.map { it.first + 1 }}) is one box: ticked once, counted once")
+            result.putString("shared", "$name ${places.joinToString { "${it.first}:${it.second}" }}")
+            onMainChecked { reader.finish() }
+            waitFor("reader closed", 120_000) { reader.isDestroyed }
+            SystemClock.sleep(15_000)
+            result.putString("stream", "Passed $passed checks. shared=${result.getString("shared")}\n")
             finish(Activity.RESULT_OK, result)
         } catch (error: Throwable) {
             result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")

@@ -125,8 +125,10 @@ class ProgressScreen(
             statusBarColor = colors.header
             addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         }
-        render()
+        // shown first: the cards are added one per turn of the main thread only while the screen is showing
+        // (owner, 2026-10-22: "נכנסתי למד לא רואים כלום" — built before showing, the first card was never added)
         dialog.show()
+        render()
     }
 
     /**
