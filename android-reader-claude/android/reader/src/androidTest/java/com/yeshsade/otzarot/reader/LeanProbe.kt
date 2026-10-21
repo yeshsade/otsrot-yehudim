@@ -1353,6 +1353,12 @@ class LeanProbe : Instrumentation() {
                 onMainChecked { field<com.yeshsade.otzarot.reader.ui.DayName>(reader, "dayName").touched(); snapshot(reader, "$name.png") }
             }
             record("The day's name shows faintly on the page after a touch, each day on its own part of a split page")
+            onMainChecked {
+                val g = reader.window.decorView.findViewWithTag<View>("tool_progress_gauge")
+                check(g != null && g.visibility == View.VISIBLE) { "no live gauge in the toolbar" }
+            }
+            record("The toolbar shows a small live gauge once the boxes are known")
+            bookletButtons(reader)
             progressScreen(reader)
             result.putString("stream", "Passed $passed checks.\n")
             finish(Activity.RESULT_OK, result)
@@ -1360,6 +1366,40 @@ class LeanProbe : Instrumentation() {
             result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
             finish(Activity.RESULT_CANCELED, result)
         }
+    }
+
+    /** The booklet's own buttons ("העמוד הבא"…): they open the right page, with its top in view. */
+    private fun bookletButtons(reader: ReaderActivity) {
+        val v = pdfView(reader)
+        for (start in listOf(20, 82)) {
+            onMainChecked { v.jumpTo(start) }
+            SystemClock.sleep(4000); waitForIdleSync()
+            var point: android.graphics.PointF? = null
+            var dest = -1
+            onMainChecked {
+                for (link in v.getLinks(start)) {
+                    val to = link.destPageIdx ?: continue
+                    if (to == 2 || to == start) continue      // the contents page, or itself
+                    val r = v.linkRectInView(start, link) ?: continue
+                    if (r.centerY() < 0 || r.centerY() > v.height) continue
+                    point = android.graphics.PointF(r.centerX(), r.centerY()); dest = to; break
+                }
+            }
+            val p = point ?: error("no button on page ${start + 1}")
+            touch(reader, MotionEvent.ACTION_DOWN, p.x, p.y)
+            touch(reader, MotionEvent.ACTION_UP, p.x, p.y)
+            SystemClock.sleep(3000); waitForIdleSync()
+            onMainChecked {
+                check(v.currentPage == dest) { "button on page ${start + 1} opened page ${v.currentPage + 1}, not ${dest + 1}" }
+                val top = v.frameRectToView(dest, android.graphics.RectF(0f, 0f, 1f, 1f))?.top ?: error("no geometry for page ${dest + 1}")
+                check(top >= -2f) { "page ${dest + 1} opened with its top hidden ($top)" }
+                val chrome = field<Any>(reader, "chrome")
+                val shown = chrome.javaClass.getDeclaredMethod("getShown").invoke(chrome) as Boolean
+                check(!shown) { "the frame stayed over the page" }
+                snapshot(reader, "button-${start + 1}-to-${dest + 1}.png")
+            }
+        }
+        record("A booklet button opens its page with the page's top in view, the frame out of the way")
     }
 
     /** Stage 2: the progress screen — from the drawer, choosing topics, ticking, "mark all", the gauges, and the file. */
@@ -1432,6 +1472,11 @@ class LeanProbe : Instrumentation() {
         onMain { kept = field<HashMap<String, Boolean>>(again, "ticked").count { it.value } }
         check(kept == afterAll) { "file kept $kept marks, screen had $afterAll" }
         record("After closing and opening again, the file holds what was ticked on the screen ($kept)")
+        val id = field<com.yeshsade.otzarot.reader.data.Doc>(again, "doc").id
+        check(File(targetContext.filesDir, "progress-cache/$id.json").isFile) { "the boxes were not remembered" }
+        check(again.mapFromCache) { "the second opening read every page again" }
+        onMainChecked { snapshotView(again.window.decorView, "reopened.png") }
+        record("The boxes are remembered with the save, so the next opening has them at once")
         onMainChecked { again.finish() }
     }
 

@@ -41,14 +41,29 @@ class ProgressScreen(
     private val settings: Settings,
     private val map: ProgressMap,
     private val ticked: MutableMap<String, Boolean>,
+    /** The boxes are still being read: the screen shows "קורא…" until [becameReady]. */
+    waiting: Boolean = false,
     private val write: (Map<String, Boolean>) -> Unit,
 ) {
+    var waiting = waiting
+        private set
+
+    /** The boxes are known now: fills the screen. */
+    fun becameReady() {
+        waiting = false
+        if (!::dialog.isInitialized || !dialog.isShowing) return
+        val (y, m, d) = OpenDay.today()
+        day = OpenDay.choose(progress().days.map { it.id }, map.booklet.weekStart, y, m, d, ticked.values.any { it })
+        render()
+    }
+
     enum class Tab { MARK, PROGRESS }
 
     private lateinit var dialog: Dialog
     private lateinit var body: LinearLayout
     private lateinit var scroll: ScrollView
     private lateinit var tabs: LinearLayout
+    private lateinit var topicsBadge: TextView
     private lateinit var dayChips: LinearLayout
     private lateinit var overlay: FrameLayout
     private var tab = Tab.MARK
@@ -80,16 +95,14 @@ class ProgressScreen(
         dialog = Dialog(activity, if (ui.night) android.R.style.Theme_Material_NoActionBar else android.R.style.Theme_Material_Light_NoActionBar)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         val root = ui.column().apply { setBackgroundColor(colors.canvas); tag = "progress_screen" }
-        val (header, titles) = ui.header(activity.getString(R.string.pr_title), listOfNotNull(map.booklet.parsha, map.booklet.issue?.let { "גיליון $it" }).joinToString(" · ").ifEmpty { null })
-        header.setPadding(header.paddingLeft, ui.dp(14), header.paddingRight, header.paddingBottom)
-        header.addView(textButton(activity.getString(R.string.pr_topics), Color.WHITE, "progress_topics") { chooseTopics(first = false) })
-        header.addView(ui.headerButton(R.drawable.otzr_ic_close, activity.getString(R.string.pr_close)) { dialog.dismiss() }.apply { tag = "progress_close" })
-        root.addView(header, LinearLayout.LayoutParams(-1, -2))
+        root.addView(header(), LinearLayout.LayoutParams(-1, -2))
+        // "סימון" and "התקדמות" in a bar at the bottom, like in apps (owner, 2026-10-21, sketch ג)
         tabs = ui.row().apply {
-            background = ui.rounded(colors.selection, 14f)
-            setPadding(ui.dp(4), ui.dp(4), ui.dp(4), ui.dp(4))
+            setBackgroundColor(colors.card)
+            elevation = ui.dp(8).toFloat()
+            setPadding(ui.dp(8), ui.dp(6), ui.dp(8), ui.dp(10))
+            tag = "progress_bottom_bar"
         }
-        root.addView(tabs, LinearLayout.LayoutParams(-1, -2).apply { setMargins(ui.dp(16), ui.dp(12), ui.dp(16), 0) })
         dayChips = ui.row()
         val chipsScroll = android.widget.HorizontalScrollView(activity).apply { isHorizontalScrollBarEnabled = false; addView(dayChips) }
         root.addView(chipsScroll, LinearLayout.LayoutParams(-1, -2).apply { setMargins(ui.dp(12), ui.dp(10), ui.dp(12), 0) })
@@ -99,6 +112,13 @@ class ProgressScreen(
         overlay = FrameLayout(activity)
         overlay.addView(scroll, FrameLayout.LayoutParams(-1, -1))
         root.addView(overlay, LinearLayout.LayoutParams(-1, 0, 1f))
+        root.addView(tabs, LinearLayout.LayoutParams(-1, -2))
+        // the phone's own bars stay clear of the bottom bar
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(tabs) { v, insets ->
+            val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.navigationBars())
+            v.setPadding(ui.dp(8), ui.dp(6), ui.dp(8), ui.dp(10) + bars.bottom)
+            insets
+        }
         dialog.setContentView(root)
         dialog.window?.apply {
             setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -109,24 +129,104 @@ class ProgressScreen(
         dialog.show()
     }
 
+    /**
+     * The header (owner, 2026-10-20): the title, and under it a white "הנושאים שלי" button with ☰ in a purple
+     * circle and the number of topics chosen — so it reads as a button, and pressing it gives way a little.
+     */
+    private fun header(): View {
+        val head = ui.column().apply {
+            background = GradientDrawable().apply {
+                setColor(ui.colors.header)
+                val r = ui.dp(24).toFloat()
+                cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, r, r, r, r)
+            }
+            setPadding(ui.dp(16), ui.dp(12), ui.dp(16), ui.dp(16))
+        }
+        val top = ui.row().apply { gravity = Gravity.TOP }
+        val titles = ui.column()
+        titles.addView(ui.label(activity.getString(R.string.pr_title), 23f, Color.WHITE, true).apply { typeface = ui.heading; maxLines = 1 })
+        listOfNotNull(map.booklet.parsha, map.booklet.issue?.let { "גיליון $it" }).joinToString(" · ").takeIf { it.isNotEmpty() }?.let {
+            titles.addView(ui.label(it, 13f, 0xCCFFFFFF.toInt()))
+        }
+        top.addView(titles, LinearLayout.LayoutParams(0, -2, 1f))
+        top.addView(ui.headerButton(R.drawable.otzr_ic_close, activity.getString(R.string.pr_close)) { dialog.dismiss() }.apply { tag = "progress_close" })
+        head.addView(top)
+        val button = ui.row().apply {
+            tag = "progress_topics"
+            isClickable = true; isFocusable = true
+            contentDescription = activity.getString(R.string.pr_my_topics)
+            background = android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(0x225B47B8),
+                ui.rounded(Color.WHITE, 22f), null)
+            elevation = ui.dp(4).toFloat()
+            setPadding(ui.dp(6), ui.dp(5), ui.dp(12), ui.dp(5))
+            setOnClickListener { chooseTopics(first = false) }
+        }
+        // pressing it gives way a little
+        fun scale(v: Float) = android.animation.ObjectAnimator.ofPropertyValuesHolder(button,
+            android.animation.PropertyValuesHolder.ofFloat(View.SCALE_X, v), android.animation.PropertyValuesHolder.ofFloat(View.SCALE_Y, v)).setDuration(90)
+        button.stateListAnimator = android.animation.StateListAnimator().apply {
+            addState(intArrayOf(android.R.attr.state_pressed), scale(.96f))
+            addState(intArrayOf(), scale(1f))
+        }
+        val circle = android.widget.ImageView(activity).apply {
+            setImageResource(R.drawable.ic_menu)
+            imageTintList = android.content.res.ColorStateList.valueOf(Color.WHITE)
+            background = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(0xFF9B8BFF.toInt(), 0xFF6A55C9.toInt())).apply { shape = GradientDrawable.OVAL }
+            setPadding(ui.dp(7), ui.dp(7), ui.dp(7), ui.dp(7))
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+        button.addView(circle, LinearLayout.LayoutParams(ui.dp(32), ui.dp(32)))
+        button.addView(ui.label(activity.getString(R.string.pr_my_topics), 15.5f, colors.header, true).apply { setPadding(ui.dp(9), 0, ui.dp(9), 0) })
+        topicsBadge = ui.label("", 12.5f, colors.accent, true).apply {
+            gravity = Gravity.CENTER
+            minWidth = ui.dp(24)
+            setPadding(ui.dp(6), ui.dp(1), ui.dp(6), ui.dp(1))
+            background = ui.rounded(colors.selection, 11f)
+        }
+        button.addView(topicsBadge)
+        val line = ui.row().apply { setPadding(0, ui.dp(12), 0, 0) }
+        line.addView(button, LinearLayout.LayoutParams(-2, -2))
+        head.addView(line)
+        return head
+    }
+
+    private fun bottomItem(t: Tab, icon: Int, text: Int, tagName: String) {
+        val on = t == tab
+        val item = ui.column().apply {
+            gravity = Gravity.CENTER_HORIZONTAL
+            tag = tagName
+            isClickable = true; isFocusable = true
+            contentDescription = activity.getString(text)
+            setOnClickListener { if (tab != t) { tab = t; render(); scroll.scrollTo(0, 0) } }
+        }
+        val pill = FrameLayout(activity).apply { background = if (on) ui.rounded(colors.selection, 16f) else null }
+        pill.addView(android.widget.ImageView(activity).apply {
+            setImageResource(icon)
+            imageTintList = android.content.res.ColorStateList.valueOf(if (on) colors.accent else colors.muted)
+        }, FrameLayout.LayoutParams(ui.dp(24), ui.dp(24), Gravity.CENTER))
+        item.addView(pill, LinearLayout.LayoutParams(ui.dp(64), ui.dp(32)))
+        item.addView(ui.label(activity.getString(text), 13f, if (on) colors.accent else colors.muted, true).apply { setPadding(0, ui.dp(3), 0, 0) })
+        tabs.addView(item, LinearLayout.LayoutParams(0, -2, 1f))
+    }
+
     private fun render() {
         tabs.removeAllViews()
-        for ((t, text, tagName) in listOf(Triple(Tab.MARK, R.string.pr_tab_mark, "progress_tab_mark"), Triple(Tab.PROGRESS, R.string.pr_tab_progress, "progress_tab_progress"))) {
-            val on = t == tab
-            tabs.addView(ui.label(activity.getString(text), 15.5f, if (on) colors.accent else colors.muted, true).apply {
-                gravity = Gravity.CENTER
-                tag = tagName
-                minimumHeight = ui.dp(40)
-                background = if (on) ui.rounded(colors.card, 11f) else null
-                setOnClickListener { if (tab != t) { tab = t; render(); scroll.scrollTo(0, 0) } }
-            }, LinearLayout.LayoutParams(0, -2, 1f))
-        }
+        bottomItem(Tab.MARK, R.drawable.ic_check_box, R.string.pr_tab_mark, "progress_tab_mark")
+        bottomItem(Tab.PROGRESS, R.drawable.ic_gauge, R.string.pr_tab_progress, "progress_tab_progress")
+        topicsBadge.text = chosen.size.toString()
+        topicsBadge.visibility = if (settings.studyTopics == null) View.GONE else View.VISIBLE
         dayChips.removeAllViews()
         val p = progress()
         for (d in p.days) chip(shortDay(d.label), d.id == day, "progress_day_${d.id}") { day = d.id; render() }
         chip(activity.getString(R.string.pr_whole_week), day == null, "progress_day_week") { day = null; render() }
         ++renders; counters.clear()
         body.removeAllViews()
+        if (waiting) {
+            body.addView(ui.label(activity.getString(R.string.pr_reading), 16f, colors.muted).apply {
+                gravity = Gravity.CENTER; setPadding(0, ui.dp(60), 0, 0); tag = "progress_waiting"
+            }, LinearLayout.LayoutParams(-1, -2))
+            return
+        }
         if (tab == Tab.MARK) renderMarking() else renderProgress()
     }
 
@@ -183,9 +283,6 @@ class ProgressScreen(
         val refresh = mutableListOf<() -> Unit>().also { counters[card] = it }
         val head = ui.row()
         head.addView(ui.label(topic.label, 17f, colors.ink, true).apply { typeface = ui.heading })
-        val count = ui.label("", 13.5f, colors.muted)
-        refresh += { count.text = "  " + activity.getString(R.string.pr_count_short, checks.count { ticked[it.field] == true }, checks.size) }
-        head.addView(count)
         head.addView(View(activity), LinearLayout.LayoutParams(0, 1, 1f))
         if (undo != null) {
             head.addView(textButton(activity.getString(R.string.pr_undo), colors.accent, "progress_undo") {
@@ -212,9 +309,7 @@ class ProgressScreen(
                     val rows = ofDay.groupBy { it.pageInDay }.toSortedMap()
                     for ((_, row) in rows) {
                         row.firstOrNull()?.group?.let { g ->
-                            val label = ui.label("", 13.5f, colors.muted, true).apply { setPadding(0, ui.dp(12), 0, 0) }
-                            refresh += { label.text = "$g  " + activity.getString(R.string.pr_count_short, row.count { ticked[it.field] == true }, row.size) }
-                            card.addView(label)
+                            card.addView(ui.label(g, 13.5f, colors.muted, true).apply { setPadding(0, ui.dp(12), 0, 0) })
                         }
                         card.addView(columns(card, topic, checks, row))
                     }
@@ -307,7 +402,6 @@ class ProgressScreen(
             tag = "progress_gauge_day"
             title = day?.let { map.day(it)?.label } ?: activity.getString(R.string.pr_whole_week)
             fraction = today.fraction
-            caption = activity.getString(R.string.pr_count, today.done, today.total)
         }
         body.addView(card { it.addView(dayGauge, LinearLayout.LayoutParams(-1, -2)) }, LinearLayout.LayoutParams(-1, -2).apply { topMargin = ui.dp(10) })
         if (day != null) {
@@ -316,7 +410,6 @@ class ProgressScreen(
                 tag = "progress_gauge_week"
                 title = activity.getString(R.string.pr_week)
                 fraction = week.fraction
-                caption = activity.getString(R.string.pr_count_short, week.done, week.total)
             }
             body.addView(card { it.addView(weekGauge, LinearLayout.LayoutParams(-1, -2)) }, LinearLayout.LayoutParams(-1, -2).apply { topMargin = ui.dp(10) })
         }
@@ -348,7 +441,6 @@ class ProgressScreen(
         setPadding(ui.dp(2), ui.dp(12), ui.dp(2), 0)
         val top = ui.row()
         top.addView(ui.label(label, 15f, colors.ink), LinearLayout.LayoutParams(0, -2, 1f))
-        top.addView(ui.label(activity.getString(R.string.pr_count_short, count.done, count.total), 13.5f, colors.muted))
         addView(top)
         val bar = FrameLayout(activity).apply { background = ui.rounded(colors.selection, 4f) }
         val fill = View(activity).apply { background = ui.rounded(if (count.fraction < Gauge.CALM_FROM) Gauge.PINK else Gauge.CALM, 4f) }

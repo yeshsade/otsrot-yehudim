@@ -330,6 +330,9 @@ class ReaderActivity : AppCompatActivity() {
             Tool(R.drawable.ic_pen, R.string.tool_pen, selected = false, enabled = false),
             Tool(R.drawable.ic_bookmark, R.string.tool_bookmark, selected = false, enabled = true,
                 tap = { addBookmark() }, hold = { bookmarks.showList(); Unit }),
+            // owner, 2026-10-21: "התקדמות", a small live gauge with today's percentage ("שעון קטן חי")
+            Tool(R.drawable.ic_gauge, R.string.tool_progress, selected = false, enabled = true,
+                tap = { openProgress(ProgressScreen.Tab.MARK) }),
         ).forEach { tool ->
             val ink = when {
                 tool.selected -> ui.colors.accent
@@ -338,17 +341,27 @@ class ReaderActivity : AppCompatActivity() {
             val item = ui.column().apply {
                 gravity = Gravity.CENTER
                 setPadding(ui.dp(8), ui.dp(6), ui.dp(8), ui.dp(6))
-                minimumWidth = ui.dp(72)
+                minimumWidth = ui.dp(62)
+                if (tool.label == R.string.tool_progress) tag = "tool_progress"
                 if (tool.selected) background = ui.rounded(ui.colors.selection, 18f)
                 alpha = if (tool.enabled) 1f else .4f
                 contentDescription = getString(tool.label)
                 tool.tap?.let { action -> setOnClickListener { action() } }
                 tool.hold?.let { action -> setOnLongClickListener { action(); true } }
             }
-            item.addView(ImageView(this).apply {
+            val icon = ImageView(this).apply {
                 setImageResource(tool.icon)
                 imageTintList = ColorStateList.valueOf(if (tool.enabled) ink else ui.colors.muted)
-            }, LinearLayout.LayoutParams(ui.dp(24), ui.dp(24)))
+            }
+            if (tool.label == R.string.tool_progress) {
+                // the plain icon until the booklet's boxes are known, then the gauge in its place
+                val box = FrameLayout(this)
+                box.addView(icon, FrameLayout.LayoutParams(ui.dp(24), ui.dp(24), Gravity.CENTER))
+                val gauge = Gauge(this, ui, big = false).apply { mini = true; miniNumber = true; visibility = View.GONE; tag = "tool_progress_gauge" }
+                box.addView(gauge, FrameLayout.LayoutParams(ui.dp(30), ui.dp(26), Gravity.CENTER))
+                toolbarGauge = gauge; toolbarGaugeIcon = icon
+                item.addView(box, LinearLayout.LayoutParams(ui.dp(30), ui.dp(26)))
+            } else item.addView(icon, LinearLayout.LayoutParams(ui.dp(24), ui.dp(24)))
             item.addView(ui.label(getString(tool.label), 12f, if (tool.enabled) ink else ui.colors.muted).apply {
                 gravity = Gravity.CENTER
                 maxLines = 1
@@ -550,16 +563,37 @@ class ReaderActivity : AppCompatActivity() {
      */
     private fun readMap(target: Doc) {
         map = null
+        parsedMap = null
+        mapState = MapState.LOADING
         dayName.map = null
-        widgets = emptyMap(); fieldOf = emptyMap(); ticked.clear(); beforeMap.clear()
+        widgets = emptyMap(); fieldOf = emptyMap(); ticked.clear()
+        refreshProgressViews()
         val generation = ++mapGeneration
+        val cacheKey = com.yeshsade.otzarot.reader.data.ProgressCache.keyOf(snapshot)
         runCatching {
             docThread.execute {
+                docIndex = null; docWidgets = emptyMap(); docTicked.clear(); docMarks.clear(); docMapHash = null
                 val bytes = runCatching { pdfView.getAttachment(com.yeshsade.otzarot.reader.data.ProgressMap.FILE_NAME) }.getOrNull()
                 val parsed = bytes?.let { com.yeshsade.otzarot.reader.data.ProgressMap.parse(String(it, Charsets.UTF_8)) }
-                val read = (parsed as? com.yeshsade.otzarot.reader.data.ProgressMap.Result.Ok)?.map ?: return@execute
-                // the day's name needs only which page is which day: it shows at once
-                main.post { if (!isDestroyed && doc?.id == target.id && generation == mapGeneration) dayName.map = read }
+                val read = (parsed as? com.yeshsade.otzarot.reader.data.ProgressMap.Result.Ok)?.map
+                if (read == null || bytes == null) { noMap(target, generation); return@execute }
+                val mapHash = com.yeshsade.otzarot.reader.data.ProgressCache.hash(bytes)
+                docMapHash = mapHash
+                // the day's name needs only which page is which day, and the screen can open (with "קורא…")
+                main.post {
+                    if (isDestroyed || doc?.id != target.id || generation != mapGeneration) return@post
+                    dayName.map = read
+                    parsedMap = read
+                    refreshProgressViews()
+                }
+                // the same file as last time: what is known about its boxes is used as is
+                val cached = cacheKey?.let { com.yeshsade.otzarot.reader.data.ProgressCache.load(this, target.id) }
+                    ?.takeIf { it.key == cacheKey && it.mapHash == mapHash }
+                mapFromCache = cached != null
+                if (cached != null) {
+                    adoptMap(target, generation, read, cached.widgets, cached.ticked.associateWith { true }, cacheKey, false)
+                    return@execute
+                }
                 // the boxes really in the file, a page per turn of the document's thread, so a tap on a box
                 // never waits for the whole booklet; a box missing → no marking screen at all
                 val pages = read.checks.flatMap { it.pages }.toSortedSet().toList()
@@ -571,21 +605,58 @@ class ReaderActivity : AppCompatActivity() {
                         runCatching { docThread.execute { next(i + 1) } }
                         return
                     }
-                    finishMap(target, generation, read, found)
+                    finishMap(target, generation, read, found, cacheKey)
                 }
                 next(0)
             }
         }
     }
 
-    @Volatile private var mapGeneration = 0
-    private val beforeMap = HashMap<Long, Boolean>()
+    enum class MapState { LOADING, READY, NONE }
 
+    /** Whether this booklet's boxes are known yet (main thread). */
+    var mapState = MapState.LOADING
+        private set
+    private var parsedMap: com.yeshsade.otzarot.reader.data.ProgressMap? = null
+
+    @Volatile private var mapGeneration = 0
+    /** Whether the boxes came from what was remembered (for tests). */
+    @Volatile var mapFromCache = false
+        private set
+
+    // The document thread's own view of the boxes: what the file in the engine holds. A save copies it, so the
+    // next opening knows the boxes without reading every page (ProgressCache).
+    private var docIndex: Map<Long, String>? = null
+    private var docWidgets: Map<String, List<Pair<Int, Int>>> = emptyMap()
+    private val docTicked = HashMap<String, Boolean>()
+    private val docMarks = ArrayList<Triple<Int, Int, Boolean>>()
+    private var docMapHash: String? = null
+    private val captureTicked = java.util.concurrent.ConcurrentHashMap<String, com.yeshsade.otzarot.reader.data.ProgressCache.Entry>()
+
+    /** Document thread: a box changed in the engine. */
+    private fun docMarked(page: Int, annotation: Int, checked: Boolean) {
+        val index = docIndex
+        if (index == null) docMarks += Triple(page, annotation, checked)
+        else index[key(page, annotation)]?.let { docTicked[it] = checked }
+    }
+
+    private fun noMap(target: Doc, generation: Int) {
+        main.post {
+            if (isDestroyed || doc?.id != target.id || generation != mapGeneration) return@post
+            mapState = MapState.NONE
+            refreshProgressViews()
+            lastProgress?.takeIf { it.waiting }?.let { it.shown.dismiss(); Messages.notice(this, getString(R.string.pr_no_map)) }
+        }
+    }
+
+    /** Document thread: every page read; checks the map against the real boxes. */
     private fun finishMap(target: Doc, generation: Int, read: com.yeshsade.otzarot.reader.data.ProgressMap,
-                          found: Map<Int, List<com.github.barteksc.pdfviewer.model.CheckField>>) {
+                          found: Map<Int, List<com.github.barteksc.pdfviewer.model.CheckField>>, cacheKey: String?) {
         val verified = com.yeshsade.otzarot.reader.data.ProgressMap.verify(read) { p -> found[p].orEmpty().mapNotNull { it.name }.toSet() }
         if (verified !is com.yeshsade.otzarot.reader.data.ProgressMap.Result.Ok) {
-            android.util.Log.w("OtzarotReader", "progress map refused: $verified"); return
+            android.util.Log.w("OtzarotReader", "progress map refused: $verified")
+            noMap(target, generation)
+            return
         }
         val names = read.checks.map { it.field }.toSet()
         val byName = HashMap<String, MutableList<Pair<Int, Int>>>()
@@ -596,15 +667,38 @@ class ReaderActivity : AppCompatActivity() {
             byName.getOrPut(name) { mutableListOf() } += f.page to f.annotationIndex
             state[name] = (state[name] ?: false) || f.checked
         }
+        // remembered only when nothing was ticked while reading: then it is exactly what the file holds
+        adoptMap(target, generation, read, byName, state, cacheKey, docMarks.isEmpty())
+    }
+
+    /** Document thread: the boxes are known; hands them to the screen. */
+    private fun adoptMap(target: Doc, generation: Int, read: com.yeshsade.otzarot.reader.data.ProgressMap,
+                         byName: Map<String, List<Pair<Int, Int>>>, state: Map<String, Boolean>, cacheKey: String?, remember: Boolean) {
+        val index = byName.flatMap { (n, w) -> w.map { key(it.first, it.second) to n } }.toMap()
+        docWidgets = byName
+        docTicked.clear(); docTicked.putAll(state)
+        // boxes ticked while the map was being read, in order (each only sets a value, so order is enough)
+        for ((page, annotation, on) in docMarks) index[key(page, annotation)]?.let { docTicked[it] = on }
+        docMarks.clear()
+        docIndex = index
+        val now = HashMap(docTicked)
+        if (remember && cacheKey != null) {
+            val hash = docMapHash
+            if (hash != null) app.io.execute {
+                com.yeshsade.otzarot.reader.data.ProgressCache.save(this, target.id,
+                    com.yeshsade.otzarot.reader.data.ProgressCache.Entry(cacheKey, hash, byName, now.filterValues { it }.keys))
+            }
+        }
         main.post {
             if (isDestroyed || doc?.id != target.id || generation != mapGeneration) return@post
             map = read
+            parsedMap = read
             widgets = byName
-            fieldOf = byName.flatMap { (n, w) -> w.map { key(it.first, it.second) to n } }.toMap()
-            ticked.clear(); ticked.putAll(state)
-            // a box ticked on the page while the map was being read: what the screen shows now wins
-            for ((k, on) in beforeMap) fieldOf[k]?.let { ticked[it] = on }
-            beforeMap.clear()
+            fieldOf = index
+            ticked.clear(); ticked.putAll(now)
+            mapState = MapState.READY
+            refreshProgressViews()
+            lastProgress?.takeIf { it.waiting }?.becameReady()
         }
     }
 
@@ -614,14 +708,56 @@ class ReaderActivity : AppCompatActivity() {
     var lastProgress: ProgressScreen? = null
         private set
 
-    private fun openProgress(tab: ProgressScreen.Tab) {
-        val m = map ?: return
+    /**
+     * Opens the progress screen. The button is there from the first moment (owner, 2026-10-20): while the boxes
+     * are still being read the screen opens with "קורא…" and fills in; a file without a map says so.
+     */
+    private fun openProgress(tab: ProgressScreen.Tab, tries: Int = 0) {
+        when (mapState) {
+            MapState.NONE -> { Messages.notice(this, getString(R.string.pr_no_map)); return }
+            MapState.LOADING -> if (parsedMap == null) {
+                // the map itself is read in a moment; try again shortly
+                if (tries < 40 && !isDestroyed) main.postDelayed({ openProgress(tab, tries + 1) }, 150)
+                return
+            }
+            MapState.READY -> {}
+        }
+        val m = map ?: parsedMap ?: return
         chrome.hold()
-        lastProgress = ProgressScreen(this, ui, app.settings, m, ticked) { changes ->
+        lastProgress = ProgressScreen(this, ui, app.settings, m, ticked, waiting = mapState != MapState.READY) { changes ->
             for ((name, on) in changes) widgets[name]?.forEach { (page, annotation) -> mark(page, annotation, on) }
         }.show(tab)
-        lastProgress?.shown?.setOnDismissListener { chrome.used(); pdfView.invalidate() }
+        lastProgress?.shown?.setOnDismissListener { chrome.used(); pdfView.invalidate(); refreshProgressViews() }
     }
+
+    /** Today's part of the booklet that is done, for the small gauge in the toolbar; null while not known. */
+    private fun todayFraction(): Float? {
+        val m = map ?: return null
+        if (mapState != MapState.READY) return null
+        val chosen = app.settings.studyTopics.orEmpty()
+        val p = com.yeshsade.otzarot.reader.data.Progress(m, chosen) { ticked[it] == true }
+        val (y, mo, d) = com.yeshsade.otzarot.reader.data.OpenDay.today()
+        val day = com.yeshsade.otzarot.reader.data.OpenDay.choose(p.days.map { it.id }, m.booklet.weekStart, y, mo, d, ticked.values.any { it })
+        return (day?.let { p.day(it) } ?: p.week()).fraction
+    }
+
+    private fun weekFraction(): Float? {
+        val m = map ?: return null
+        if (mapState != MapState.READY) return null
+        return com.yeshsade.otzarot.reader.data.Progress(m, app.settings.studyTopics.orEmpty()) { ticked[it] == true }.week().fraction
+    }
+
+    /** Redraws what shows the progress outside its screen (the toolbar's gauge). Cheap: one small drawing. */
+    private fun refreshProgressViews() {
+        val gauge = toolbarGauge ?: return
+        val f = todayFraction()
+        gauge.visibility = if (f != null) View.VISIBLE else View.GONE
+        toolbarGaugeIcon?.visibility = if (f != null) View.GONE else View.VISIBLE
+        if (f != null) gauge.fraction = f
+    }
+
+    private var toolbarGauge: Gauge? = null
+    private var toolbarGaugeIcon: View? = null
 
     private fun showPage(page: Int) {
         val text = getString(R.string.reader_page, page + 1, pageCount)
@@ -637,7 +773,12 @@ class ReaderActivity : AppCompatActivity() {
         // Boxes are found from what the screen already knows, so a tap never waits for a save in progress.
         val known = pdfView.canPeekFormFieldAt(event.x, event.y)
         val field = (if (known) pdfView.peekFormFieldAt(event.x, event.y) else pdfView.findFormFieldAt(event.x, event.y)) ?: run {
-            if (pdfView.findLinkAt(event.x, event.y) != null) { chrome.used(); return false }
+            if (pdfView.findLinkAt(event.x, event.y) != null) {
+                // a booklet button: the page it opens starts at the top of the screen, not under the floating
+                // top bar (owner, 2026-10-20: the buttons felt like they landed "at the bottom of the page")
+                if (FramePolicy.canHide(app.settings.frameMode)) chrome.hide() else chrome.used()
+                return false
+            }
             chrome.toggle(); return true
         }
         if (field.readOnly) return false
@@ -659,11 +800,12 @@ class ReaderActivity : AppCompatActivity() {
         runCatching {
             docThread.execute {
                 val ok = pdfView.setFormFieldCheckedInBackground(page, annotation, checked)
+                if (ok) docMarked(page, annotation, checked)
                 main.post {
                     if (isDestroyed) return@post
                     pdfView.formFieldApplied(page, annotation, ok)
                     val now = if (ok) checked else !checked
-                    fieldOf[key(page, annotation)]?.let { ticked[it] = now } ?: run { if (map == null) beforeMap[key(page, annotation)] = now }
+                    fieldOf[key(page, annotation)]?.let { ticked[it] = now; refreshProgressViews() }
                     done(ok)
                     updateUndoButtons()
                 }
@@ -710,15 +852,14 @@ class ReaderActivity : AppCompatActivity() {
         val goTo = Drawer.Item(R.drawable.ic_goto, getString(R.string.menu_goto), "menu_goto") { goToPage() }
         val marks = Drawer.Item(R.drawable.ic_bookmark, getString(R.string.menu_bookmarks), "menu_bookmarks") { bookmarks.showList() }
         val info = Drawer.Item(R.drawable.ic_info, getString(R.string.menu_info), "menu_info") { fileDetails() }
-        val m = map
         val quick = Drawer.Item(R.drawable.ic_check_box, getString(R.string.menu_quick_mark), "menu_quick_mark") { openProgress(ProgressScreen.Tab.MARK) }
-        val week = m?.let { com.yeshsade.otzarot.reader.data.Progress(it, app.settings.studyTopics.orEmpty()) { f -> ticked[f] == true }.week().fraction }
+        // always there, from the first moment (owner, 2026-10-20); while the boxes are read, without a percentage
         // still to come, in the owner's place: "share the file" (in More)
         lastMenu = Drawer.show(this, ui, target?.name, page,
-            top = listOfNotNull(quick.takeIf { m != null }, AppMenu.rotationLock(this), files, goTo.takeIf { pageCount > 0 }),
+            top = listOfNotNull(quick.takeIf { target != null }, AppMenu.rotationLock(this), files, goTo.takeIf { pageCount > 0 }),
             more = listOfNotNull(marks.takeIf { pageCount > 0 }, info.takeIf { target != null }),
             pinned = listOf(AppMenu.settings(this)),
-            progress = week?.let { it to { openProgress(ProgressScreen.Tab.PROGRESS) } })
+            progress = if (target != null) Drawer.ProgressButton(weekFraction()) { openProgress(ProgressScreen.Tab.PROGRESS) } else null)
         lastMenu?.dialog?.setOnDismissListener { chrome.used() }
     }
 
@@ -841,6 +982,9 @@ class ReaderActivity : AppCompatActivity() {
         val ok = runCatching { pdfView.saveAsCopy(file) }.getOrDefault(false)
         if (!ok) { file.delete(); return null }
         capturedGeneration = generation
+        val hash = docMapHash
+        if (docIndex != null && hash != null)
+            captureTicked[file.path] = com.yeshsade.otzarot.reader.data.ProgressCache.Entry("", hash, docWidgets, docTicked.filterValues { it }.keys.toSet())
         return file
     }
 
@@ -870,6 +1014,11 @@ class ReaderActivity : AppCompatActivity() {
             written = Files.writeVerified(this, uri, data) ?: return false
             app.library.update(target.id) { it.copy(identity = written, size = size) }
             kept = runCatching { adoptAsSnapshot(target, uri, data, written) }.getOrDefault(false)
+            // the saved file is the private copy now: remember its boxes for the next opening
+            val boxes = captureTicked.remove(file.path)
+            val key = if (kept) com.yeshsade.otzarot.reader.data.ProgressCache.keyOf(snapshotFile(target)) else null
+            if (boxes != null && key != null) com.yeshsade.otzarot.reader.data.ProgressCache.save(this, target.id, boxes.copy(key = key))
+            else com.yeshsade.otzarot.reader.data.ProgressCache.forget(this, target.id)
             return true
         } finally {
             // a pending copy stays only while its write has not been verified

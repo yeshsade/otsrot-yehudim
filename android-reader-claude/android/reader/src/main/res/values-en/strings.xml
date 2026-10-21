@@ -109,6 +109,8 @@
     <string name="search_hint">Search by name</string>
     <string name="search_none">No file with this name</string>
     <!-- Stage 2, the progress screen (2026-10-20). Draft, translated from the Hebrew drafts -->
+    <string name="tool_progress">Progress</string>
+    <string name="pr_my_topics">My topics</string>
     <string name="pr_title">Progress</string>
     <string name="pr_tab_mark">Marking</string>
     <string name="pr_tab_progress">Progress</string>

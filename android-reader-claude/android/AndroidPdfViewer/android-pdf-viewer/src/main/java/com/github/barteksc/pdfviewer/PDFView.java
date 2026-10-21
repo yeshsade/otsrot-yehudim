@@ -2479,6 +2479,30 @@ public class PDFView extends RelativeLayout {
         return null;
     }
 
+    /** Where a page's link is on the screen now, in view coordinates; null when unknown. Otzarot reader, GPLv3. */
+    public RectF linkRectInView(int page, PdfDocument.Link link) {
+        if (pdfFile == null || link == null || page < 0 || page >= pdfFile.getPagesCount()) {
+            return null;
+        }
+        SizeF pageSize = pdfFile.getScaledPageSize(page, getZoom());
+        int pageX, pageY;
+        if (isSwipeVertical()) {
+            pageX = (int) pdfFile.getSecondaryPageOffset(page, getZoom());
+            pageY = (int) pdfFile.getPageOffset(page, getZoom());
+        } else {
+            pageY = (int) pdfFile.getSecondaryPageOffset(page, getZoom());
+            pageX = (int) pdfFile.getPageOffset(page, getZoom());
+        }
+        RectF mapped = pdfFile.mapRectToDevice(page, pageX, pageY, (int) pageSize.getWidth(),
+                (int) pageSize.getHeight(), link.getBounds());
+        if (mapped == null) {
+            return null;
+        }
+        mapped.sort();
+        mapped.offset(getCurrentXOffset(), getCurrentYOffset());
+        return mapped;
+    }
+
     public boolean hasLinkAt(float x, float y) {
         return findLinkAt(x, y) != null;
     }

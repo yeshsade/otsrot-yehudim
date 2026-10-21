@@ -26,6 +26,9 @@ object Drawer {
         val action: () -> Unit,
     )
 
+    /** The progress button at the head of the drawer; [fraction] is the week's part done, null while not known. */
+    class ProgressButton(val fraction: Float?, val open: () -> Unit)
+
     /** The open drawer (for tests). */
     class Shown(val dialog: Dialog, val root: View)
 
@@ -33,7 +36,7 @@ object Drawer {
         context: Context, ui: Ui, title: String?, subtitle: String?,
         top: List<Item>, more: List<Item>, pinned: List<Item>,
         /** The progress button at the head of the drawer ("מד התקדמות"), with the week's percentage; null = none. */
-        progress: Pair<Float, () -> Unit>? = null,
+        progress: ProgressButton? = null,
     ): Shown {
         val dialog = Dialog(context)
         val panel = LinearLayout(context).apply {
@@ -51,7 +54,8 @@ object Drawer {
             subtitle?.let { list.addView(ui.label(it, 13.5f, ui.colors.muted).apply { setPadding(ui.dp(24), ui.dp(2), ui.dp(24), ui.dp(14)) }) }
         }
         if (progress != null) {
-            val (fraction, open) = progress
+            val fraction = progress.fraction
+            val open = progress.open
             val button = LinearLayout(context).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.CENTER_VERTICAL
@@ -63,11 +67,12 @@ object Drawer {
                 contentDescription = context.getString(R.string.pr_title)
                 setOnClickListener { dialog.dismiss(); open() }
             }
-            val gauge = Gauge(context, ui, big = false).apply { this.fraction = fraction; mini = true }
+            val gauge = Gauge(context, ui, big = false).apply { this.fraction = fraction ?: 0f; mini = true }
             button.addView(gauge, LinearLayout.LayoutParams(ui.dp(54), ui.dp(44)).apply { marginEnd = ui.dp(12) })
             val words = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
             words.addView(ui.label(context.getString(R.string.pr_title), 17f, ui.colors.ink, true))
-            words.addView(ui.label(context.getString(R.string.menu_progress_week, (fraction * 100).toInt()), 13f, ui.colors.muted))
+            words.addView(ui.label(if (fraction != null) context.getString(R.string.menu_progress_week, (fraction * 100).toInt())
+                else context.getString(R.string.pr_reading), 13f, ui.colors.muted))
             button.addView(words, LinearLayout.LayoutParams(0, -2, 1f))
             button.addView(ImageView(context).apply {
                 setImageResource(R.drawable.otzr_ic_chevron)
