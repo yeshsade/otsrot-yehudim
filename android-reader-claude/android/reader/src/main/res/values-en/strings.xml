@@ -127,7 +127,7 @@
     <string name="pr_by_topics">By topic</string>
     <string name="pr_whole_week">Whole week</string>
     <string name="pr_no_map">This file has no map of its check boxes, so it has no progress.</string>
-    <string name="pr_nothing_chosen">No topics chosen. Choose them under "Topics".</string>
+    <string name="pr_nothing_chosen">No topics chosen</string>
     <string name="pr_study_title">What do you learn?</string>
     <string name="pr_study_note">Only the topics you choose count in the progress. You can change this any time.</string>
     <string name="pr_select_all">Select all</string>

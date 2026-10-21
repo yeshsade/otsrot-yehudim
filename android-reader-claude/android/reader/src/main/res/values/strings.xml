@@ -135,7 +135,7 @@
     <string name="pr_by_topics">לפי נושאים</string>
     <string name="pr_whole_week">כל השבוע</string>
     <string name="pr_no_map">בקובץ הזה אין מפה של תיבות הסימון, ולכן אין בו מד התקדמות.</string>
-    <string name="pr_nothing_chosen">לא נבחרו נושאים. אפשר לבחור ב"נושאים".</string>
+    <string name="pr_nothing_chosen">לא נבחרו נושאים</string>
     <string name="pr_study_title">מה אתה לומד?</string>
     <string name="pr_study_note">רק הנושאים שתבחר ייספרו בהתקדמות. אפשר לשנות בכל זמן.</string>
     <string name="pr_select_all">בחר הכול</string>
