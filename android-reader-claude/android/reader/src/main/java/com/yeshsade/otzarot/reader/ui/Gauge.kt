@@ -125,11 +125,16 @@ class Gauge(context: Context, private val ui: Ui, private val big: Boolean) : Vi
         }
     }
 
-    /** Pink at the start, orange a third of the way, purple at the end — fixed along the arc. */
+    /**
+     * Pink at the start, orange half way, purple at the end — fixed along the arc. The gradient starts a little
+     * before the arc, so the arc's rounded start stays pink (a gradient that begins exactly there wraps round to
+     * its last colour, and the start showed a purple blob).
+     */
     private fun sweep(cx: Float, cy: Float): SweepGradient {
-        val shader = SweepGradient(cx, cy, intArrayOf(PINK, ORANGE, PURPLE, PURPLE),
-            floatArrayOf(0f, SWEEP / 2f / 360f, SWEEP / 360f, 1f))
-        shader.setLocalMatrix(Matrix().apply { setRotate(START, cx, cy) })
+        val lead = 20f
+        val shader = SweepGradient(cx, cy, intArrayOf(PINK, PINK, ORANGE, PURPLE, PURPLE, PINK),
+            floatArrayOf(0f, lead / 360f, (lead + SWEEP / 2f) / 360f, (lead + SWEEP) / 360f, (lead + SWEEP + 20f) / 360f, 1f))
+        shader.setLocalMatrix(Matrix().apply { setRotate(START - lead, cx, cy) })
         return shader
     }
 
