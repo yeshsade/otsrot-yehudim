@@ -9,3 +9,5 @@ Separate pristine-source pipeline, source-hash-bound manual review, geometric st
 2026-10-20: replace single-font Shulchan Aruch measurements with visual commentary boundaries inherited from Skill 6. Preserve variable geometric counts and gray exclusions. Add independent original-glyph coverage before placement and after PDF round trip, including expected counts per active column.
 
 2026-10-21: fix shared Gemara occurrence-list mutation and loss of newly inserted links during duplicate-field joining. Add a build-level regression with real PDF validation and a shared A / independent B state check.
+
+2026-10-23 owner correction: remove progress boxes from all previous-week completion pages, retaining text, page provenance and reciprocal links. Add both-edition build regressions for all four completion topics and validation that rejects a prior page even when its check is mislabeled current-week.

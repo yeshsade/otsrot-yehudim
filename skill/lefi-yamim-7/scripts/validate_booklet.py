@@ -27,6 +27,13 @@ def validate_internal_destination(doc, link):
         raise ValueError("Internal link must land at the target page's top, not outside it")
 
 
+def validate_progress_scope(progress, placements, rows):
+    previous_pages = {row["page"] for row in rows if row.get("week_offset") == -1}
+    for check in [*progress["checks"], *placements]:
+        if check.get("week_offset", 0) != 0 or previous_pages.intersection(check["pages"]):
+            raise ValueError("Previous-week completion pages must not have progress checkboxes")
+
+
 def validate(path, source, source_model, placements, rows, navigation, before_hashes, interior, cover):
     doc = fitz.open(path)
     if len(doc) != len(rows):
@@ -34,6 +41,7 @@ def validate(path, source, source_model, placements, rows, navigation, before_ha
     progress = json.loads(doc.embfile_get("otzarot-progress-map.v1.json"))
     if progress["pages"] != rows:
         raise ValueError("Embedded page map differs from actual build provenance")
+    validate_progress_scope(progress, placements, rows)
     actual, planned = defaultdict(list), defaultdict(list)
     for item in placements:
         planned[item["field"]].append(item["pages"][0])
@@ -61,6 +69,8 @@ def validate(path, source, source_model, placements, rows, navigation, before_ha
             shulchan_coverage.append({"page": page.number + 1, "source_page": n, **coverage})
         words = [fitz.Rect(word[:4]) for word in page.get_text("words")]
         widgets = list(page.widgets() or [])
+        if row.get("week_offset") == -1 and widgets:
+            raise ValueError("Previous-week completion pages must not have progress checkboxes")
         links = page.get_links()
         for index, widget in enumerate(widgets):
             widget_count += 1
@@ -132,6 +142,8 @@ def validate(path, source, source_model, placements, rows, navigation, before_ha
         "zero_text_overlaps": True, "zero_widget_overlaps": True,
         "zero_widget_link_overlaps": True, "navigation_matches_manifest": True, "navigation_uses_fixed_anchors": True,
         "all_internal_links_land_at_target_top": True,
+        "previous_week_pages_have_no_checkboxes": True,
+        "progress_checks_cover_current_week_only": True,
         "transparent_navigation_over_source_text_allowed": True,
         "progress_map_matches_widgets": True, "source_files_unchanged": True,
         "shulchan_source_coverage": shulchan_coverage}

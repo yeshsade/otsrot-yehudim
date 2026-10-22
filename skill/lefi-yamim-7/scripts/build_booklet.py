@@ -181,7 +181,7 @@ def build(interior, cover, answers, output, checker, edition="days"):
     for row in rows:
         n = row.get("source_page")
         topic = row["topic_id"]
-        if n is None or topic in {"parsha", "tikkun_haklali", "introduction"}:
+        if n is None or row["week_offset"] == -1 or topic in {"parsha", "tikkun_haklali", "introduction"}:
             continue
         page_number = row["page"]
         page = doc[page_number - 1]
