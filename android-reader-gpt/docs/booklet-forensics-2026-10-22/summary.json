@@ -1,0 +1,97 @@
+{
+  "toldot_send_turns": [
+    {
+      "id": "01a14f4b-599b-79e2-b6a7-a50b83497811",
+      "status": "failed",
+      "start_israel": "2026-10-18T16:55:01+03:00",
+      "end_israel": "2026-10-19T10:07:23+03:00",
+      "recorded_duration_ms": 61941744,
+      "command_duration_sum_ms": 47136,
+      "mcp_duration_sum_ms": 0,
+      "item_types": {
+        "userMessage": 1,
+        "agentMessage": 3,
+        "commandExecution": 34
+      }
+    },
+    {
+      "id": "01a152fc-b18e-79f3-98c0-5a616220e2d7",
+      "status": "interrupted",
+      "start_israel": "2026-10-19T10:07:34+03:00",
+      "end_israel": "2026-10-19T13:04:00+03:00",
+      "recorded_duration_ms": 10584969,
+      "command_duration_sum_ms": 250498,
+      "mcp_duration_sum_ms": 125626,
+      "item_types": {
+        "agentMessage": 16,
+        "commandExecution": 132,
+        "imageView": 48,
+        "fileChange": 10,
+        "contextCompaction": 1,
+        "mcpToolCall": 7
+      }
+    }
+  ],
+  "toldot_send_action_counts": {
+    "userMessage": 1,
+    "agentMessage": 19,
+    "commandExecution": 166,
+    "imageView": 48,
+    "fileChange": 10,
+    "contextCompaction": 1,
+    "mcpToolCall": 7
+  },
+  "cloud_build_logs": 34,
+  "toldot_cloud_builds": 25,
+  "vayera_builds": 8,
+  "vayera_intervals": [
+    {
+      "log": "vayera-843-topics-build.log",
+      "start": "2026-10-22T00:50:21+03:00",
+      "end": "2026-10-22T00:51:28+03:00",
+      "seconds": 67.791
+    },
+    {
+      "log": "vayera-843-days-build.log",
+      "start": "2026-10-22T00:50:19+03:00",
+      "end": "2026-10-22T00:51:52+03:00",
+      "seconds": 92.919
+    },
+    {
+      "log": "vayera-843-topics-build-02.log",
+      "start": "2026-10-22T00:52:56+03:00",
+      "end": "2026-10-22T00:57:49+03:00",
+      "seconds": 292.321
+    },
+    {
+      "log": "vayera-843-days-build-02.log",
+      "start": "2026-10-22T00:52:56+03:00",
+      "end": "2026-10-22T00:57:57+03:00",
+      "seconds": 300.911
+    },
+    {
+      "log": "vayera-843-topics-build-03.log",
+      "start": "2026-10-22T01:01:24+03:00",
+      "end": "2026-10-22T01:05:22+03:00",
+      "seconds": 238.068
+    },
+    {
+      "log": "vayera-843-days-build-03.log",
+      "start": "2026-10-22T01:01:24+03:00",
+      "end": "2026-10-22T01:05:26+03:00",
+      "seconds": 241.584
+    },
+    {
+      "log": "vayera-843-topics-build-04.log",
+      "start": "2026-10-22T01:07:20+03:00",
+      "end": "2026-10-22T01:11:22+03:00",
+      "seconds": 241.744
+    },
+    {
+      "log": "vayera-843-days-build-04.log",
+      "start": "2026-10-22T01:07:20+03:00",
+      "end": "2026-10-22T01:11:27+03:00",
+      "seconds": 247.261
+    }
+  ]
+}

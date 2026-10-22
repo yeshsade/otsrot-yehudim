@@ -1,0 +1,26 @@
+SOURCE_OWNERSHIP_VALIDATED
+LAYOUT_PAGES=175
+PLANNING_SOURCE_COLLISIONS
+PLACED_THROUGH_PAGE=40
+PLACED_THROUGH_PAGE=60
+PLACED_THROUGH_PAGE=80
+PLACED_THROUGH_PAGE=100
+PLACED_THROUGH_PAGE=120
+PLACED_THROUGH_PAGE=140
+PLACED_THROUGH_PAGE=160
+NAVIGATION_LINKS=311 CHECKBOX_WIDGETS=858
+• 175 עמודים, 858 תיבות (857 שדות)
+• אזהרה: 111 כפתורי מעבר יושבים על טקסט של העמוד. עמודים: 22, 26, 27, 28, 29, 31, 34, 35, 38, 40, 43, 48, 49, 50, 51, 52, 53, 54, 57, 58, 60, 61, 62, 63, 66, 69, 70, 71, 72, 73, 74, 75, 78, 79, 81, 82, 83, 84, 87, 90, 91, 92, 93, 94, 95, 96, 99, 100, 102, 103, 104, 105, 108, 111, 112, 113, 114, 115, 116, 117, 120, 121, 123, 124, 125, 126, 129, 132, 133, 134, 135, 136, 137, 138, 141, 142, 144, 145, 146, 147, 150, 153, 155, 156, 157, 158, 162, 163, 165, 167, 168
+• תיבות לפי נושא: gemara 14, likutey_halakhot 84, likutey_moharan 42, likutey_tefilot 84, mishnah 48, mishnah_berurah 7, nach 28, sefer_hamidot 42, shemot_tzadikim 42, shulchan_aruch 84, sifrei_rabeinu 168, tehillim 96, zohar 104
+✗ נמצאו 2 בעיות:
+  - עמוד 116 (zohar, thursday): בטור 2 יש טקסט לימוד (855 אותיות) ואין אף תיבה
+  - עמוד 158 (zohar, saturday): בטור 3 יש טקסט לימוד (864 אותיות) ואין אף תיבה
+
+Traceback (most recent call last):
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 438, in <module>
+    main()
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 434, in main
+    build(args.interior, args.cover, answers, args.output_dir, args.checker, args.edition)
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 413, in build
+    raise ValueError("Independent checker failed; candidate is not ready for delivery")
+ValueError: Independent checker failed; candidate is not ready for delivery

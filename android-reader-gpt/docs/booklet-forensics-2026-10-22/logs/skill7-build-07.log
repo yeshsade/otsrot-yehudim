@@ -1,0 +1,23 @@
+SOURCE_OWNERSHIP_VALIDATED
+LAYOUT_PAGES=166
+PLANNING_SOURCE_COLLISIONS
+PLACED_THROUGH_PAGE=20
+PLACED_THROUGH_PAGE=40
+PLACED_THROUGH_PAGE=60
+PLACED_THROUGH_PAGE=80
+PLACED_THROUGH_PAGE=100
+PLACED_THROUGH_PAGE=120
+PLACED_THROUGH_PAGE=140
+Traceback (most recent call last):
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 376, in <module>
+    main()
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 372, in main
+    build(args.interior, args.cover, answers, args.output_dir, args.checker, args.edition)
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 258, in build
+    link(runs[0][1][0], prior[-1], "previous")
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 234, in link
+    rect = canvases[source_page].button(kind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/placement.py", line 192, in button
+    raise ValueError(f"No safe readable {kind} button on final page {self.page.number + 1}")
+ValueError: No safe readable previous button on final page 15

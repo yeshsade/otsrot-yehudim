@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 400, in <module>
+    main()
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 396, in main
+    build(args.interior, args.cover, answers, args.output_dir, args.checker, args.edition)
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 69, in build
+    base = discover(interior, cover)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/source_model.py", line 131, in discover
+    rotated = legacy.detect_rotated(str(interior))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[REPOSITORY]/skill/lefi-yamim-7/days/scripts/build_lefi_yamim.py", line 411, in detect_rotated
+    doc = fitz.open(pdf_path)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.onboarding/otsrot-yehudim/venv/lib/python3.12/site-packages/pymupdf/__init__.py", line 3006, in __init__
+    raise FileNotFoundError(f"no such file: '{filename}'")
+pymupdf.FileNotFoundError: no such file: '[ATTACHMENTS]/845_תולדות_כריכה.pdf'

@@ -1,0 +1,13 @@
+SOURCE_OWNERSHIP_VALIDATED
+LAYOUT_PAGES=166
+Traceback (most recent call last):
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 378, in <module>
+    main()
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 374, in main
+    build(args.interior, args.cover, answers, args.output_dir, args.checker, args.edition)
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 213, in build
+    regions = measured_regions(page, topic, font=fonts.get(topic),
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/placement.py", line 53, in measured_regions
+    raise ValueError(f"Expected two verse halves on source page {page.number + 1}")
+ValueError: Expected two verse halves on source page 19

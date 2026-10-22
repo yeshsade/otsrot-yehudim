@@ -1,0 +1,20 @@
+commit	author_timestamp	subject
+e60f1fba	2026-10-19T19:00:29Z	תיעוד החלטות האפיון המאושרות לסקיל 7
+bf09323e	2026-10-19T20:32:43Z	Build separate Skill 7 with measured progress and source-bound review
+296c7bac	2026-10-19T20:38:05Z	Place navigation around crowded source headers and landscape margins
+d2991c6f	2026-10-19T20:45:12Z	Use readable type for the short continuation labels
+72de1e04	2026-10-19T20:49:20Z	Recognize gray future reading through rendered transparency groups
+a767eddc	2026-10-19T20:53:19Z	Link topic-edition context pages to the current reading
+b09170f1	2026-10-19T21:00:01Z	Keep split progress subjects in their canonical topic order
+00cec57a	2026-10-19T21:05:22Z	Publish validated Toldot 845 results and the actual reader progress map
+7256468e	2026-10-20T07:18:01Z	Provide one browser-download archive for the validated Toldot files
+131806b8	2026-10-20T07:28:36Z	Record rejected fallback typography and original-font requirements
+4d247adf	2026-10-20T07:47:56Z	Restore owner-supplied font families through one verified typography profile
+f538178a	2026-10-20T07:52:21Z	Deliver validated booklets with restored original typography
+921e3b71	2026-10-20T20:13:11Z	Enforce fixed button placement and restore original label sizing
+b45e5152	2026-10-20T20:25:23Z	Allow intentional transparent navigation over source text and validate both editions
+1ec5c002	2026-10-20T20:43:17Z	Measure all Shulchan Aruch study above the visual commentary boundary
+c6ea6439	2026-10-21T15:05:47Z	תיקון שדה גמרא משותף ושימור קישורים בבנייה מלאה
+f41dd9bd	2026-10-21T22:12:44Z	אימות וירא 843 ותיקון גבולות זוהר ויעדי קישורים
+1fe9c9da	2026-10-21T22:19:55Z	תיעוד מסירה מלא לקלוד והגבלות הבדיקות וזמן ההפקה
+3e072330	2026-10-21T22:26:09Z	פרסום חוברות וירא 843 וארכיון הסקיל באישור בעל המוצר

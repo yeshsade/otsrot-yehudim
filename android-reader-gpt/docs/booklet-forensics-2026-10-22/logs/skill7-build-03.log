@@ -1,0 +1,19 @@
+SOURCE_OWNERSHIP_VALIDATED
+LAYOUT_PAGES=166
+LEARNING_FONTS={"mishnah": "TT2D61o00", "zohar": "TTC8FAo00", "nach": "TTE635E008o00", "shulchan_aruch": "TT5CF6o00"}
+PLACED_THROUGH_PAGE=20
+PLACED_THROUGH_PAGE=40
+PLACED_THROUGH_PAGE=60
+PLACED_THROUGH_PAGE=80
+PLACED_THROUGH_PAGE=100
+Traceback (most recent call last):
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 382, in <module>
+    main()
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 378, in main
+    build(args.interior, args.cover, answers, args.output_dir, args.checker, args.edition)
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 217, in build
+    regions = measured_regions(page, topic, font=fonts.get(topic),
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/placement.py", line 53, in measured_regions
+    raise ValueError(f"Expected two verse halves on page {page.number + 1}, font={font}, halves={list(halves)}")
+ValueError: Expected two verse halves on page 101, font=TTE635E008o00, halves=[]

@@ -1,0 +1,59 @@
+{
+  "source_thread": {
+    "title": "בנה ושלח חוברות תולדות",
+    "id": "01a14f4a-8a01-7b51-ba94-95ef68cc9c5b",
+    "host": "local",
+    "turns_returned": 2,
+    "has_more": false,
+    "public_action_count": 252,
+    "command_count": 166,
+    "command_duration_sum_ms": 297634,
+    "mcp_duration_sum_ms": 125626
+  },
+  "unreadable_thread": {
+    "title": "הכן את פרשת תולדות",
+    "id": "01a15314-f239-7352-8fcd-009afbb7344f",
+    "status": "unreadable_due_to_tool_size_limit",
+    "owner_has_share_link": false,
+    "content_reconstructed": false
+  },
+  "attached_html": {
+    "file_name": "16111910_כל_השיחה.html",
+    "sha256": "fbcc1562a51ca16c05fa85e35af3ce71a36fee27fda6520c4c9426f7f50bcc3a",
+    "article_count": 51,
+    "classification": "Separate Skill 7 requirements conversation, not either requested production thread"
+  },
+  "cloud_logs": {
+    "count": 34,
+    "toldot_builds": 25,
+    "vayera_builds": 8,
+    "source_discovery": 1
+  },
+  "limitations": [
+    "No per-item start timestamp for Windows commands",
+    "Some original tool outputs already truncated",
+    "Birth/mtime observations are not process performance telemetry",
+    "No complete Vayera conversation command transcript was recovered",
+    "Model/reasoning-level performance comparison not measured"
+  ],
+  "redactions": [
+    "Personal local directory prefixes",
+    "Email addresses",
+    "Delivery folder and connector identifiers",
+    "Google login session URL",
+    "Read instruction and memory documents represented by operation metadata and hashes, not republished in full"
+  ],
+  "publication_minimisation": {
+    "raw_desktop_commands_and_outputs_published": false,
+    "public_operation_records": 252,
+    "command_summaries": 166,
+    "raw_local_copy_retained": true,
+    "removed": [
+      "Phone numbers",
+      "Raw desktop command bodies",
+      "Full original tool outputs",
+      "Delivery and browser/window identifiers",
+      "Personal filesystem paths"
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "public_operation_records": 252,
+  "command_summaries": 166,
+  "original_command_bodies_in_public_ledger": false,
+  "raw_desktop_tool_outputs_in_public_ledger": false,
+  "phone_pattern_scan_passed": true,
+  "email_address_scan_passed": true,
+  "credential_pattern_scan_passed": true,
+  "private_account_window_and_delivery_identifiers_omitted": true,
+  "unreadable_first_thread_explicitly_marked": true,
+  "changes_are_documentation_only": true
+}

@@ -1,0 +1,2562 @@
+{
+  "time_zone": "Asia/Jerusalem",
+  "meaning": "birth/mtime observations only; no inference of exact CPU time or missing events; directory mtime can change later, so run end uses log mtime. Stage files may be absent after early failure.",
+  "runs": [
+    {
+      "log": "skill7-build-01.log",
+      "kind": "toldot-cloud-build",
+      "result": "failed",
+      "error": "ValueError: No safe checkbox position, final page 32, column 4",
+      "output_directory": {
+        "artifact_name": "skill7-build-01",
+        "birth_israel": "2026-10-19T23:12:29+03:00",
+        "mtime_israel": "2026-10-19T23:12:29+03:00",
+        "mtime_unix": 1792440749.9208362,
+        "birth_unix": 1792440749.920836,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-build-01.log",
+        "birth_israel": "2026-10-19T23:12:29+03:00",
+        "mtime_israel": "2026-10-19T23:14:21+03:00",
+        "mtime_unix": 1792440861.0560153,
+        "birth_unix": 1792440749.500854,
+        "bytes": 897
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:13:07+03:00",
+          "mtime_israel": "2026-10-19T23:13:07+03:00",
+          "mtime_unix": 1792440787.4887664,
+          "birth_unix": 1792440787.487208,
+          "bytes": 19847
+        },
+        "layout.json": null,
+        "source-layer.pdf": null,
+        "measurements.json": null,
+        "placement-manifest.json": null,
+        "navigation-manifest.json": null,
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "d9dd260f59b728cdedf9ee4b6528caa416f3a04ac9f09633b018ece9b1427f7a",
+      "observed_directory_birth_to_log_mtime_seconds": 111.135
+    },
+    {
+      "log": "skill7-build-02.log",
+      "kind": "toldot-cloud-build",
+      "result": "failed",
+      "error": "ValueError: Expected two verse halves on source page 19",
+      "output_directory": {
+        "artifact_name": "skill7-build-02",
+        "birth_israel": "2026-10-19T23:15:20+03:00",
+        "mtime_israel": "2026-10-19T23:15:20+03:00",
+        "mtime_unix": 1792440920.781424,
+        "birth_unix": 1792440920.781423,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-build-02.log",
+        "birth_israel": "2026-10-19T23:15:19+03:00",
+        "mtime_israel": "2026-10-19T23:16:42+03:00",
+        "mtime_unix": 1792441002.9178395,
+        "birth_unix": 1792440919.93746,
+        "bytes": 859
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:15:57+03:00",
+          "mtime_israel": "2026-10-19T23:15:57+03:00",
+          "mtime_unix": 1792440957.2712314,
+          "birth_unix": 1792440957.26384,
+          "bytes": 19847
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:16:14+03:00",
+          "mtime_israel": "2026-10-19T23:16:14+03:00",
+          "mtime_unix": 1792440974.7435765,
+          "birth_unix": 1792440974.739061,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:16:14+03:00",
+          "mtime_israel": "2026-10-19T23:16:21+03:00",
+          "mtime_unix": 1792440981.2867758,
+          "birth_unix": 1792440974.743576,
+          "bytes": 13748148
+        },
+        "measurements.json": null,
+        "placement-manifest.json": null,
+        "navigation-manifest.json": null,
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "bd2b0f9ad86138d2006f1a72c4af4385df1260aed79cf6599805aa0d9f7fc359",
+      "observed_directory_birth_to_log_mtime_seconds": 82.136
+    },
+    {
+      "log": "skill7-build-03.log",
+      "kind": "toldot-cloud-build",
+      "result": "failed",
+      "error": "ValueError: Expected two verse halves on page 101, font=TTE635E008o00, halves=[]",
+      "output_directory": {
+        "artifact_name": "skill7-build-03",
+        "birth_israel": "2026-10-19T23:18:34+03:00",
+        "mtime_israel": "2026-10-19T23:18:34+03:00",
+        "mtime_unix": 1792441114.8009756,
+        "birth_unix": 1792441114.800975,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-build-03.log",
+        "birth_israel": "2026-10-19T23:18:34+03:00",
+        "mtime_israel": "2026-10-19T23:20:24+03:00",
+        "mtime_unix": 1792441224.7161882,
+        "birth_unix": 1792441114.380993,
+        "bytes": 1147
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:19:25+03:00",
+          "mtime_israel": "2026-10-19T23:19:25+03:00",
+          "mtime_unix": 1792441165.8633761,
+          "birth_unix": 1792441165.858749,
+          "bytes": 19847
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:19:44+03:00",
+          "mtime_israel": "2026-10-19T23:19:44+03:00",
+          "mtime_unix": 1792441184.8939197,
+          "birth_unix": 1792441184.889919,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:19:44+03:00",
+          "mtime_israel": "2026-10-19T23:19:50+03:00",
+          "mtime_unix": 1792441190.9536555,
+          "birth_unix": 1792441184.893919,
+          "bytes": 13748148
+        },
+        "measurements.json": null,
+        "placement-manifest.json": null,
+        "navigation-manifest.json": null,
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "7f56075998247601439167b7916f51602398f6e46ea158450c1d362a25155f9f",
+      "observed_directory_birth_to_log_mtime_seconds": 109.915
+    },
+    {
+      "log": "skill7-build-04.log",
+      "kind": "toldot-cloud-build",
+      "result": "failed",
+      "error": "ValueError: Expected two verse halves on page 101, font=TTE5DFE238o00, halves=[2]",
+      "output_directory": {
+        "artifact_name": "skill7-build-04",
+        "birth_israel": "2026-10-19T23:23:17+03:00",
+        "mtime_israel": "2026-10-19T23:23:17+03:00",
+        "mtime_unix": 1792441397.016684,
+        "birth_unix": 1792441397.016684,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-build-04.log",
+        "birth_israel": "2026-10-19T23:23:16+03:00",
+        "mtime_israel": "2026-10-19T23:24:45+03:00",
+        "mtime_unix": 1792441485.0288568,
+        "birth_unix": 1792441396.6407,
+        "bytes": 1148
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:23:51+03:00",
+          "mtime_israel": "2026-10-19T23:23:51+03:00",
+          "mtime_unix": 1792441431.5252745,
+          "birth_unix": 1792441431.523183,
+          "bytes": 19847
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:24:07+03:00",
+          "mtime_israel": "2026-10-19T23:24:07+03:00",
+          "mtime_unix": 1792441447.0471869,
+          "birth_unix": 1792441447.042508,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:24:07+03:00",
+          "mtime_israel": "2026-10-19T23:24:12+03:00",
+          "mtime_unix": 1792441452.8542554,
+          "birth_unix": 1792441447.047186,
+          "bytes": 13748148
+        },
+        "measurements.json": null,
+        "placement-manifest.json": null,
+        "navigation-manifest.json": null,
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "a39845b52c9c7e84be3007152f39539f1c7ab12c537bd1f557f5720f77dc81fa",
+      "observed_directory_birth_to_log_mtime_seconds": 88.012
+    },
+    {
+      "log": "skill7-build-05.log",
+      "kind": "toldot-cloud-build",
+      "result": "failed",
+      "error": "ValueError: No safe checkbox position, final page 165, column 1",
+      "output_directory": {
+        "artifact_name": "skill7-build-05",
+        "birth_israel": "2026-10-19T23:25:24+03:00",
+        "mtime_israel": "2026-10-19T23:25:24+03:00",
+        "mtime_unix": 1792441524.5671337,
+        "birth_unix": 1792441524.563133,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-build-05.log",
+        "birth_israel": "2026-10-19T23:25:24+03:00",
+        "mtime_israel": "2026-10-19T23:26:58+03:00",
+        "mtime_unix": 1792441618.8630354,
+        "birth_unix": 1792441524.155151,
+        "bytes": 1157
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:26:00+03:00",
+          "mtime_israel": "2026-10-19T23:26:00+03:00",
+          "mtime_unix": 1792441560.5985231,
+          "birth_unix": 1792441560.593568,
+          "bytes": 19847
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:26:14+03:00",
+          "mtime_israel": "2026-10-19T23:26:14+03:00",
+          "mtime_unix": 1792441574.8161588,
+          "birth_unix": 1792441574.812949,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:26:14+03:00",
+          "mtime_israel": "2026-10-19T23:26:20+03:00",
+          "mtime_unix": 1792441580.1447175,
+          "birth_unix": 1792441574.816158,
+          "bytes": 13748148
+        },
+        "measurements.json": null,
+        "placement-manifest.json": null,
+        "navigation-manifest.json": null,
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "286e59c1f9466091f194a7f7c0d1a4c0fb4e3e7b3dc3876ae202667b36cff107",
+      "observed_directory_birth_to_log_mtime_seconds": 94.3
+    },
+    {
+      "log": "skill7-build-06.log",
+      "kind": "toldot-cloud-build",
+      "result": "failed",
+      "error": "ValueError: No safe readable return button on final page 13",
+      "output_directory": {
+        "artifact_name": "skill7-build-06",
+        "birth_israel": "2026-10-19T23:27:10+03:00",
+        "mtime_israel": "2026-10-19T23:27:10+03:00",
+        "mtime_unix": 1792441630.3785357,
+        "birth_unix": 1792441630.378535,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-build-06.log",
+        "birth_israel": "2026-10-19T23:27:09+03:00",
+        "mtime_israel": "2026-10-19T23:29:53+03:00",
+        "mtime_unix": 1792441793.2994637,
+        "birth_unix": 1792441629.698565,
+        "bytes": 1219
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:27:51+03:00",
+          "mtime_israel": "2026-10-19T23:27:51+03:00",
+          "mtime_unix": 1792441671.876733,
+          "birth_unix": 1792441671.872733,
+          "bytes": 19847
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:28:10+03:00",
+          "mtime_israel": "2026-10-19T23:28:10+03:00",
+          "mtime_unix": 1792441690.3922932,
+          "birth_unix": 1792441690.38793,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:28:10+03:00",
+          "mtime_israel": "2026-10-19T23:28:17+03:00",
+          "mtime_unix": 1792441697.411627,
+          "birth_unix": 1792441690.392293,
+          "bytes": 13748148
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-19T23:29:52+03:00",
+          "mtime_israel": "2026-10-19T23:29:52+03:00",
+          "mtime_unix": 1792441792.7766156,
+          "birth_unix": 1792441792.775486,
+          "bytes": 121416
+        },
+        "placement-manifest.json": null,
+        "navigation-manifest.json": null,
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "f6ea450cce32c20b49916feb24b82864377673e359044e648814460cb372d1fb",
+      "observed_directory_birth_to_log_mtime_seconds": 162.921
+    },
+    {
+      "log": "skill7-topics-01.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-topics-01",
+        "birth_israel": "2026-10-19T23:27:01+03:00",
+        "mtime_israel": "2026-10-19T23:48:39+03:00",
+        "mtime_unix": 1792442919.5350118,
+        "birth_unix": 1792441621.162935,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-topics-01.log",
+        "birth_israel": "2026-10-19T23:27:00+03:00",
+        "mtime_israel": "2026-10-19T23:32:46+03:00",
+        "mtime_unix": 1792441966.3834171,
+        "birth_unix": 1792441620.82295,
+        "bytes": 871
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:27:39+03:00",
+          "mtime_israel": "2026-10-19T23:27:39+03:00",
+          "mtime_unix": 1792441659.9147544,
+          "birth_unix": 1792441659.909252,
+          "bytes": 19847
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:28:14+03:00",
+          "mtime_israel": "2026-10-19T23:28:14+03:00",
+          "mtime_unix": 1792441694.6413436,
+          "birth_unix": 1792441694.635746,
+          "bytes": 19184
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:28:14+03:00",
+          "mtime_israel": "2026-10-19T23:28:53+03:00",
+          "mtime_unix": 1792441733.074081,
+          "birth_unix": 1792441694.641343,
+          "bytes": 15270654
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-19T23:30:00+03:00",
+          "mtime_israel": "2026-10-19T23:30:00+03:00",
+          "mtime_unix": 1792441800.8124726,
+          "birth_unix": 1792441800.811137,
+          "bytes": 121439
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-19T23:32:16+03:00",
+          "mtime_israel": "2026-10-19T23:32:16+03:00",
+          "mtime_unix": 1792441936.9292178,
+          "birth_unix": 1792441936.925218,
+          "bytes": 481793
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-19T23:32:16+03:00",
+          "mtime_israel": "2026-10-19T23:32:16+03:00",
+          "mtime_unix": 1792441936.9340544,
+          "birth_unix": 1792441936.929217,
+          "bytes": 23524
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-19T23:32:16+03:00",
+          "mtime_israel": "2026-10-19T23:32:16+03:00",
+          "mtime_unix": 1792441936.9121501,
+          "birth_unix": 1792441936.909218,
+          "bytes": 449578
+        }
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "bd6e581bf4723ca24fffdf661f3f2b3de02df3cbb619fbdb57554ff63b8c7ae0",
+      "observed_directory_birth_to_log_mtime_seconds": 345.22
+    },
+    {
+      "log": "skill7-build-07.log",
+      "kind": "toldot-cloud-build",
+      "result": "failed",
+      "error": "ValueError: No safe readable previous button on final page 15",
+      "output_directory": {
+        "artifact_name": "skill7-build-07",
+        "birth_israel": "2026-10-19T23:31:06+03:00",
+        "mtime_israel": "2026-10-19T23:31:06+03:00",
+        "mtime_unix": 1792441866.224293,
+        "birth_unix": 1792441866.224293,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-build-07.log",
+        "birth_israel": "2026-10-19T23:31:05+03:00",
+        "mtime_israel": "2026-10-19T23:33:00+03:00",
+        "mtime_unix": 1792441980.2473333,
+        "birth_unix": 1792441865.896307,
+        "bytes": 1159
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:32:00+03:00",
+          "mtime_israel": "2026-10-19T23:32:00+03:00",
+          "mtime_unix": 1792441920.7431295,
+          "birth_unix": 1792441920.737922,
+          "bytes": 19866
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:32:16+03:00",
+          "mtime_israel": "2026-10-19T23:32:16+03:00",
+          "mtime_unix": 1792441936.3707051,
+          "birth_unix": 1792441936.365242,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:32:16+03:00",
+          "mtime_israel": "2026-10-19T23:32:21+03:00",
+          "mtime_unix": 1792441941.757008,
+          "birth_unix": 1792441936.370705,
+          "bytes": 13739886
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-19T23:32:54+03:00",
+          "mtime_israel": "2026-10-19T23:32:54+03:00",
+          "mtime_unix": 1792441974.3494966,
+          "birth_unix": 1792441974.347589,
+          "bytes": 121413
+        },
+        "placement-manifest.json": null,
+        "navigation-manifest.json": null,
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "e9799f421b36e5f5ef6b15f244f3c9e9465bdd8346958f1cbbf93874951cce59",
+      "observed_directory_birth_to_log_mtime_seconds": 114.023
+    },
+    {
+      "log": "skill7-topics-02.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-topics-02",
+        "birth_israel": "2026-10-19T23:32:11+03:00",
+        "mtime_israel": "2026-10-19T23:48:39+03:00",
+        "mtime_unix": 1792442919.5363066,
+        "birth_unix": 1792441931.029474,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-topics-02.log",
+        "birth_israel": "2026-10-19T23:32:09+03:00",
+        "mtime_israel": "2026-10-19T23:38:26+03:00",
+        "mtime_unix": 1792442306.2382052,
+        "birth_unix": 1792441929.757529,
+        "bytes": 780
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:33:17+03:00",
+          "mtime_israel": "2026-10-19T23:33:17+03:00",
+          "mtime_unix": 1792441997.2083168,
+          "birth_unix": 1792441997.206596,
+          "bytes": 19866
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:33:35+03:00",
+          "mtime_israel": "2026-10-19T23:33:35+03:00",
+          "mtime_unix": 1792442015.290429,
+          "birth_unix": 1792442015.285809,
+          "bytes": 19184
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:33:35+03:00",
+          "mtime_israel": "2026-10-19T23:33:45+03:00",
+          "mtime_unix": 1792442025.2293773,
+          "birth_unix": 1792442015.290429,
+          "bytes": 15269742
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-19T23:34:35+03:00",
+          "mtime_israel": "2026-10-19T23:34:35+03:00",
+          "mtime_unix": 1792442075.0325267,
+          "birth_unix": 1792442075.031211,
+          "bytes": 121436
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-19T23:37:46+03:00",
+          "mtime_israel": "2026-10-19T23:37:46+03:00",
+          "mtime_unix": 1792442266.8380556,
+          "birth_unix": 1792442266.835133,
+          "bytes": 477775
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-19T23:37:46+03:00",
+          "mtime_israel": "2026-10-19T23:37:46+03:00",
+          "mtime_unix": 1792442266.8411431,
+          "birth_unix": 1792442266.839133,
+          "bytes": 24189
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-19T23:37:46+03:00",
+          "mtime_israel": "2026-10-19T23:37:46+03:00",
+          "mtime_unix": 1792442266.8010447,
+          "birth_unix": 1792442266.799135,
+          "bytes": 446109
+        }
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "88ce690796219024a3797c6ef0ff8d700dbd457d0077c3601f037f326d2730c2",
+      "observed_directory_birth_to_log_mtime_seconds": 375.209
+    },
+    {
+      "log": "skill7-build-08.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-build-08",
+        "birth_israel": "2026-10-19T23:38:04+03:00",
+        "mtime_israel": "2026-10-19T23:48:39+03:00",
+        "mtime_unix": 1792442919.5390115,
+        "birth_unix": 1792442284.314387,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-build-08.log",
+        "birth_israel": "2026-10-19T23:38:04+03:00",
+        "mtime_israel": "2026-10-19T23:42:59+03:00",
+        "mtime_unix": 1792442579.9102905,
+        "birth_unix": 1792442284.050399,
+        "bytes": 674
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:38:46+03:00",
+          "mtime_israel": "2026-10-19T23:38:46+03:00",
+          "mtime_unix": 1792442326.093444,
+          "birth_unix": 1792442326.088604,
+          "bytes": 19866
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:39:03+03:00",
+          "mtime_israel": "2026-10-19T23:39:03+03:00",
+          "mtime_unix": 1792442343.8195708,
+          "birth_unix": 1792442343.811852,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:39:03+03:00",
+          "mtime_israel": "2026-10-19T23:39:09+03:00",
+          "mtime_unix": 1792442349.1956213,
+          "birth_unix": 1792442343.81957,
+          "bytes": 13739886
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-19T23:39:44+03:00",
+          "mtime_israel": "2026-10-19T23:39:44+03:00",
+          "mtime_unix": 1792442384.8300564,
+          "birth_unix": 1792442384.826102,
+          "bytes": 121413
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-19T23:42:24+03:00",
+          "mtime_israel": "2026-10-19T23:42:24+03:00",
+          "mtime_unix": 1792442544.6778455,
+          "birth_unix": 1792442544.675221,
+          "bytes": 477677
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-19T23:42:24+03:00",
+          "mtime_israel": "2026-10-19T23:42:24+03:00",
+          "mtime_unix": 1792442544.6844292,
+          "birth_unix": 1792442544.683221,
+          "bytes": 45969
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-19T23:42:24+03:00",
+          "mtime_israel": "2026-10-19T23:42:24+03:00",
+          "mtime_unix": 1792442544.6492827,
+          "birth_unix": 1792442544.647223,
+          "bytes": 451843
+        }
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "71e63b8ad11c2bbc472e2d61e040ad0f4aca0dfa88f1cce942f9da5ad120b8d5",
+      "observed_directory_birth_to_log_mtime_seconds": 295.596
+    },
+    {
+      "log": "skill7-build-09.log",
+      "kind": "toldot-cloud-build",
+      "result": "no-completion-marker",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-build-09",
+        "birth_israel": "2026-10-19T23:43:50+03:00",
+        "mtime_israel": "2026-10-19T23:43:50+03:00",
+        "mtime_unix": 1792442630.7155144,
+        "birth_unix": 1792442630.715514,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-build-09.log",
+        "birth_israel": "2026-10-19T23:43:50+03:00",
+        "mtime_israel": "2026-10-19T23:46:28+03:00",
+        "mtime_unix": 1792442788.420696,
+        "birth_unix": 1792442630.355529,
+        "bytes": 277
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:44:25+03:00",
+          "mtime_israel": "2026-10-19T23:44:25+03:00",
+          "mtime_unix": 1792442665.912692,
+          "birth_unix": 1792442665.909997,
+          "bytes": 19866
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:44:43+03:00",
+          "mtime_israel": "2026-10-19T23:44:43+03:00",
+          "mtime_unix": 1792442683.4319916,
+          "birth_unix": 1792442683.42924,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:44:43+03:00",
+          "mtime_israel": "2026-10-19T23:44:50+03:00",
+          "mtime_unix": 1792442690.2369468,
+          "birth_unix": 1792442683.431991,
+          "bytes": 13739886
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-19T23:46:06+03:00",
+          "mtime_israel": "2026-10-19T23:46:06+03:00",
+          "mtime_unix": 1792442766.2622874,
+          "birth_unix": 1792442766.257652,
+          "bytes": 121413
+        },
+        "placement-manifest.json": null,
+        "navigation-manifest.json": null,
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "e0dbcf323b6d2b3b80b8113694cc2b0bd759a98e269d3da3bb556e98cd51a142",
+      "observed_directory_birth_to_log_mtime_seconds": 157.705
+    },
+    {
+      "log": "skill7-build-10.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-build-10",
+        "birth_israel": "2026-10-19T23:47:48+03:00",
+        "mtime_israel": "2026-10-19T23:52:40+03:00",
+        "mtime_unix": 1792443160.1163962,
+        "birth_unix": 1792442868.645207,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-build-10.log",
+        "birth_israel": "2026-10-19T23:47:47+03:00",
+        "mtime_israel": "2026-10-19T23:52:40+03:00",
+        "mtime_unix": 1792443160.1163962,
+        "birth_unix": 1792442867.893239,
+        "bytes": 674
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:48:48+03:00",
+          "mtime_israel": "2026-10-19T23:48:48+03:00",
+          "mtime_unix": 1792442928.5546823,
+          "birth_unix": 1792442928.550622,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:49:13+03:00",
+          "mtime_israel": "2026-10-19T23:49:13+03:00",
+          "mtime_unix": 1792442953.2690213,
+          "birth_unix": 1792442953.265556,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:49:13+03:00",
+          "mtime_israel": "2026-10-19T23:49:24+03:00",
+          "mtime_unix": 1792442964.8170576,
+          "birth_unix": 1792442953.269021,
+          "bytes": 13739886
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-19T23:50:13+03:00",
+          "mtime_israel": "2026-10-19T23:50:13+03:00",
+          "mtime_unix": 1792443013.1749635,
+          "birth_unix": 1792443013.170963,
+          "bytes": 120616
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-19T23:51:57+03:00",
+          "mtime_israel": "2026-10-19T23:51:57+03:00",
+          "mtime_unix": 1792443117.6101768,
+          "birth_unix": 1792443117.60643,
+          "bytes": 473190
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-19T23:51:57+03:00",
+          "mtime_israel": "2026-10-19T23:51:57+03:00",
+          "mtime_unix": 1792443117.6142697,
+          "birth_unix": 1792443117.61043,
+          "bytes": 45969
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-19T23:51:57+03:00",
+          "mtime_israel": "2026-10-19T23:51:57+03:00",
+          "mtime_unix": 1792443117.5904317,
+          "birth_unix": 1792443117.586431,
+          "bytes": 447770
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "845_תולדות_לפי_ימים.pdf",
+        "birth_israel": "2026-10-19T23:51:53+03:00",
+        "mtime_israel": "2026-10-19T23:51:57+03:00",
+        "mtime_unix": 1792443117.306444,
+        "birth_unix": 1792443113.798596,
+        "bytes": 13919858
+      },
+      "log_raw_sha256": "350cd7806f90e14d74bbfb771b3832594c2207b68ede8667f2ae0a291600bcae",
+      "observed_directory_birth_to_log_mtime_seconds": 291.471
+    },
+    {
+      "log": "skill7-topics-03.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-topics-03",
+        "birth_israel": "2026-10-19T23:47:50+03:00",
+        "mtime_israel": "2026-10-19T23:53:33+03:00",
+        "mtime_unix": 1792443213.3322067,
+        "birth_unix": 1792442870.16914,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-topics-03.log",
+        "birth_israel": "2026-10-19T23:47:49+03:00",
+        "mtime_israel": "2026-10-19T23:53:33+03:00",
+        "mtime_unix": 1792443213.3322067,
+        "birth_unix": 1792442869.297178,
+        "bytes": 780
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:48:50+03:00",
+          "mtime_israel": "2026-10-19T23:48:50+03:00",
+          "mtime_unix": 1792442930.3300834,
+          "birth_unix": 1792442930.326546,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:49:12+03:00",
+          "mtime_israel": "2026-10-19T23:49:12+03:00",
+          "mtime_unix": 1792442952.997568,
+          "birth_unix": 1792442952.993568,
+          "bytes": 19184
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:49:12+03:00",
+          "mtime_israel": "2026-10-19T23:49:25+03:00",
+          "mtime_unix": 1792442965.0730464,
+          "birth_unix": 1792442952.997567,
+          "bytes": 15269742
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-19T23:50:44+03:00",
+          "mtime_israel": "2026-10-19T23:50:44+03:00",
+          "mtime_unix": 1792443044.085314,
+          "birth_unix": 1792443044.081621,
+          "bytes": 120640
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-19T23:52:38+03:00",
+          "mtime_israel": "2026-10-19T23:52:38+03:00",
+          "mtime_unix": 1792443158.2005763,
+          "birth_unix": 1792443158.196674,
+          "bytes": 473291
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-19T23:52:38+03:00",
+          "mtime_israel": "2026-10-19T23:52:38+03:00",
+          "mtime_unix": 1792443158.2039564,
+          "birth_unix": 1792443158.200674,
+          "bytes": 24189
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-19T23:52:38+03:00",
+          "mtime_israel": "2026-10-19T23:52:38+03:00",
+          "mtime_unix": 1792443158.1792407,
+          "birth_unix": 1792443158.172675,
+          "bytes": 442039
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "845_תולדות_לפי_נושאים.pdf",
+        "birth_israel": "2026-10-19T23:52:33+03:00",
+        "mtime_israel": "2026-10-19T23:52:37+03:00",
+        "mtime_unix": 1792443157.7686927,
+        "birth_unix": 1792443153.964857,
+        "bytes": 15420184
+      },
+      "log_raw_sha256": "5a5fe5ec516b38805257ced483767b5f671a3b517f88c5f706988a3c6d7bcd33",
+      "observed_directory_birth_to_log_mtime_seconds": 343.163
+    },
+    {
+      "log": "skill7-topics-04.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-topics-04",
+        "birth_israel": "2026-10-19T23:52:43+03:00",
+        "mtime_israel": "2026-10-19T23:57:53+03:00",
+        "mtime_unix": 1792443473.445101,
+        "birth_unix": 1792443163.228456,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-topics-04.log",
+        "birth_israel": "2026-10-19T23:52:42+03:00",
+        "mtime_israel": "2026-10-19T23:57:53+03:00",
+        "mtime_unix": 1792443473.445101,
+        "birth_unix": 1792443162.920469,
+        "bytes": 780
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:53:24+03:00",
+          "mtime_israel": "2026-10-19T23:53:24+03:00",
+          "mtime_unix": 1792443204.0572627,
+          "birth_unix": 1792443204.05469,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:53:39+03:00",
+          "mtime_israel": "2026-10-19T23:53:39+03:00",
+          "mtime_unix": 1792443219.5176215,
+          "birth_unix": 1792443219.514023,
+          "bytes": 19184
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:53:39+03:00",
+          "mtime_israel": "2026-10-19T23:53:44+03:00",
+          "mtime_unix": 1792443224.445811,
+          "birth_unix": 1792443219.517621,
+          "bytes": 15269742
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-19T23:54:46+03:00",
+          "mtime_israel": "2026-10-19T23:54:46+03:00",
+          "mtime_unix": 1792443286.630178,
+          "birth_unix": 1792443286.627127,
+          "bytes": 120640
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-19T23:56:57+03:00",
+          "mtime_israel": "2026-10-19T23:56:57+03:00",
+          "mtime_unix": 1792443417.858747,
+          "birth_unix": 1792443417.853486,
+          "bytes": 473291
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-19T23:56:57+03:00",
+          "mtime_israel": "2026-10-19T23:56:57+03:00",
+          "mtime_unix": 1792443417.861275,
+          "birth_unix": 1792443417.858747,
+          "bytes": 25383
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-19T23:56:57+03:00",
+          "mtime_israel": "2026-10-19T23:56:57+03:00",
+          "mtime_unix": 1792443417.8334877,
+          "birth_unix": 1792443417.829487,
+          "bytes": 442039
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "845_תולדות_לפי_נושאים.pdf",
+        "birth_israel": "2026-10-19T23:56:53+03:00",
+        "mtime_israel": "2026-10-19T23:56:57+03:00",
+        "mtime_unix": 1792443417.3775072,
+        "birth_unix": 1792443413.621663,
+        "bytes": 15437076
+      },
+      "log_raw_sha256": "39434ec624aea790dab867baaaab72fad27e6975cbe6b6d840cd6ab4b5f3171f",
+      "observed_directory_birth_to_log_mtime_seconds": 310.217
+    },
+    {
+      "log": "skill7-topics-05.log",
+      "kind": "toldot-cloud-build",
+      "result": "failed",
+      "error": "pymupdf.FileNotFoundError: no such file: '[ATTACHMENTS]/845_תולדות_כריכה.pdf'",
+      "output_directory": {
+        "artifact_name": "skill7-topics-05",
+        "birth_israel": "2026-10-19T23:58:47+03:00",
+        "mtime_israel": "2026-10-19T23:58:47+03:00",
+        "mtime_unix": 1792443527.536745,
+        "birth_unix": 1792443527.536745,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-topics-05.log",
+        "birth_israel": "2026-10-19T23:58:46+03:00",
+        "mtime_israel": "2026-10-19T23:58:47+03:00",
+        "mtime_unix": 1792443527.536745,
+        "birth_unix": 1792443526.72078,
+        "bytes": 1207
+      },
+      "stages": {
+        "source-model.json": null,
+        "layout.json": null,
+        "source-layer.pdf": null,
+        "measurements.json": null,
+        "placement-manifest.json": null,
+        "navigation-manifest.json": null,
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "83764d337adbd759b5470bdb67cd748693f78ad5ac5ea504619d01edab975d05",
+      "observed_directory_birth_to_log_mtime_seconds": 0.0
+    },
+    {
+      "log": "skill7-build-11.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-build-11",
+        "birth_israel": "2026-10-19T23:58:45+03:00",
+        "mtime_israel": "2026-10-20T00:04:32+03:00",
+        "mtime_unix": 1792443872.696739,
+        "birth_unix": 1792443525.696824,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-build-11.log",
+        "birth_israel": "2026-10-19T23:58:45+03:00",
+        "mtime_israel": "2026-10-20T00:04:32+03:00",
+        "mtime_unix": 1792443872.696739,
+        "birth_unix": 1792443525.33284,
+        "bytes": 674
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-19T23:59:28+03:00",
+          "mtime_israel": "2026-10-19T23:59:28+03:00",
+          "mtime_unix": 1792443568.6282587,
+          "birth_unix": 1792443568.622965,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-19T23:59:44+03:00",
+          "mtime_israel": "2026-10-19T23:59:44+03:00",
+          "mtime_unix": 1792443584.6576617,
+          "birth_unix": 1792443584.654271,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-19T23:59:44+03:00",
+          "mtime_israel": "2026-10-19T23:59:50+03:00",
+          "mtime_unix": 1792443590.922,
+          "birth_unix": 1792443584.657661,
+          "bytes": 13739886
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-20T00:00:29+03:00",
+          "mtime_israel": "2026-10-20T00:00:29+03:00",
+          "mtime_unix": 1792443629.609326,
+          "birth_unix": 1792443629.604329,
+          "bytes": 120616
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-20T00:03:54+03:00",
+          "mtime_israel": "2026-10-20T00:03:54+03:00",
+          "mtime_unix": 1792443834.8274314,
+          "birth_unix": 1792443834.823431,
+          "bytes": 473190
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-20T00:03:54+03:00",
+          "mtime_israel": "2026-10-20T00:03:54+03:00",
+          "mtime_unix": 1792443834.8377316,
+          "birth_unix": 1792443834.835431,
+          "bytes": 45969
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-20T00:03:54+03:00",
+          "mtime_israel": "2026-10-20T00:03:54+03:00",
+          "mtime_unix": 1792443834.7874331,
+          "birth_unix": 1792443834.779433,
+          "bytes": 447770
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "845_תולדות_לפי_ימים.pdf",
+        "birth_israel": "2026-10-20T00:03:42+03:00",
+        "mtime_israel": "2026-10-20T00:03:53+03:00",
+        "mtime_unix": 1792443833.6594825,
+        "birth_unix": 1792443822.795958,
+        "bytes": 13919859
+      },
+      "log_raw_sha256": "7e9d41587429f385b8e94ad403af0d770c64167f29b8dc52a98db132891d5537",
+      "observed_directory_birth_to_log_mtime_seconds": 347.0
+    },
+    {
+      "log": "skill7-topics-06.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-topics-06",
+        "birth_israel": "2026-10-19T23:58:58+03:00",
+        "mtime_israel": "2026-10-20T00:04:37+03:00",
+        "mtime_unix": 1792443877.5960493,
+        "birth_unix": 1792443538.992249,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-topics-06.log",
+        "birth_israel": "2026-10-19T23:58:58+03:00",
+        "mtime_israel": "2026-10-20T00:04:37+03:00",
+        "mtime_unix": 1792443877.5960493,
+        "birth_unix": 1792443538.196284,
+        "bytes": 780
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-20T00:00:07+03:00",
+          "mtime_israel": "2026-10-20T00:00:07+03:00",
+          "mtime_unix": 1792443607.2361135,
+          "birth_unix": 1792443607.233293,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-20T00:00:31+03:00",
+          "mtime_israel": "2026-10-20T00:00:31+03:00",
+          "mtime_unix": 1792443631.1647186,
+          "birth_unix": 1792443631.160262,
+          "bytes": 19184
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-20T00:00:31+03:00",
+          "mtime_israel": "2026-10-20T00:00:35+03:00",
+          "mtime_unix": 1792443635.688067,
+          "birth_unix": 1792443631.164718,
+          "bytes": 15269742
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-20T00:01:14+03:00",
+          "mtime_israel": "2026-10-20T00:01:14+03:00",
+          "mtime_unix": 1792443674.1467361,
+          "birth_unix": 1792443674.142404,
+          "bytes": 120640
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-20T00:03:42+03:00",
+          "mtime_israel": "2026-10-20T00:03:42+03:00",
+          "mtime_unix": 1792443822.3746748,
+          "birth_unix": 1792443822.371976,
+          "bytes": 473291
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-20T00:03:42+03:00",
+          "mtime_israel": "2026-10-20T00:03:42+03:00",
+          "mtime_unix": 1792443822.379047,
+          "birth_unix": 1792443822.374674,
+          "bytes": 25383
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-20T00:03:42+03:00",
+          "mtime_israel": "2026-10-20T00:03:42+03:00",
+          "mtime_unix": 1792443822.3314867,
+          "birth_unix": 1792443822.323978,
+          "bytes": 442039
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "845_תולדות_לפי_נושאים.pdf",
+        "birth_israel": "2026-10-20T00:03:35+03:00",
+        "mtime_israel": "2026-10-20T00:03:41+03:00",
+        "mtime_unix": 1792443821.6120095,
+        "birth_unix": 1792443815.312282,
+        "bytes": 15437073
+      },
+      "log_raw_sha256": "d2196b42d008c3aff09abd0c69d7a837c9993dcc8b34e8d6939132f1eeb66d50",
+      "observed_directory_birth_to_log_mtime_seconds": 338.604
+    },
+    {
+      "log": "skill7-fonts-topics-01.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-fonts-topics-01",
+        "birth_israel": "2026-10-20T10:43:06+03:00",
+        "mtime_israel": "2026-10-20T10:49:07+03:00",
+        "mtime_unix": 1792482547.5159328,
+        "birth_unix": 1792482186.307636,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-fonts-topics-01.log",
+        "birth_israel": "2026-10-20T10:43:05+03:00",
+        "mtime_israel": "2026-10-20T10:48:19+03:00",
+        "mtime_unix": 1792482499.2567396,
+        "birth_unix": 1792482185.895653,
+        "bytes": 798
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-20T10:44:01+03:00",
+          "mtime_israel": "2026-10-20T10:44:01+03:00",
+          "mtime_unix": 1792482241.2375948,
+          "birth_unix": 1792482241.233242,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-20T10:44:20+03:00",
+          "mtime_israel": "2026-10-20T10:44:20+03:00",
+          "mtime_unix": 1792482260.776345,
+          "birth_unix": 1792482260.772391,
+          "bytes": 19184
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-20T10:44:20+03:00",
+          "mtime_israel": "2026-10-20T10:44:26+03:00",
+          "mtime_unix": 1792482266.128158,
+          "birth_unix": 1792482260.776345,
+          "bytes": 15271209
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-20T10:45:04+03:00",
+          "mtime_israel": "2026-10-20T10:45:04+03:00",
+          "mtime_unix": 1792482304.7935314,
+          "birth_unix": 1792482304.790476,
+          "bytes": 120640
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-20T10:47:41+03:00",
+          "mtime_israel": "2026-10-20T10:47:41+03:00",
+          "mtime_unix": 1792482461.7956512,
+          "birth_unix": 1792482461.791651,
+          "bytes": 473291
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-20T10:47:41+03:00",
+          "mtime_israel": "2026-10-20T10:47:41+03:00",
+          "mtime_unix": 1792482461.8019383,
+          "birth_unix": 1792482461.795651,
+          "bytes": 25383
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-20T10:47:41+03:00",
+          "mtime_israel": "2026-10-20T10:47:41+03:00",
+          "mtime_unix": 1792482461.7716522,
+          "birth_unix": 1792482461.767652,
+          "bytes": 442039
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "845_תולדות_לפי_נושאים.pdf",
+        "birth_israel": "2026-10-20T10:47:37+03:00",
+        "mtime_israel": "2026-10-20T10:47:41+03:00",
+        "mtime_unix": 1792482461.3356712,
+        "birth_unix": 1792482457.21185,
+        "bytes": 15450862
+      },
+      "log_raw_sha256": "6874d4d38a735faea413bfe756c790a12dce50ca2d41c9e091bde1c548f6d598",
+      "observed_directory_birth_to_log_mtime_seconds": 312.949
+    },
+    {
+      "log": "skill7-fonts-days-01.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-fonts-days-01",
+        "birth_israel": "2026-10-20T10:43:04+03:00",
+        "mtime_israel": "2026-10-20T10:49:07+03:00",
+        "mtime_unix": 1792482547.4639351,
+        "birth_unix": 1792482184.883698,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-fonts-days-01.log",
+        "birth_israel": "2026-10-20T10:43:04+03:00",
+        "mtime_israel": "2026-10-20T10:48:41+03:00",
+        "mtime_unix": 1792482521.869527,
+        "birth_unix": 1792482184.571711,
+        "bytes": 679
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-20T10:44:18+03:00",
+          "mtime_israel": "2026-10-20T10:44:18+03:00",
+          "mtime_unix": 1792482258.3186994,
+          "birth_unix": 1792482258.312498,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-20T10:44:42+03:00",
+          "mtime_israel": "2026-10-20T10:44:42+03:00",
+          "mtime_unix": 1792482282.900927,
+          "birth_unix": 1792482282.899429,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-20T10:44:42+03:00",
+          "mtime_israel": "2026-10-20T10:44:46+03:00",
+          "mtime_unix": 1792482286.947253,
+          "birth_unix": 1792482282.900927,
+          "bytes": 13784969
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-20T10:45:27+03:00",
+          "mtime_israel": "2026-10-20T10:45:27+03:00",
+          "mtime_unix": 1792482327.9824495,
+          "birth_unix": 1792482327.977468,
+          "bytes": 120616
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-20T10:48:00+03:00",
+          "mtime_israel": "2026-10-20T10:48:00+03:00",
+          "mtime_unix": 1792482480.9722238,
+          "birth_unix": 1792482480.97082,
+          "bytes": 473190
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-20T10:48:00+03:00",
+          "mtime_israel": "2026-10-20T10:48:00+03:00",
+          "mtime_unix": 1792482480.9868195,
+          "birth_unix": 1792482480.978819,
+          "bytes": 45969
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-20T10:48:00+03:00",
+          "mtime_israel": "2026-10-20T10:48:00+03:00",
+          "mtime_unix": 1792482480.9468212,
+          "birth_unix": 1792482480.938821,
+          "bytes": 447770
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "845_תולדות_לפי_ימים.pdf",
+        "birth_israel": "2026-10-20T10:47:56+03:00",
+        "mtime_israel": "2026-10-20T10:48:00+03:00",
+        "mtime_unix": 1792482480.426844,
+        "birth_unix": 1792482476.259024,
+        "bytes": 13976984
+      },
+      "log_raw_sha256": "58d7559235899069294d689edf4d9c4c764070c8e0354efd97ebee87bd8028c4",
+      "observed_directory_birth_to_log_mtime_seconds": 336.986
+    },
+    {
+      "log": "skill7-fixed-buttons-days-01.log",
+      "kind": "toldot-cloud-build",
+      "result": "failed",
+      "error": "ValueError: 277 controls conflict at their approved anchors; see [OUTPUTS]/skill7-fixed-buttons-days-01/qa/navigation-placement-audit.json. No delivery PDF created.",
+      "output_directory": {
+        "artifact_name": "skill7-fixed-buttons-days-01",
+        "birth_israel": "2026-10-20T23:04:19+03:00",
+        "mtime_israel": "2026-10-20T23:04:19+03:00",
+        "mtime_unix": 1792526659.9835584,
+        "birth_unix": 1792526659.979558,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-fixed-buttons-days-01.log",
+        "birth_israel": "2026-10-20T23:04:19+03:00",
+        "mtime_israel": "2026-10-20T23:06:02+03:00",
+        "mtime_unix": 1792526762.9550939,
+        "birth_unix": 1792526659.747568,
+        "bytes": 939
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-20T23:05:03+03:00",
+          "mtime_israel": "2026-10-20T23:05:03+03:00",
+          "mtime_unix": 1792526703.665037,
+          "birth_unix": 1792526703.657664,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-20T23:05:20+03:00",
+          "mtime_israel": "2026-10-20T23:05:20+03:00",
+          "mtime_unix": 1792526720.145386,
+          "birth_unix": 1792526720.140948,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-20T23:05:20+03:00",
+          "mtime_israel": "2026-10-20T23:05:26+03:00",
+          "mtime_unix": 1792526726.2246845,
+          "birth_unix": 1792526720.145385,
+          "bytes": 13784969
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-20T23:06:00+03:00",
+          "mtime_israel": "2026-10-20T23:06:00+03:00",
+          "mtime_unix": 1792526760.0690267,
+          "birth_unix": 1792526760.067219,
+          "bytes": 120616
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-20T23:06:02+03:00",
+          "mtime_israel": "2026-10-20T23:06:02+03:00",
+          "mtime_unix": 1792526762.5052166,
+          "birth_unix": 1792526762.503113,
+          "bytes": 473190
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-20T23:06:02+03:00",
+          "mtime_israel": "2026-10-20T23:08:44+03:00",
+          "mtime_unix": 1792526924.5339231,
+          "birth_unix": 1792526762.505216,
+          "bytes": 5278
+        },
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "90a05772dbfb838d28fad7176c2811df6cbfdb8b7d09298224dc3b1eaefa1168",
+      "observed_directory_birth_to_log_mtime_seconds": 102.976
+    },
+    {
+      "log": "skill7-fixed-buttons-topics-01.log",
+      "kind": "toldot-cloud-build",
+      "result": "failed",
+      "error": "ValueError: 152 controls conflict at their approved anchors; see [OUTPUTS]/skill7-fixed-buttons-topics-01/qa/navigation-placement-audit.json. No delivery PDF created.",
+      "output_directory": {
+        "artifact_name": "skill7-fixed-buttons-topics-01",
+        "birth_israel": "2026-10-20T23:04:22+03:00",
+        "mtime_israel": "2026-10-20T23:04:22+03:00",
+        "mtime_unix": 1792526662.2354608,
+        "birth_unix": 1792526662.23546,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-fixed-buttons-topics-01.log",
+        "birth_israel": "2026-10-20T23:04:21+03:00",
+        "mtime_israel": "2026-10-20T23:06:32+03:00",
+        "mtime_unix": 1792526792.7418053,
+        "birth_unix": 1792526661.191506,
+        "bytes": 1070
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-20T23:05:38+03:00",
+          "mtime_israel": "2026-10-20T23:05:38+03:00",
+          "mtime_unix": 1792526738.4434454,
+          "birth_unix": 1792526738.436155,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-20T23:05:58+03:00",
+          "mtime_israel": "2026-10-20T23:05:58+03:00",
+          "mtime_unix": 1792526758.856518,
+          "birth_unix": 1792526758.855271,
+          "bytes": 19184
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-20T23:05:58+03:00",
+          "mtime_israel": "2026-10-20T23:06:03+03:00",
+          "mtime_unix": 1792526763.3910751,
+          "birth_unix": 1792526758.856518,
+          "bytes": 15271209
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-20T23:06:31+03:00",
+          "mtime_israel": "2026-10-20T23:06:31+03:00",
+          "mtime_unix": 1792526791.1807308,
+          "birth_unix": 1792526791.177872,
+          "bytes": 120640
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-20T23:06:32+03:00",
+          "mtime_israel": "2026-10-20T23:06:32+03:00",
+          "mtime_unix": 1792526792.4071145,
+          "birth_unix": 1792526792.401819,
+          "bytes": 473291
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-20T23:06:32+03:00",
+          "mtime_israel": "2026-10-20T23:09:03+03:00",
+          "mtime_unix": 1792526943.4451056,
+          "birth_unix": 1792526792.407114,
+          "bytes": 1442
+        },
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "b567c5e15f23355e12d41c1815209de0b3c610df5cb06f7d988ee79c011e00d5",
+      "observed_directory_birth_to_log_mtime_seconds": 130.506
+    },
+    {
+      "log": "skill7-transparent-topics-01.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-transparent-topics-01",
+        "birth_israel": "2026-10-20T23:19:25+03:00",
+        "mtime_israel": "2026-10-20T23:22:53+03:00",
+        "mtime_unix": 1792527773.3222318,
+        "birth_unix": 1792527565.405417,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-transparent-topics-01.log",
+        "birth_israel": "2026-10-20T23:19:24+03:00",
+        "mtime_israel": "2026-10-20T23:22:53+03:00",
+        "mtime_unix": 1792527773.3222318,
+        "birth_unix": 1792527564.489456,
+        "bytes": 930
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-20T23:19:55+03:00",
+          "mtime_israel": "2026-10-20T23:19:55+03:00",
+          "mtime_unix": 1792527595.7604878,
+          "birth_unix": 1792527595.752107,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-20T23:20:09+03:00",
+          "mtime_israel": "2026-10-20T23:20:09+03:00",
+          "mtime_unix": 1792527609.063475,
+          "birth_unix": 1792527609.055532,
+          "bytes": 19184
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-20T23:20:09+03:00",
+          "mtime_israel": "2026-10-20T23:20:15+03:00",
+          "mtime_unix": 1792527615.3432653,
+          "birth_unix": 1792527609.063531,
+          "bytes": 15271209
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-20T23:20:44+03:00",
+          "mtime_israel": "2026-10-20T23:20:44+03:00",
+          "mtime_unix": 1792527644.774022,
+          "birth_unix": 1792527644.770022,
+          "bytes": 120640
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-20T23:20:50+03:00",
+          "mtime_israel": "2026-10-20T23:22:27+03:00",
+          "mtime_unix": 1792527747.4654026,
+          "birth_unix": 1792527650.117793,
+          "bytes": 473291
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-20T23:20:50+03:00",
+          "mtime_israel": "2026-10-20T23:22:27+03:00",
+          "mtime_unix": 1792527747.4676874,
+          "birth_unix": 1792527650.123329,
+          "bytes": 25477
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-20T23:22:27+03:00",
+          "mtime_israel": "2026-10-20T23:22:27+03:00",
+          "mtime_unix": 1792527747.4458692,
+          "birth_unix": 1792527747.433632,
+          "bytes": 442039
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "845_תולדות_לפי_נושאים.pdf",
+        "birth_israel": "2026-10-20T23:22:24+03:00",
+        "mtime_israel": "2026-10-20T23:22:27+03:00",
+        "mtime_unix": 1792527747.109646,
+        "birth_unix": 1792527744.001778,
+        "bytes": 15442362
+      },
+      "log_raw_sha256": "79da2712318c640654ebf97f01168dccfe35d41dbcbe04b979d7e4670436aa71",
+      "observed_directory_birth_to_log_mtime_seconds": 207.917
+    },
+    {
+      "log": "skill7-transparent-days-01.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-transparent-days-01",
+        "birth_israel": "2026-10-20T23:19:19+03:00",
+        "mtime_israel": "2026-10-20T23:24:43+03:00",
+        "mtime_unix": 1792527883.6227071,
+        "birth_unix": 1792527559.053687,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-transparent-days-01.log",
+        "birth_israel": "2026-10-20T23:19:11+03:00",
+        "mtime_israel": "2026-10-20T23:24:43+03:00",
+        "mtime_unix": 1792527883.6227071,
+        "birth_unix": 1792527551.733999,
+        "bytes": 1191
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-20T23:20:31+03:00",
+          "mtime_israel": "2026-10-20T23:20:31+03:00",
+          "mtime_unix": 1792527631.5980484,
+          "birth_unix": 1792527631.594582,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-20T23:21:02+03:00",
+          "mtime_israel": "2026-10-20T23:21:02+03:00",
+          "mtime_unix": 1792527662.9664483,
+          "birth_unix": 1792527662.961246,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-20T23:21:02+03:00",
+          "mtime_israel": "2026-10-20T23:21:15+03:00",
+          "mtime_unix": 1792527675.536706,
+          "birth_unix": 1792527662.969246,
+          "bytes": 13784969
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-20T23:22:19+03:00",
+          "mtime_israel": "2026-10-20T23:22:19+03:00",
+          "mtime_unix": 1792527739.4219341,
+          "birth_unix": 1792527739.417974,
+          "bytes": 120616
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-20T23:22:43+03:00",
+          "mtime_israel": "2026-10-20T23:24:14+03:00",
+          "mtime_unix": 1792527854.7210183,
+          "birth_unix": 1792527763.284947,
+          "bytes": 473190
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-20T23:22:43+03:00",
+          "mtime_israel": "2026-10-20T23:24:14+03:00",
+          "mtime_unix": 1792527854.7269394,
+          "birth_unix": 1792527763.288947,
+          "bytes": 48126
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-20T23:24:14+03:00",
+          "mtime_israel": "2026-10-20T23:24:14+03:00",
+          "mtime_unix": 1792527854.701019,
+          "birth_unix": 1792527854.697019,
+          "bytes": 447770
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "845_תולדות_לפי_ימים.pdf",
+        "birth_israel": "2026-10-20T23:24:11+03:00",
+        "mtime_israel": "2026-10-20T23:24:14+03:00",
+        "mtime_unix": 1792527854.333035,
+        "birth_unix": 1792527851.237167,
+        "bytes": 13961625
+      },
+      "log_raw_sha256": "30a77165d16aaf489ac0192e831e31b2c3d09954e1f48ca69618feeb6f4fb326",
+      "observed_directory_birth_to_log_mtime_seconds": 324.569
+    },
+    {
+      "log": "skill7-shulchan-topics-01.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-shulchan-topics-01",
+        "birth_israel": "2026-10-20T23:35:33+03:00",
+        "mtime_israel": "2026-10-20T23:41:14+03:00",
+        "mtime_unix": 1792528874.17,
+        "birth_unix": 1792528533.050698,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-shulchan-topics-01.log",
+        "birth_israel": "2026-10-20T23:35:32+03:00",
+        "mtime_israel": "2026-10-20T23:41:14+03:00",
+        "mtime_unix": 1792528874.17,
+        "birth_unix": 1792528532.002744,
+        "bytes": 921
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-20T23:36:52+03:00",
+          "mtime_israel": "2026-10-20T23:36:52+03:00",
+          "mtime_unix": 1792528612.922285,
+          "birth_unix": 1792528612.919148,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-20T23:37:13+03:00",
+          "mtime_israel": "2026-10-20T23:37:13+03:00",
+          "mtime_unix": 1792528633.822412,
+          "birth_unix": 1792528633.818226,
+          "bytes": 19184
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-20T23:37:13+03:00",
+          "mtime_israel": "2026-10-20T23:37:20+03:00",
+          "mtime_unix": 1792528640.2739599,
+          "birth_unix": 1792528633.822412,
+          "bytes": 15271209
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-20T23:38:02+03:00",
+          "mtime_israel": "2026-10-20T23:38:02+03:00",
+          "mtime_unix": 1792528682.8686585,
+          "birth_unix": 1792528682.86412,
+          "bytes": 121840
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-20T23:38:11+03:00",
+          "mtime_israel": "2026-10-20T23:40:46+03:00",
+          "mtime_unix": 1792528846.4709542,
+          "birth_unix": 1792528691.603735,
+          "bytes": 485208
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-20T23:38:11+03:00",
+          "mtime_israel": "2026-10-20T23:40:46+03:00",
+          "mtime_unix": 1792528846.4732811,
+          "birth_unix": 1792528691.607131,
+          "bytes": 25477
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-20T23:40:46+03:00",
+          "mtime_israel": "2026-10-20T23:40:46+03:00",
+          "mtime_unix": 1792528846.4521677,
+          "birth_unix": 1792528846.44897,
+          "bytes": 452289
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "845_תולדות_לפי_נושאים.pdf",
+        "birth_israel": "2026-10-20T23:40:42+03:00",
+        "mtime_israel": "2026-10-20T23:40:46+03:00",
+        "mtime_unix": 1792528846.1209846,
+        "birth_unix": 1792528842.685135,
+        "bytes": 15443515
+      },
+      "log_raw_sha256": "76a1cb9aaae709e0573c31d69a519fed681564bc3d9d7cc02a3ee6a281823117",
+      "observed_directory_birth_to_log_mtime_seconds": 341.119
+    },
+    {
+      "log": "skill7-shulchan-days-01.log",
+      "kind": "toldot-cloud-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-shulchan-days-01",
+        "birth_israel": "2026-10-20T23:35:31+03:00",
+        "mtime_israel": "2026-10-20T23:42:26+03:00",
+        "mtime_unix": 1792528946.1287746,
+        "birth_unix": 1792528531.366772,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "skill7-shulchan-days-01.log",
+        "birth_israel": "2026-10-20T23:35:30+03:00",
+        "mtime_israel": "2026-10-20T23:42:26+03:00",
+        "mtime_unix": 1792528946.1287746,
+        "birth_unix": 1792528530.566808,
+        "bytes": 1188
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-20T23:37:01+03:00",
+          "mtime_israel": "2026-10-20T23:37:01+03:00",
+          "mtime_unix": 1792528621.4183683,
+          "birth_unix": 1792528621.414774,
+          "bytes": 19508
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-20T23:37:29+03:00",
+          "mtime_israel": "2026-10-20T23:37:29+03:00",
+          "mtime_unix": 1792528649.175478,
+          "birth_unix": 1792528649.173579,
+          "bytes": 20379
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-20T23:37:29+03:00",
+          "mtime_israel": "2026-10-20T23:37:39+03:00",
+          "mtime_unix": 1792528659.6891274,
+          "birth_unix": 1792528649.175477,
+          "bytes": 13784969
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-20T23:38:46+03:00",
+          "mtime_israel": "2026-10-20T23:38:46+03:00",
+          "mtime_unix": 1792528726.9925694,
+          "birth_unix": 1792528726.990179,
+          "bytes": 121816
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-20T23:38:57+03:00",
+          "mtime_israel": "2026-10-20T23:41:58+03:00",
+          "mtime_unix": 1792528918.2362006,
+          "birth_unix": 1792528737.8897,
+          "bytes": 485108
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-20T23:38:57+03:00",
+          "mtime_israel": "2026-10-20T23:41:58+03:00",
+          "mtime_unix": 1792528918.2390866,
+          "birth_unix": 1792528737.892175,
+          "bytes": 48126
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-20T23:41:58+03:00",
+          "mtime_israel": "2026-10-20T23:41:58+03:00",
+          "mtime_unix": 1792528918.2170584,
+          "birth_unix": 1792528918.213838,
+          "bytes": 458021
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "845_תולדות_לפי_ימים.pdf",
+        "birth_israel": "2026-10-20T23:41:54+03:00",
+        "mtime_israel": "2026-10-20T23:41:57+03:00",
+        "mtime_unix": 1792528917.937851,
+        "birth_unix": 1792528914.529999,
+        "bytes": 13963073
+      },
+      "log_raw_sha256": "0a0adc12ff6972e0af52ced1605cbe5192b5e22aba7e893716f07507b0e25903",
+      "observed_directory_birth_to_log_mtime_seconds": 414.762
+    },
+    {
+      "log": "vayera-843-discovery.log",
+      "kind": "source-discovery",
+      "result": "no-completion-marker",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "vayera-843-discovery",
+        "birth_israel": "2026-10-22T00:41:17+03:00",
+        "mtime_israel": "2026-10-22T00:41:43+03:00",
+        "mtime_unix": 1792618903.9392617,
+        "birth_unix": 1792618877.412148,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "vayera-843-discovery.log",
+        "birth_israel": "2026-10-22T00:41:17+03:00",
+        "mtime_israel": "2026-10-22T00:41:43+03:00",
+        "mtime_unix": 1792618903.9394126,
+        "birth_unix": 1792618877.22015,
+        "bytes": 88
+      },
+      "stages": {
+        "source-model.json": null,
+        "layout.json": null,
+        "source-layer.pdf": null,
+        "measurements.json": null,
+        "placement-manifest.json": null,
+        "navigation-manifest.json": null,
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "7e87b0bd0789af42c613fb12dc288704f62a0f3d50d020d40d4c21b1233b3502",
+      "observed_directory_birth_to_log_mtime_seconds": 26.527
+    },
+    {
+      "log": "vayera-843-topics-build.log",
+      "kind": "vayera-build",
+      "result": "failed",
+      "error": "ValueError: No safe lower left corner, page 9",
+      "output_directory": {
+        "artifact_name": "skill7-vayera-843-topics-01",
+        "birth_israel": "2026-10-22T00:50:21+03:00",
+        "mtime_israel": "2026-10-22T00:50:21+03:00",
+        "mtime_unix": 1792619421.0910356,
+        "birth_unix": 1792619421.091035,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "vayera-843-topics-build.log",
+        "birth_israel": "2026-10-22T00:50:20+03:00",
+        "mtime_israel": "2026-10-22T00:51:28+03:00",
+        "mtime_unix": 1792619488.882401,
+        "birth_unix": 1792619420.735038,
+        "bytes": 974
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-22T00:50:51+03:00",
+          "mtime_israel": "2026-10-22T00:50:51+03:00",
+          "mtime_unix": 1792619451.0203102,
+          "birth_unix": 1792619451.014754,
+          "bytes": 19342
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-22T00:51:05+03:00",
+          "mtime_israel": "2026-10-22T00:51:05+03:00",
+          "mtime_unix": 1792619465.5599718,
+          "birth_unix": 1792619465.554617,
+          "bytes": 19986
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-22T00:51:05+03:00",
+          "mtime_israel": "2026-10-22T00:51:10+03:00",
+          "mtime_unix": 1792619470.6905694,
+          "birth_unix": 1792619465.559971,
+          "bytes": 16301852
+        },
+        "measurements.json": null,
+        "placement-manifest.json": null,
+        "navigation-manifest.json": null,
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "57bf6edae768cc9c558fef38a7ba1f72541b5c0b75cf339bc158627c6053bf8a",
+      "observed_directory_birth_to_log_mtime_seconds": 67.791
+    },
+    {
+      "log": "vayera-843-days-build.log",
+      "kind": "vayera-build",
+      "result": "failed",
+      "error": "ValueError: No safe lower left corner, page 43",
+      "output_directory": {
+        "artifact_name": "skill7-vayera-843-days-01",
+        "birth_israel": "2026-10-22T00:50:19+03:00",
+        "mtime_israel": "2026-10-22T00:50:19+03:00",
+        "mtime_unix": 1792619419.635049,
+        "birth_unix": 1792619419.635049,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "vayera-843-days-build.log",
+        "birth_israel": "2026-10-22T00:50:19+03:00",
+        "mtime_israel": "2026-10-22T00:51:52+03:00",
+        "mtime_unix": 1792619512.5541816,
+        "birth_unix": 1792619419.355051,
+        "bytes": 852
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-22T00:50:52+03:00",
+          "mtime_israel": "2026-10-22T00:50:52+03:00",
+          "mtime_unix": 1792619452.9442317,
+          "birth_unix": 1792619452.938736,
+          "bytes": 19342
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-22T00:51:09+03:00",
+          "mtime_israel": "2026-10-22T00:51:09+03:00",
+          "mtime_unix": 1792619469.8215346,
+          "birth_unix": 1792619469.814577,
+          "bytes": 21442
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-22T00:51:09+03:00",
+          "mtime_israel": "2026-10-22T00:51:20+03:00",
+          "mtime_unix": 1792619480.2904801,
+          "birth_unix": 1792619469.821534,
+          "bytes": 14808810
+        },
+        "measurements.json": null,
+        "placement-manifest.json": null,
+        "navigation-manifest.json": null,
+        "progress-map.json": null
+      },
+      "final_or_rejected_pdf": null,
+      "log_raw_sha256": "da348c4537130e1dc8b1ba5632b6662146f4a4fd9c0aec5c01144e0a3ed503fb",
+      "observed_directory_birth_to_log_mtime_seconds": 92.919
+    },
+    {
+      "log": "vayera-843-topics-build-02.log",
+      "kind": "vayera-build",
+      "result": "failed",
+      "error": "ValueError: Independent checker failed; candidate is not ready for delivery",
+      "output_directory": {
+        "artifact_name": "skill7-vayera-843-topics-02",
+        "birth_israel": "2026-10-22T00:52:56+03:00",
+        "mtime_israel": "2026-10-22T00:57:49+03:00",
+        "mtime_unix": 1792619869.1708226,
+        "birth_unix": 1792619576.853583,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "vayera-843-topics-build-02.log",
+        "birth_israel": "2026-10-22T00:52:56+03:00",
+        "mtime_israel": "2026-10-22T00:57:49+03:00",
+        "mtime_unix": 1792619869.1743557,
+        "birth_unix": 1792619576.557586,
+        "bytes": 1690
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-22T00:53:35+03:00",
+          "mtime_israel": "2026-10-22T00:53:35+03:00",
+          "mtime_unix": 1792619615.7417257,
+          "birth_unix": 1792619615.737221,
+          "bytes": 19342
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-22T00:53:51+03:00",
+          "mtime_israel": "2026-10-22T00:53:51+03:00",
+          "mtime_unix": 1792619631.3327487,
+          "birth_unix": 1792619631.329075,
+          "bytes": 19986
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-22T00:53:51+03:00",
+          "mtime_israel": "2026-10-22T00:54:01+03:00",
+          "mtime_unix": 1792619641.3969815,
+          "birth_unix": 1792619631.333075,
+          "bytes": 16301852
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-22T00:54:30+03:00",
+          "mtime_israel": "2026-10-22T00:54:30+03:00",
+          "mtime_unix": 1792619670.0123527,
+          "birth_unix": 1792619670.00871,
+          "bytes": 121295
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-22T00:54:35+03:00",
+          "mtime_israel": "2026-10-22T00:56:59+03:00",
+          "mtime_unix": 1792619819.5206227,
+          "birth_unix": 1792619675.960654,
+          "bytes": 490705
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-22T00:54:35+03:00",
+          "mtime_israel": "2026-10-22T00:56:59+03:00",
+          "mtime_unix": 1792619819.5229325,
+          "birth_unix": 1792619675.966201,
+          "bytes": 26596
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-22T00:56:59+03:00",
+          "mtime_israel": "2026-10-22T00:56:59+03:00",
+          "mtime_unix": 1792619819.5020254,
+          "birth_unix": 1792619819.495293,
+          "bytes": 457185
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "candidate.pdf",
+        "birth_israel": "2026-10-22T00:56:54+03:00",
+        "mtime_israel": "2026-10-22T00:56:59+03:00",
+        "mtime_unix": 1792619819.463294,
+        "birth_unix": 1792619814.199342,
+        "bytes": 16463301
+      },
+      "log_raw_sha256": "99d75ec499ed874a9a8af054dae878d35ef3054533ccd64308dd2fc35b28a084",
+      "observed_directory_birth_to_log_mtime_seconds": 292.321
+    },
+    {
+      "log": "vayera-843-days-build-02.log",
+      "kind": "vayera-build",
+      "result": "failed",
+      "error": "ValueError: Independent checker failed; candidate is not ready for delivery",
+      "output_directory": {
+        "artifact_name": "skill7-vayera-843-days-02",
+        "birth_israel": "2026-10-22T00:52:56+03:00",
+        "mtime_israel": "2026-10-22T00:57:57+03:00",
+        "mtime_unix": 1792619877.7427385,
+        "birth_unix": 1792619576.837583,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "vayera-843-days-build-02.log",
+        "birth_israel": "2026-10-22T00:52:56+03:00",
+        "mtime_israel": "2026-10-22T00:57:57+03:00",
+        "mtime_unix": 1792619877.7482793,
+        "birth_unix": 1792619576.545586,
+        "bytes": 1939
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-22T00:53:35+03:00",
+          "mtime_israel": "2026-10-22T00:53:35+03:00",
+          "mtime_unix": 1792619615.8552816,
+          "birth_unix": 1792619615.85322,
+          "bytes": 19342
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-22T00:53:50+03:00",
+          "mtime_israel": "2026-10-22T00:53:50+03:00",
+          "mtime_unix": 1792619630.4918067,
+          "birth_unix": 1792619630.489083,
+          "bytes": 21442
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-22T00:53:50+03:00",
+          "mtime_israel": "2026-10-22T00:53:59+03:00",
+          "mtime_unix": 1792619639.5049992,
+          "birth_unix": 1792619630.491806,
+          "bytes": 14808810
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-22T00:54:31+03:00",
+          "mtime_israel": "2026-10-22T00:54:31+03:00",
+          "mtime_unix": 1792619671.367696,
+          "birth_unix": 1792619671.364697,
+          "bytes": 121256
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-22T00:54:43+03:00",
+          "mtime_israel": "2026-10-22T00:57:11+03:00",
+          "mtime_unix": 1792619831.1271913,
+          "birth_unix": 1792619683.356583,
+          "bytes": 490577
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-22T00:54:43+03:00",
+          "mtime_israel": "2026-10-22T00:57:11+03:00",
+          "mtime_unix": 1792619831.1360288,
+          "birth_unix": 1792619683.360583,
+          "bytes": 49580
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-22T00:57:11+03:00",
+          "mtime_israel": "2026-10-22T00:57:11+03:00",
+          "mtime_unix": 1792619831.1011102,
+          "birth_unix": 1792619831.095191,
+          "bytes": 465442
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "candidate.pdf",
+        "birth_israel": "2026-10-22T00:57:05+03:00",
+        "mtime_israel": "2026-10-22T00:57:11+03:00",
+        "mtime_unix": 1792619831.043192,
+        "birth_unix": 1792619825.295242,
+        "bytes": 14976365
+      },
+      "log_raw_sha256": "847428784e82ccad14e781dcbc75b6cad9d048c8f851d3f2e36ee8fb85fabd09",
+      "observed_directory_birth_to_log_mtime_seconds": 300.911
+    },
+    {
+      "log": "vayera-843-topics-build-03.log",
+      "kind": "vayera-build",
+      "result": "builder-pass-then-rejected-by-independent-link-audit",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-vayera-843-topics-03",
+        "birth_israel": "2026-10-22T01:01:24+03:00",
+        "mtime_israel": "2026-10-22T01:07:05+03:00",
+        "mtime_unix": 1792620425.0164137,
+        "birth_unix": 1792620084.764757,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "vayera-843-topics-build-03.log",
+        "birth_israel": "2026-10-22T01:01:24+03:00",
+        "mtime_israel": "2026-10-22T01:05:22+03:00",
+        "mtime_unix": 1792620322.8325298,
+        "birth_unix": 1792620084.47676,
+        "bytes": 946
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-22T01:01:52+03:00",
+          "mtime_israel": "2026-10-22T01:01:52+03:00",
+          "mtime_unix": 1792620112.2841015,
+          "birth_unix": 1792620112.280495,
+          "bytes": 19342
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-22T01:02:07+03:00",
+          "mtime_israel": "2026-10-22T01:02:07+03:00",
+          "mtime_unix": 1792620127.585784,
+          "birth_unix": 1792620127.580348,
+          "bytes": 19986
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-22T01:02:07+03:00",
+          "mtime_israel": "2026-10-22T01:02:12+03:00",
+          "mtime_unix": 1792620132.2003045,
+          "birth_unix": 1792620127.585783,
+          "bytes": 16301852
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-22T01:02:39+03:00",
+          "mtime_israel": "2026-10-22T01:02:39+03:00",
+          "mtime_unix": 1792620159.087757,
+          "birth_unix": 1792620159.084046,
+          "bytes": 121681
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-22T01:02:43+03:00",
+          "mtime_israel": "2026-10-22T01:04:34+03:00",
+          "mtime_unix": 1792620274.7000034,
+          "birth_unix": 1792620163.8,
+          "bytes": 493592
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-22T01:02:43+03:00",
+          "mtime_israel": "2026-10-22T01:04:34+03:00",
+          "mtime_unix": 1792620274.7023451,
+          "birth_unix": 1792620163.804509,
+          "bytes": 26596
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-22T01:04:34+03:00",
+          "mtime_israel": "2026-10-22T01:04:34+03:00",
+          "mtime_unix": 1792620274.682669,
+          "birth_unix": 1792620274.678936,
+          "bytes": 459665
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "rejected-navigation.pdf",
+        "birth_israel": "2026-10-22T01:04:30+03:00",
+        "mtime_israel": "2026-10-22T01:04:34+03:00",
+        "mtime_unix": 1792620274.646937,
+        "birth_unix": 1792620270.578975,
+        "bytes": 16463695
+      },
+      "log_raw_sha256": "ad45fe46104724ec4b2025fa0570b0d892e6bb86b5c45b53f00f9aafb86ecf0c",
+      "observed_directory_birth_to_log_mtime_seconds": 238.068
+    },
+    {
+      "log": "vayera-843-days-build-03.log",
+      "kind": "vayera-build",
+      "result": "builder-pass-then-rejected-by-independent-link-audit",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-vayera-843-days-03",
+        "birth_israel": "2026-10-22T01:01:24+03:00",
+        "mtime_israel": "2026-10-22T01:07:05+03:00",
+        "mtime_unix": 1792620425.0134943,
+        "birth_unix": 1792620084.768757,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "vayera-843-days-build-03.log",
+        "birth_israel": "2026-10-22T01:01:24+03:00",
+        "mtime_israel": "2026-10-22T01:05:26+03:00",
+        "mtime_unix": 1792620326.3523617,
+        "birth_unix": 1792620084.46876,
+        "bytes": 1187
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-22T01:01:56+03:00",
+          "mtime_israel": "2026-10-22T01:01:56+03:00",
+          "mtime_unix": 1792620116.7362003,
+          "birth_unix": 1792620116.732452,
+          "bytes": 19342
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-22T01:02:12+03:00",
+          "mtime_israel": "2026-10-22T01:02:12+03:00",
+          "mtime_unix": 1792620132.954928,
+          "birth_unix": 1792620132.952297,
+          "bytes": 21442
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-22T01:02:12+03:00",
+          "mtime_israel": "2026-10-22T01:02:19+03:00",
+          "mtime_unix": 1792620139.0762386,
+          "birth_unix": 1792620132.954927,
+          "bytes": 14808810
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-22T01:02:50+03:00",
+          "mtime_israel": "2026-10-22T01:02:50+03:00",
+          "mtime_unix": 1792620170.837652,
+          "birth_unix": 1792620170.831933,
+          "bytes": 121644
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-22T01:02:59+03:00",
+          "mtime_israel": "2026-10-22T01:04:40+03:00",
+          "mtime_unix": 1792620280.4167845,
+          "birth_unix": 1792620179.131853,
+          "bytes": 493471
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-22T01:02:59+03:00",
+          "mtime_israel": "2026-10-22T01:04:40+03:00",
+          "mtime_unix": 1792620280.4203472,
+          "birth_unix": 1792620179.135293,
+          "bytes": 49580
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-22T01:04:40+03:00",
+          "mtime_israel": "2026-10-22T01:04:40+03:00",
+          "mtime_unix": 1792620280.3993938,
+          "birth_unix": 1792620280.394881,
+          "bytes": 467929
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "rejected-navigation.pdf",
+        "birth_israel": "2026-10-22T01:04:36+03:00",
+        "mtime_israel": "2026-10-22T01:04:40+03:00",
+        "mtime_unix": 1792620280.3628821,
+        "birth_unix": 1792620276.666917,
+        "bytes": 14976762
+      },
+      "log_raw_sha256": "16023f9b43ba8259d7d525419c410abf6ae1c67ccfbfade66038c5973568079e",
+      "observed_directory_birth_to_log_mtime_seconds": 241.584
+    },
+    {
+      "log": "vayera-843-topics-build-04.log",
+      "kind": "vayera-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-vayera-843-topics-04",
+        "birth_israel": "2026-10-22T01:07:20+03:00",
+        "mtime_israel": "2026-10-22T01:11:22+03:00",
+        "mtime_unix": 1792620682.2892735,
+        "birth_unix": 1792620440.545345,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "vayera-843-topics-build-04.log",
+        "birth_israel": "2026-10-22T01:07:20+03:00",
+        "mtime_israel": "2026-10-22T01:11:22+03:00",
+        "mtime_unix": 1792620682.2892735,
+        "birth_unix": 1792620440.297347,
+        "bytes": 946
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-22T01:07:52+03:00",
+          "mtime_israel": "2026-10-22T01:07:52+03:00",
+          "mtime_unix": 1792620472.9057636,
+          "birth_unix": 1792620472.901035,
+          "bytes": 19342
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-22T01:08:06+03:00",
+          "mtime_israel": "2026-10-22T01:08:06+03:00",
+          "mtime_unix": 1792620486.7572865,
+          "birth_unix": 1792620486.752902,
+          "bytes": 19986
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-22T01:08:06+03:00",
+          "mtime_israel": "2026-10-22T01:08:11+03:00",
+          "mtime_unix": 1792620491.5368564,
+          "birth_unix": 1792620486.757286,
+          "bytes": 16301852
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-22T01:08:41+03:00",
+          "mtime_israel": "2026-10-22T01:08:41+03:00",
+          "mtime_unix": 1792620521.329078,
+          "birth_unix": 1792620521.32457,
+          "bytes": 121681
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-22T01:08:46+03:00",
+          "mtime_israel": "2026-10-22T01:10:37+03:00",
+          "mtime_unix": 1792620637.248005,
+          "birth_unix": 1792620526.436521,
+          "bytes": 493592
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-22T01:08:46+03:00",
+          "mtime_israel": "2026-10-22T01:10:37+03:00",
+          "mtime_unix": 1792620637.2506227,
+          "birth_unix": 1792620526.440521,
+          "bytes": 26596
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-22T01:10:37+03:00",
+          "mtime_israel": "2026-10-22T01:10:37+03:00",
+          "mtime_unix": 1792620637.223598,
+          "birth_unix": 1792620637.219457,
+          "bytes": 459665
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "843_וירא_לפי_נושאים.pdf",
+        "birth_israel": "2026-10-22T01:10:32+03:00",
+        "mtime_israel": "2026-10-22T01:10:37+03:00",
+        "mtime_unix": 1792620637.1834576,
+        "birth_unix": 1792620632.983498,
+        "bytes": 16464022
+      },
+      "log_raw_sha256": "89ba48fec838017c4eff009180cdc7004afce5c924f0a1f63a83515ec7fde68b",
+      "observed_directory_birth_to_log_mtime_seconds": 241.744
+    },
+    {
+      "log": "vayera-843-days-build-04.log",
+      "kind": "vayera-build",
+      "result": "builder-pass",
+      "error": null,
+      "output_directory": {
+        "artifact_name": "skill7-vayera-843-days-04",
+        "birth_israel": "2026-10-22T01:07:20+03:00",
+        "mtime_israel": "2026-10-22T01:11:27+03:00",
+        "mtime_unix": 1792620687.9466014,
+        "birth_unix": 1792620440.685344,
+        "bytes": 4096
+      },
+      "log_artifact": {
+        "artifact_name": "vayera-843-days-build-04.log",
+        "birth_israel": "2026-10-22T01:07:20+03:00",
+        "mtime_israel": "2026-10-22T01:11:27+03:00",
+        "mtime_unix": 1792620687.9466014,
+        "birth_unix": 1792620440.289347,
+        "bytes": 1187
+      },
+      "stages": {
+        "source-model.json": {
+          "artifact_name": "source-model.json",
+          "birth_israel": "2026-10-22T01:07:55+03:00",
+          "mtime_israel": "2026-10-22T01:07:55+03:00",
+          "mtime_unix": 1792620475.1649137,
+          "birth_unix": 1792620475.161013,
+          "bytes": 19342
+        },
+        "layout.json": {
+          "artifact_name": "layout.json",
+          "birth_israel": "2026-10-22T01:08:09+03:00",
+          "mtime_israel": "2026-10-22T01:08:09+03:00",
+          "mtime_unix": 1792620489.7951193,
+          "birth_unix": 1792620489.792873,
+          "bytes": 21442
+        },
+        "source-layer.pdf": {
+          "artifact_name": "source-layer.pdf",
+          "birth_israel": "2026-10-22T01:08:09+03:00",
+          "mtime_israel": "2026-10-22T01:08:15+03:00",
+          "mtime_unix": 1792620495.2448208,
+          "birth_unix": 1792620489.795119,
+          "bytes": 14808810
+        },
+        "measurements.json": {
+          "artifact_name": "measurements.json",
+          "birth_israel": "2026-10-22T01:08:47+03:00",
+          "mtime_israel": "2026-10-22T01:08:47+03:00",
+          "mtime_unix": 1792620527.748447,
+          "birth_unix": 1792620527.744509,
+          "bytes": 121644
+        },
+        "placement-manifest.json": {
+          "artifact_name": "placement-manifest.json",
+          "birth_israel": "2026-10-22T01:08:56+03:00",
+          "mtime_israel": "2026-10-22T01:10:46+03:00",
+          "mtime_unix": 1792620646.3872042,
+          "birth_unix": 1792620536.272427,
+          "bytes": 493471
+        },
+        "navigation-manifest.json": {
+          "artifact_name": "navigation-manifest.json",
+          "birth_israel": "2026-10-22T01:08:56+03:00",
+          "mtime_israel": "2026-10-22T01:10:46+03:00",
+          "mtime_unix": 1792620646.3901055,
+          "birth_unix": 1792620536.277895,
+          "bytes": 49580
+        },
+        "progress-map.json": {
+          "artifact_name": "progress-map.json",
+          "birth_israel": "2026-10-22T01:10:46+03:00",
+          "mtime_israel": "2026-10-22T01:10:46+03:00",
+          "mtime_unix": 1792620646.3686914,
+          "birth_unix": 1792620646.363369,
+          "bytes": 467929
+        }
+      },
+      "final_or_rejected_pdf": {
+        "artifact_name": "843_וירא_לפי_ימים.pdf",
+        "birth_israel": "2026-10-22T01:10:42+03:00",
+        "mtime_israel": "2026-10-22T01:10:46+03:00",
+        "mtime_unix": 1792620646.3313696,
+        "birth_unix": 1792620642.515406,
+        "bytes": 14977296
+      },
+      "log_raw_sha256": "cb8dd313f6e2e6eba3b1aad0784e4c324fd435bd903b9ecc9904cafcd5f8f66f",
+      "observed_directory_birth_to_log_mtime_seconds": 247.261
+    }
+  ]
+}

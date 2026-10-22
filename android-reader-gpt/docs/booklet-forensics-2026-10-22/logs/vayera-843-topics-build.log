@@ -1,0 +1,16 @@
+SOURCE_OWNERSHIP_VALIDATED
+TOC_PNG=[OUTPUTS]/skill7-vayera-843-topics-01/qa/topics-toc.png
+TOC_PDF=[OUTPUTS]/skill7-vayera-843-topics-01/qa/topics-toc.pdf
+LAYOUT_PAGES=162
+PLANNING_SOURCE_COLLISIONS
+Traceback (most recent call last):
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 438, in <module>
+    main()
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 434, in main
+    build(args.interior, args.cover, answers, args.output_dir, args.checker, args.edition)
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 222, in build
+    add(canvas.lower_corner(), 1, 1,
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/placement.py", line 167, in lower_corner
+    raise ValueError(f"No safe lower {'right' if right else 'left'} corner, page {self.page.number + 1}")
+ValueError: No safe lower left corner, page 9

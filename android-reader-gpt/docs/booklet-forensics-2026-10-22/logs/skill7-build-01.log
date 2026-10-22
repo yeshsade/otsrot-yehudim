@@ -1,0 +1,14 @@
+SOURCE_OWNERSHIP_VALIDATED
+LAYOUT_PAGES=166
+PLACED_THROUGH_PAGE=20
+Traceback (most recent call last):
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 376, in <module>
+    main()
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 372, in main
+    build(args.interior, args.cover, answers, args.output_dir, args.checker, args.edition)
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 224, in build
+    add(canvas.checkbox(region, index / count), col, index, region=rect)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/placement.py", line 120, in checkbox
+    raise ValueError(f"No safe checkbox position, final page {self.page.number + 1}, column {region['column']}")
+ValueError: No safe checkbox position, final page 32, column 4

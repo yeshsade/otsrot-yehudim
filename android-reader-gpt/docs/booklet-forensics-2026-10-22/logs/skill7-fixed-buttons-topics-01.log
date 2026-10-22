@@ -1,0 +1,19 @@
+SOURCE_OWNERSHIP_VALIDATED
+TOC_PNG=[OUTPUTS]/skill7-fixed-buttons-topics-01/qa/topics-toc.png
+TOC_PDF=[OUTPUTS]/skill7-fixed-buttons-topics-01/qa/topics-toc.pdf
+LAYOUT_PAGES=155
+PLANNING_SOURCE_COLLISIONS
+PLACED_THROUGH_PAGE=20
+PLACED_THROUGH_PAGE=60
+PLACED_THROUGH_PAGE=80
+PLACED_THROUGH_PAGE=100
+PLACED_THROUGH_PAGE=120
+PLACED_THROUGH_PAGE=140
+Traceback (most recent call last):
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 426, in <module>
+    main()
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 422, in main
+    build(args.interior, args.cover, answers, args.output_dir, args.checker, args.edition)
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 339, in build
+    raise ValueError(f"{len(button_conflicts)} controls conflict at their approved anchors; "
+ValueError: 152 controls conflict at their approved anchors; see [OUTPUTS]/skill7-fixed-buttons-topics-01/qa/navigation-placement-audit.json. No delivery PDF created.

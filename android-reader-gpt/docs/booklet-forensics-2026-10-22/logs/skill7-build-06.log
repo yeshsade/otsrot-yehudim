@@ -1,0 +1,22 @@
+SOURCE_OWNERSHIP_VALIDATED
+LAYOUT_PAGES=166
+LEARNING_FONTS={"mishnah": "TT2D61o00", "zohar": "TTC8FAo00", "nach": "TTE635E008o00", "shulchan_aruch": "TT5CF6o00"}
+PLACED_THROUGH_PAGE=20
+PLACED_THROUGH_PAGE=40
+PLACED_THROUGH_PAGE=60
+PLACED_THROUGH_PAGE=80
+PLACED_THROUGH_PAGE=100
+PLACED_THROUGH_PAGE=120
+PLACED_THROUGH_PAGE=140
+Traceback (most recent call last):
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 385, in <module>
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 381, in main
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 252, in build
+    numbers = [p for p in numbers if gemara_identity(source[rows[p - 1]["source_page"] - 1]) is not None]
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/build_booklet.py", line 243, in link
+    link(number, toc_number, "return")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[REPOSITORY]/skill/lefi-yamim-7/scripts/placement.py", line 178, in button
+    raise ValueError(f"No safe readable {kind} button on final page {self.page.number + 1}")
+ValueError: No safe readable return button on final page 13
