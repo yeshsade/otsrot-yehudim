@@ -83,10 +83,15 @@ class SettingsActivity : AppCompatActivity() {
         val sixth = JSONObject(assets.open("settings-copy-2026-10-18b.json").bufferedReader().use { it.readText() })
         turnApproved = sixth.getString("status") == "approved"
         val turnWording = if (turnApproved) sixth.getJSONArray("entries") else org.json.JSONArray()
+        // and on 2026-10-21 ("שם היום באמצע המסך")
+        val seventh = JSONObject(assets.open("settings-copy-2026-10-21.json").bufferedReader().use { it.readText() })
+        require(seventh.getString("status") == "approved")
+        val dayWording = seventh.getJSONArray("entries")
         wording = ((0 until entries.length()).map { entries.getJSONObject(it) } + (0 until extra.length()).map { extra.getJSONObject(it) } +
             (0 until more.length()).map { more.getJSONObject(it) } + (0 until latest.length()).map { latest.getJSONObject(it) } +
             (0 until newest.length()).map { newest.getJSONObject(it) } +
-            (0 until turnWording.length()).map { turnWording.getJSONObject(it) })
+            (0 until turnWording.length()).map { turnWording.getJSONObject(it) } +
+            (0 until dayWording.length()).map { dayWording.getJSONObject(it) })
             .associateBy { it.getString("id") }
         font = Fonts.regular(this)
         mediumFont = Fonts.medium(this)
@@ -117,6 +122,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun groups() = listOf(
         Group("reading", R.id.otzr_group_reading, listOf(
             Setting("resume", R.id.otzr_resume_label, R.id.otzr_resume_desc, listOf(Choice("last", R.id.otzr_resume_last), Choice("start", R.id.otzr_resume_start))),
+            Setting("dayname", R.id.otzr_dayname_label, R.id.otzr_dayname_desc, listOf(Choice("on", R.id.otzr_dayname_on), Choice("off", R.id.otzr_dayname_off))),
             // Repeat marking requires the forthcoming inline pen/highlighter tools; do not offer a no-op control.
             Setting("marks", R.id.otzr_marks_label, R.id.otzr_marks_desc, listOf(Choice("once", R.id.otzr_marks_once), Choice("repeat", R.id.otzr_marks_repeat)), enabled = false),
         ), subgroups = listOf(Group("paging", R.id.otzr_group_paging, listOf(
@@ -164,6 +170,7 @@ class SettingsActivity : AppCompatActivity() {
         "language" -> settings.language ?: if (resources.configuration.localesLanguage() in setOf("he", "iw")) "he" else "en"
         "frame" -> settings.frameMode
         "sortsize" -> if (settings.sortBySize) "on" else "off"
+        "dayname" -> if (settings.dayNameCentered) "on" else "off"
         else -> error("Unknown setting")
     }
 
@@ -185,6 +192,7 @@ class SettingsActivity : AppCompatActivity() {
             }
             "frame" -> settings.frameMode = value
             "sortsize" -> settings.sortBySize = value == "on"
+            "dayname" -> settings.dayNameCentered = value == "on"
         }
         scrollPosition = scroll.scrollY
         sheet?.dismiss()

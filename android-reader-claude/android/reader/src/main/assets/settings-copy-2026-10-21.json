@@ -1,0 +1,11 @@
+{
+  "version": "2026-10-21",
+  "status": "approved",
+  "note": "Approved by the owner on 2026-10-21 (row in the reading screen group). No description line. English is Claude's translation.",
+  "entries": [
+    {"id": "dayname_label", "he": "שם היום באמצע המסך", "en": "Day name in the middle of the screen"},
+    {"id": "dayname_desc", "he": "", "en": ""},
+    {"id": "dayname_on", "he": "פועל", "en": "On"},
+    {"id": "dayname_off", "he": "כבוי", "en": "Off"}
+  ]
+}

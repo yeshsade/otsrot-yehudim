@@ -11,8 +11,8 @@ android {
         applicationId "com.yeshsade.otzarot.reader"
         minSdkVersion 23
         targetSdkVersion 36
-        versionCode 74
-        versionName "0.2.14-dev"
+        versionCode 75
+        versionName "0.2.15-dev"
         testInstrumentationRunner "com.yeshsade.otzarot.reader.LeanProbe"
     }
 

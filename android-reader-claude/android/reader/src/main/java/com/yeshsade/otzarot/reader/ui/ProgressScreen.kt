@@ -54,6 +54,7 @@ class ProgressScreen(
         if (!::dialog.isInitialized || !dialog.isShowing) return
         val (y, m, d) = OpenDay.today()
         day = OpenDay.choose(progress().days.map { it.id }, map.booklet.weekStart, y, m, d, ticked.values.any { it })
+        firstDay = day
         render()
     }
 
@@ -68,6 +69,10 @@ class ProgressScreen(
     private lateinit var overlay: FrameLayout
     private var tab = Tab.MARK
     private var day: String? = null
+    /** The day the screen opened on — in "כל השבוע" its row is the one open. */
+    private var firstDay: String? = null
+    /** In "כל השבוע": which days are open, per topic. */
+    private val openDays = HashMap<String, MutableSet<String>>()
     private var byTopics = false
     private var celebrated = mutableSetOf<String?>()
     private val colors = ui.colors
@@ -83,6 +88,7 @@ class ProgressScreen(
         val days = progress().days.map { it.id }
         val (y, m, d) = OpenDay.today()
         day = OpenDay.choose(days, map.booklet.weekStart, y, m, d, ticked.values.any { it })
+        firstDay = day
         build()
         // the first time: "what do you learn?" — on the next turn of the main thread, so neither window waits for the other
         if (settings.studyTopics == null) dialog.window?.decorView?.post { if (dialog.isShowing) chooseTopics(first = true) }
@@ -96,16 +102,15 @@ class ProgressScreen(
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         val root = ui.column().apply { setBackgroundColor(colors.canvas); tag = "progress_screen" }
         root.addView(header(), LinearLayout.LayoutParams(-1, -2))
-        // "סימון" and "התקדמות" in a bar at the bottom, like in apps (owner, 2026-10-21, sketch ג)
+        // "סימון" and "הספק" at the bottom: two soft raised buttons, the chosen one deep navy (owner, 2026-10-21, ג1)
         tabs = ui.row().apply {
-            setBackgroundColor(colors.card)
-            elevation = ui.dp(8).toFloat()
-            setPadding(ui.dp(8), ui.dp(6), ui.dp(8), ui.dp(10))
+            setBackgroundColor(if (ui.night) colors.canvas else BAR)
+            setPadding(ui.dp(10), ui.dp(12), ui.dp(10), ui.dp(18))
             tag = "progress_bottom_bar"
         }
-        dayChips = ui.row()
-        val chipsScroll = android.widget.HorizontalScrollView(activity).apply { isHorizontalScrollBarEnabled = false; addView(dayChips) }
-        root.addView(chipsScroll, LinearLayout.LayoutParams(-1, -2).apply { setMargins(ui.dp(12), ui.dp(10), ui.dp(12), 0) })
+        // the days as letters in circles, all in one row, and "כל השבוע" under them (owner, 2026-10-21, "א")
+        dayChips = ui.column().apply { tag = "progress_days" }
+        root.addView(dayChips, LinearLayout.LayoutParams(-1, -2).apply { setMargins(ui.dp(10), ui.dp(12), ui.dp(10), 0) })
         scroll = ScrollView(activity).apply { isFillViewport = true; clipToPadding = false }
         body = ui.column().apply { setPadding(ui.dp(12), ui.dp(8), ui.dp(12), ui.dp(28)) }
         scroll.addView(body)
@@ -116,7 +121,7 @@ class ProgressScreen(
         // the phone's own bars stay clear of the bottom bar
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(tabs) { v, insets ->
             val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.navigationBars())
-            v.setPadding(ui.dp(8), ui.dp(6), ui.dp(8), ui.dp(10) + bars.bottom)
+            v.setPadding(ui.dp(10), ui.dp(12), ui.dp(10), ui.dp(18) + bars.bottom)
             insets
         }
         dialog.setContentView(root)
@@ -194,21 +199,27 @@ class ProgressScreen(
 
     private fun bottomItem(t: Tab, icon: Int, text: Int, tagName: String) {
         val on = t == tab
-        val item = ui.column().apply {
-            gravity = Gravity.CENTER_HORIZONTAL
+        val ink = if (on) Color.WHITE else if (ui.night) colors.ink else OFF_INK
+        val item = ui.row().apply {
+            gravity = Gravity.CENTER
             tag = tagName
             isClickable = true; isFocusable = true
             contentDescription = activity.getString(text)
+            minimumHeight = ui.dp(48)
+            // the chosen one: deep navy, a little lighter at the top; the other: white, floating a little
+            background = if (on) GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(NAVY_TOP, NAVY, NAVY_BOTTOM))
+                .apply { cornerRadius = ui.dp(16).toFloat() } else ui.rounded(colors.card, 16f)
+            elevation = ui.dp(if (on) 5 else 3).toFloat()
+            if (android.os.Build.VERSION.SDK_INT >= 28) { outlineSpotShadowColor = SHADOW; outlineAmbientShadowColor = SHADOW }
             setOnClickListener { if (tab != t) { tab = t; render(); scroll.scrollTo(0, 0) } }
         }
-        val pill = FrameLayout(activity).apply { background = if (on) ui.rounded(colors.selection, 16f) else null }
-        pill.addView(android.widget.ImageView(activity).apply {
+        item.addView(android.widget.ImageView(activity).apply {
             setImageResource(icon)
-            imageTintList = android.content.res.ColorStateList.valueOf(if (on) colors.accent else colors.muted)
-        }, FrameLayout.LayoutParams(ui.dp(24), ui.dp(24), Gravity.CENTER))
-        item.addView(pill, LinearLayout.LayoutParams(ui.dp(64), ui.dp(32)))
-        item.addView(ui.label(activity.getString(text), 13f, if (on) colors.accent else colors.muted, true).apply { setPadding(0, ui.dp(3), 0, 0) })
-        tabs.addView(item, LinearLayout.LayoutParams(0, -2, 1f))
+            imageTintList = android.content.res.ColorStateList.valueOf(ink)
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }, LinearLayout.LayoutParams(ui.dp(20), ui.dp(20)).apply { marginEnd = ui.dp(8) })
+        item.addView(ui.label(activity.getString(text), 15.5f, ink, true))
+        tabs.addView(item, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = ui.dp(6); marginEnd = ui.dp(6) })
     }
 
     private fun render() {
@@ -220,8 +231,12 @@ class ProgressScreen(
         topicsBadge.visibility = if (settings.studyTopics == null) View.GONE else View.VISIBLE
         dayChips.removeAllViews()
         val p = progress()
-        for (d in p.days) chip(shortDay(d.label), d.id == day, "progress_day_${d.id}") { day = d.id; render() }
-        chip(activity.getString(R.string.pr_whole_week), day == null, "progress_day_week") { day = null; render() }
+        val letters = ui.row()
+        for (d in p.days) letter(letters, d, d.id == day) { day = d.id; render() }
+        dayChips.addView(letters, LinearLayout.LayoutParams(-1, -2))
+        val week = ui.row().apply { gravity = Gravity.CENTER; setPadding(0, ui.dp(8), 0, 0) }
+        week.addView(pill(activity.getString(R.string.pr_whole_week), day == null, "progress_day_week") { day = null; render() })
+        dayChips.addView(week, LinearLayout.LayoutParams(-1, -2))
         ++renders; counters.clear()
         body.removeAllViews()
         if (waiting) {
@@ -233,15 +248,33 @@ class ProgressScreen(
         if (tab == Tab.MARK) renderMarking() else renderProgress()
     }
 
-    private fun chip(text: String, on: Boolean, tagName: String, action: () -> Unit) {
-        dayChips.addView(ui.label(text, 14.5f, if (on) Color.WHITE else colors.ink, on).apply {
+    /** A day as its letter in a circle (the full name is read out). */
+    private fun letter(row: LinearLayout, d: ProgressMap.Day, on: Boolean, action: () -> Unit) {
+        val cell = FrameLayout(activity)
+        cell.addView(ui.label(dayLetter(d), 17f, if (on) Color.WHITE else colors.ink, true).apply {
+            tag = "progress_day_${d.id}"
+            gravity = Gravity.CENTER
+            contentDescription = d.label
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(if (on) ui.colors.accent else ui.colors.card)
+                if (!on) setStroke(ui.dp(1), ui.colors.border)
+            }
+            setOnClickListener { action(); scroll.scrollTo(0, 0) }
+        }, FrameLayout.LayoutParams(ui.dp(42), ui.dp(42), Gravity.CENTER))
+        row.addView(cell, LinearLayout.LayoutParams(0, ui.dp(46), 1f))
+    }
+
+    private fun dayLetter(d: ProgressMap.Day) = DAY_LETTERS[d.id] ?: (shortDay(d.label).take(1) + "׳")
+
+    private fun pill(text: String, on: Boolean, tagName: String, action: () -> Unit) =
+        ui.label(text, 14.5f, if (on) Color.WHITE else colors.ink, on).apply {
             tag = tagName
             gravity = Gravity.CENTER
-            setPadding(ui.dp(14), ui.dp(7), ui.dp(14), ui.dp(7))
+            setPadding(ui.dp(18), ui.dp(7), ui.dp(18), ui.dp(7))
             background = if (on) ui.rounded(colors.accent, 18f) else ui.rounded(colors.card, 18f, colors.border)
             setOnClickListener { action(); scroll.scrollTo(0, 0) }
-        }, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = ui.dp(6) })
-    }
+        }
 
     private fun shortDay(label: String) = label.removePrefix("יום ").replace("שבת קודש", "שבת")
 
@@ -300,15 +333,53 @@ class ProgressScreen(
             })
         }
         card.addView(head)
+        if (day == null) {
+            // the whole week: a bar per day that opens and closes; the day the screen opened on is open
+            // (owner, 2026-10-22, "מושלם") — so a big topic is not hundreds of boxes in a row
+            val open = openDays.getOrPut(topic.id) { listOfNotNull(firstDay).toMutableSet() }
+            val order = map.days.associate { it.id to it.order }
+            for ((dayId, ofDay) in checks.groupBy { it.dayId.orEmpty() }.toList().sortedBy { order[it.first] ?: Int.MAX_VALUE }) {
+                val isOpen = dayId in open
+                card.addView(fold(dayId, isOpen, refresh, ofDay) {
+                    if (isOpen) open.remove(dayId) else open.add(dayId)
+                    fillCard(card, topic, checks)
+                }, LinearLayout.LayoutParams(-1, -2).apply { topMargin = ui.dp(8) })
+                if (isOpen) boxes(card, topic, checks, ofDay)
+            }
+        } else boxes(card, topic, checks, checks)
         refresh.forEach { it() }
-        val labelled = checks.any { it.label != null }
+    }
+
+    /** One day's bar in "כל השבוע": its name, ✓ once it is all marked, and ▾ / ▴. */
+    private fun fold(dayId: String, open: Boolean, refresh: MutableList<() -> Unit>, ofDay: List<ProgressMap.Check>, toggle: () -> Unit): View {
+        val label = map.day(dayId)?.label ?: dayId
+        val bar = ui.row().apply {
+            tag = "progress_fold_$dayId"
+            minimumHeight = ui.dp(44)
+            setPadding(ui.dp(12), ui.dp(6), ui.dp(12), ui.dp(6))
+            background = ui.rounded(if (open) colors.selection else if (ui.night) colors.canvas else BAR, 12f)
+            isClickable = true; isFocusable = true
+            contentDescription = label
+            setOnClickListener { toggle() }
+        }
+        bar.addView(ui.label(shortDay(label), 14.5f, if (ui.night) colors.ink else colors.header, true))
+        val done = ui.label("✓", 15f, colors.accent, true).apply { setPadding(ui.dp(6), 0, 0, 0); tag = "progress_fold_done" }
+        bar.addView(done)
+        refresh += { done.visibility = if (ofDay.all { ticked[it.field] == true }) View.VISIBLE else View.GONE }
+        bar.addView(View(activity), LinearLayout.LayoutParams(0, 1, 1f))
+        bar.addView(ui.label(if (open) "▴" else "▾", 20f, colors.muted))
+        return bar
+    }
+
+    /** The boxes of [some] (a day, or all of a chosen day's): named ones in a row, or the columns as printed. */
+    private fun boxes(card: LinearLayout, topic: ProgressMap.Topic, checks: List<ProgressMap.Check>, some: List<ProgressMap.Check>) {
+        val labelled = some.any { it.label != null }
         when {
-            labelled -> card.addView(namedBoxes(card, topic, checks))
-            checks.size == 1 -> card.addView(ui.row().apply { setPadding(0, ui.dp(10), 0, 0); addView(box(card, topic, checks, checks[0])) })
+            labelled -> card.addView(namedBoxes(card, topic, checks, some))
+            some.size == 1 -> card.addView(ui.row().apply { setPadding(0, ui.dp(10), 0, 0); addView(box(card, topic, checks, some[0])) })
             else -> {
                 // a row for each page of the day, under its title ("עמוד 1"), the columns side by side as printed
-                val days = checks.groupBy { it.dayId }
-                for ((_, ofDay) in days) {
+                for ((_, ofDay) in some.groupBy { it.dayId }) {
                     val rows = ofDay.groupBy { it.pageInDay }.toSortedMap()
                     for ((_, row) in rows) {
                         row.firstOrNull()?.group?.let { g ->
@@ -319,7 +390,6 @@ class ProgressScreen(
                 }
             }
         }
-        refresh.forEach { it() }
     }
 
     private fun columns(card: LinearLayout, topic: ProgressMap.Topic, all: List<ProgressMap.Check>, row: List<ProgressMap.Check>): View {
@@ -337,22 +407,32 @@ class ProgressScreen(
         return line
     }
 
-    private fun namedBoxes(card: LinearLayout, topic: ProgressMap.Topic, checks: List<ProgressMap.Check>): View {
+    private fun namedBoxes(card: LinearLayout, topic: ProgressMap.Topic, checks: List<ProgressMap.Check>, some: List<ProgressMap.Check>): View {
         val line = ui.row().apply { setPadding(0, ui.dp(10), 0, 0) }
-        for (c in checks.sortedBy { it.order }) {
+        for (c in some.sortedBy { it.order }) {
             val item = ui.column().apply { gravity = Gravity.CENTER_HORIZONTAL }
             item.addView(box(card, topic, checks, c), boxParams())
-            item.addView(ui.label(c.label ?: "", 13f, colors.ink).apply { gravity = Gravity.CENTER })
+            item.addView(ui.label(shownLabel(c.label), 13f, colors.ink).apply { gravity = Gravity.CENTER })
             line.addView(item, LinearLayout.LayoutParams(0, -2, 1f))
         }
         return line
+    }
+
+    /**
+     * A box's name as shown. In נביאים וכתובים the booklet calls its boxes "חלק 1–4", but each is a page of the
+     * book (two to a booklet page, no columns): "עמוד 1–4" (owner, 2026-10-22). The booklet is not changed.
+     */
+    private fun shownLabel(label: String?): String {
+        if (label == null) return ""
+        val n = Regex("^חלק (\\d+)$").matchEntire(label)?.groupValues?.get(1)?.toIntOrNull() ?: return label
+        return activity.getString(R.string.pr_page_n, n)
     }
 
     private fun boxParams() = LinearLayout.LayoutParams(ui.dp(40), ui.dp(40)).apply { topMargin = ui.dp(6); gravity = Gravity.CENTER_HORIZONTAL }
 
     /** A real check box: an empty rounded square, or filled with a ✓ — so it reads as "tick here". */
     private fun box(card: LinearLayout, topic: ProgressMap.Topic, all: List<ProgressMap.Check>, c: ProgressMap.Check): View =
-        Box(activity, ui, ticked[c.field] == true, c.label ?: topic.label).apply {
+        Box(activity, ui, ticked[c.field] == true, c.label?.let { shownLabel(it) } ?: topic.label).apply {
             setOnClickListener {
                 val now = !checked
                 change(mapOf(c.field to now))
@@ -606,5 +686,13 @@ class ProgressScreen(
 
     companion object {
         const val UNDO_MS = 6000L
+        private val BAR = Color.parseColor("#F7F5FC")
+        private val OFF_INK = Color.parseColor("#4A3F86")
+        private val NAVY_TOP = Color.parseColor("#544BA3")
+        private val NAVY = Color.parseColor("#4A4196")
+        private val NAVY_BOTTOM = Color.parseColor("#352E73")
+        private val SHADOW = Color.parseColor("#1E1446")
+        private val DAY_LETTERS = mapOf("sunday" to "א׳", "monday" to "ב׳", "tuesday" to "ג׳", "wednesday" to "ד׳",
+            "thursday" to "ה׳", "friday" to "ו׳", "saturday" to "ש׳")
     }
 }

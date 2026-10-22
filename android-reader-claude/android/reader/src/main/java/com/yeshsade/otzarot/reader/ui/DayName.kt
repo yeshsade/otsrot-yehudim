@@ -23,6 +23,12 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
     /** Whether it may show now (the setting, and whether the frame is shown). */
     var allowed: () -> Boolean = { true }
 
+    /**
+     * In the middle of the screen, the same size at any zoom, naming the day of what is in the middle of the screen
+     * (owner, 2026-10-21: "יישאר תמיד במרכז המסך גם אם אני זז והגדלתי בענק"). Off: in the middle of each page, as before.
+     */
+    var centered: () -> Boolean = { true }
+
     private var strength = 0f
     private var animator: ValueAnimator? = null
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -55,6 +61,7 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
         val map = map ?: return
         if (strength <= 0f) return
         val range = pdfView.visiblePageRange ?: return
+        if (centered()) { drawCentered(canvas, map, range); return }
         for (page in range[0]..range[1]) {
             val info = map.pageInfo(page) ?: continue
             if (info.weekOffset != 0) continue
@@ -79,6 +86,32 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
         if (!pdfView.isPageOpen(page)) return emptyList()
         val size = pdfView.getFrameSize(page) ?: return emptyList()
         return listOf(day to RectF(0f, 0f, size[0], size[1]))
+    }
+
+    /** The day whose part of a page is nearest the middle of the screen, written in the middle of the screen. */
+    private fun drawCentered(canvas: Canvas, map: ProgressMap, range: IntArray) {
+        val cx = pdfView.width / 2f
+        val cy = pdfView.height / 2f
+        var best: String? = null
+        var bestDistance = Float.MAX_VALUE
+        for (page in range[0]..range[1]) {
+            val info = map.pageInfo(page) ?: continue
+            if (info.weekOffset != 0) continue
+            for ((dayId, frame) in parts(info, page)) {
+                val box = pdfView.frameRectToView(page, frame) ?: continue
+                // 0 inside the part; otherwise how far its edge is from the middle of the screen
+                val dx = maxOf(box.left - cx, 0f, cx - box.right)
+                val dy = maxOf(box.top - cy, 0f, cy - box.bottom)
+                val distance = dx * dx + dy * dy
+                if (distance < bestDistance) { bestDistance = distance; best = dayId }
+            }
+        }
+        val label = best?.let { map.day(it)?.label } ?: return
+        paint.textSize = 1f
+        val w = paint.measureText(label).coerceAtLeast(1f)
+        paint.textSize = minOf(pdfView.width * 0.62f / w, pdfView.height * 0.12f, MAX_TEXT_PX)
+        paint.alpha = (255 * OPACITY * strength).toInt()
+        canvas.drawText(label, cx, cy - (paint.descent() + paint.ascent()) / 2, paint)
     }
 
     private fun drawName(canvas: Canvas, label: String, box: RectF) {

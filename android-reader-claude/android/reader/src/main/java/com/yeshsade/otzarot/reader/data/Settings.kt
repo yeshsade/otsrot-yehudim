@@ -103,6 +103,11 @@ class Settings(context: Context) {
         get() = ScrubberPolicy.clampHold(prefs.getInt(SCRUB_HOLD, ScrubberPolicy.DEFAULT_HOLD_MS))
         set(v) = prefs.edit().putInt(SCRUB_HOLD, ScrubberPolicy.clampHold(v)).apply()
     /** The page handle stays on screen even while the frame is hidden (default: no, it comes and goes with the frame). */
+    /** The day's name in the middle of the screen, the same size at any zoom (owner, 2026-10-21); off: on the page, as before. */
+    var dayNameCentered: Boolean
+        get() = prefs.getBoolean(DAY_NAME_CENTERED, true)
+        set(v) = prefs.edit().putBoolean(DAY_NAME_CENTERED, v).apply()
+
     var scrubberAlways: Boolean
         get() = prefs.getBoolean(SCRUB_ALWAYS, false)
         set(v) = prefs.edit().putBoolean(SCRUB_ALWAYS, v).apply()
@@ -139,6 +144,7 @@ class Settings(context: Context) {
         const val SCRUB_SIDE = "scrubber_side"
         const val SCRUB_HOLD = "scrubber_hold_ms"
         const val SCRUB_ALWAYS = "scrubber_always"
+        const val DAY_NAME_CENTERED = "day_name_centered"
         const val BM_HORIZONTAL = "bookmark_horizontal"
         const val SORT_REVERSED = "sort_reversed"
         const val SORT_SIZE = "sort_by_size"

@@ -141,4 +141,6 @@
     <string name="pr_select_all">בחר הכול</string>
     <string name="pr_save">שמירה</string>
     <string name="pr_reading">קורא…</string>
+    <string name="menu_version">גרסה %1$s</string>
+    <string name="pr_page_n">עמוד %1$d</string>
 </resources>

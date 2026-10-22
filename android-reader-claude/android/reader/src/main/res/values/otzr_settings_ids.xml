@@ -47,6 +47,10 @@
   <item type="id" name="otzr_language_desc" />
   <item type="id" name="otzr_language_he" />
   <item type="id" name="otzr_language_en" />
+  <item type="id" name="otzr_dayname_label" />
+  <item type="id" name="otzr_dayname_desc" />
+  <item type="id" name="otzr_dayname_on" />
+  <item type="id" name="otzr_dayname_off" />
   <item type="id" name="otzr_sortsize_label" />
   <item type="id" name="otzr_sortsize_desc" />
   <item type="id" name="otzr_sortsize_off" />

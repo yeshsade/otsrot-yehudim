@@ -133,6 +133,10 @@ object Drawer {
         if (pinned.isNotEmpty()) {
             panel.addView(line(ui), LinearLayout.LayoutParams(-1, ui.dp(1)).apply { setMargins(ui.dp(24), 0, ui.dp(24), 0) })
             pinned.forEach { panel.addView(row(it)) }
+            // the version, quiet, at the far end of the last row — so the owner knows whether to update
+            // (owner, 2026-10-23: "ב")
+            (panel.getChildAt(panel.childCount - 1) as? LinearLayout)?.addView(ui.label(
+                context.getString(R.string.menu_version, version(context)), 13f, ui.colors.muted).apply { tag = "drawer_version" })
             panel.addView(View(context), LinearLayout.LayoutParams(-1, ui.dp(10)))
         }
         // the phone's bars stay clear of the rows
@@ -156,6 +160,10 @@ object Drawer {
         dialog.show()
         return Shown(dialog, panel)
     }
+
+    private fun version(context: Context): String = runCatching {
+        context.packageManager.getPackageInfo(context.packageName, 0).versionName
+    }.getOrNull().orEmpty().substringBefore("-")
 
     private fun line(ui: Ui) = View(ui.row().context).apply { setBackgroundColor(ui.colors.border) }
 

@@ -1409,6 +1409,7 @@ class LeanProbe : Instrumentation() {
             waitFor("shared box ticked", 120_000) { var on = false; onMain { on = field<HashMap<String, Boolean>>(reader, "ticked")[name] == true }; on }
             record("A Gemara amud on two pages (${places.map { it.first + 1 }}) is one box: ticked once, counted once")
             result.putString("shared", "$name ${places.joinToString { "${it.first}:${it.second}" }}")
+            version15(reader)
             onMainChecked { reader.finish() }
             waitFor("reader closed", 120_000) { reader.isDestroyed }
             SystemClock.sleep(15_000)
@@ -1418,6 +1419,94 @@ class LeanProbe : Instrumentation() {
             result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
             finish(Activity.RESULT_CANCELED, result)
         }
+    }
+
+    /** 0.2.15: the name in the top bar, the version in the drawer, the new progress screen, the day name in the middle. */
+    private var result15 = ""
+    private fun version15(reader: ReaderActivity) {
+        fun settle() { SystemClock.sleep(2500); waitForIdleSync() }
+        val v = pdfView(reader)
+        onMainChecked { v.jumpTo(24, false) }
+        settle()
+        onMainChecked { reader.javaClass.getDeclaredField("chrome").apply { isAccessible = true }.get(reader).let { c -> c.javaClass.getMethod("show").invoke(c) } }
+        settle()
+        var title = ""; var page = ""
+        onMain {
+            title = (reader.window.decorView.findViewWithTag<View>("bar_title") as android.widget.TextView).text.toString()
+            page = (reader.window.decorView.findViewWithTag<View>("bar_page") as android.widget.TextView).text.toString()
+        }
+        check(title.isNotBlank() && page.contains("25")) { "top bar: '$title' / '$page'" }
+        onMainChecked { snapshot(reader, "15-reader.png") }
+        record("The top bar shows the booklet's name and the page ($title · $page)")
+        onMainChecked { reader.javaClass.getDeclaredMethod("openMenu").apply { isAccessible = true }.invoke(reader) }
+        waitFor("menu", 20_000) { reader.lastMenu != null && reader.lastMenu!!.dialog.isShowing }
+        settle()
+        var version = ""
+        onMain { version = (reader.lastMenu!!.root.findViewWithTag<View>("drawer_version") as android.widget.TextView).text.toString() }
+        check(version.contains("0.2.15")) { "version: '$version'" }
+        onMainChecked { snapshotView(reader.lastMenu!!.dialog.window!!.decorView, "15-drawer.png") }
+        record("The drawer shows the version at the bottom ($version)")
+        onMainChecked { reader.lastMenu!!.root.findViewWithTag<View>("menu_quick_mark").performClick() }
+        waitFor("screen", 30_000) { reader.lastProgress?.shown?.isShowing == true }
+        val decor = reader.lastProgress!!.shown.window!!.decorView
+        fun has(tag: String): Boolean { var ok = false; onMain { ok = decor.findViewWithTag<View>(tag) != null }; return ok }
+        waitFor("cards", 60_000) { has("progress_topic_nach") }
+        settle()
+        check(has("progress_day_saturday") && has("progress_day_week")) { "day letters missing" }
+        onMainChecked { snapshotView(decor, "15-mark-day.png") }
+        uiAutomation.takeScreenshot()?.let { writePng(it, "15-real-mark.png") }
+        onMainChecked {
+            val root = decor.findViewWithTag<View>("progress_screen")
+            val at = IntArray(2); root.getLocationOnScreen(at)
+            result15 = "root at ${at[1]} h=${root.height} decor h=${decor.height} pad=${decor.paddingTop} statusColor=${Integer.toHexString(reader.lastProgress!!.shown.window!!.statusBarColor)}"
+        }
+        record("frame: $result15")
+        fun text(v: View): String = when (v) { is android.widget.TextView -> v.text.toString(); is android.view.ViewGroup -> (0 until v.childCount).joinToString(" ") { text(v.getChildAt(it)) }; else -> "" }
+        var nach = ""
+        onMain { nach = text(decor.findViewWithTag<View>("progress_topic_nach")) }
+        check(nach.contains("עמוד 1") && !nach.contains("חלק")) { "nach labels: $nach" }
+        record("The days are letters in one row; in נביאים וכתובים the boxes read \"עמוד 1–4\"")
+        onMainChecked { decor.findViewWithTag<View>("progress_day_week").performClick() }
+        waitFor("week cards", 120_000) { has("progress_topic_nach") }
+        settle()
+        fun scrollTo(tag: String) = onMainChecked {
+            val card = decor.findViewWithTag<View>(tag)
+            (card?.parent?.parent as? android.widget.ScrollView)?.scrollTo(0, card.top)
+        }
+        scrollTo("progress_topic_nach")
+        settle()
+        var folds = 0; var boxes = 0
+        onMain {
+            val card = decor.findViewWithTag<View>("progress_topic_nach") as android.view.ViewGroup
+            for (i in 0 until card.childCount) { val t = card.getChildAt(i).tag?.toString().orEmpty(); if (t.startsWith("progress_fold_") && t != "progress_fold_done") folds++ }
+            fun count(g: View): Int = if (g.tag == "progress_box") 1 else if (g is android.view.ViewGroup) (0 until g.childCount).sumOf { count(g.getChildAt(it)) } else 0
+            boxes = count(card)
+        }
+        check(folds == 7 && boxes == 4) { "week folds=$folds boxes=$boxes" }
+        onMainChecked { snapshotView(decor, "15-week-nach.png") }
+        record("In כל השבוע each day is a bar; only the opening day is open ($boxes boxes shown)")
+        onMainChecked { (decor.findViewWithTag<View>("progress_topic_nach") as android.view.ViewGroup).findViewWithTag<View>("progress_fold_monday").performClick() }
+        settle()
+        onMain {
+            val card = decor.findViewWithTag<View>("progress_topic_nach")
+            fun count(g: View): Int = if (g.tag == "progress_box") 1 else if (g is android.view.ViewGroup) (0 until g.childCount).sumOf { count(g.getChildAt(it)) } else 0
+            boxes = count(card)
+        }
+        check(boxes == 8) { "after opening monday: $boxes" }
+        scrollTo("progress_topic_nach")
+        settle()
+        onMainChecked { snapshotView(decor, "15-week-nach-open.png") }
+        record("A tap on a day's bar opens it")
+        onMainChecked { reader.lastProgress!!.shown.dismiss() }
+        settle()
+        // the day's name in the middle of the screen, the same size zoomed in
+        onMainChecked { v.zoomCenteredTo(4f, android.graphics.PointF(v.width / 2f, v.height / 2f)) }
+        settle()
+        onMainChecked { reader.javaClass.getDeclaredField("dayName").apply { isAccessible = true }.get(reader).let { d -> d.javaClass.getMethod("touched").invoke(d) } }
+        SystemClock.sleep(300)
+        onMainChecked { snapshot(reader, "15-dayname-zoom.png") }
+        record("The day's name shows in the middle of the screen when zoomed in")
+        waitFor("pictures written", 120_000) { pendingPngs.get() == 0 }
     }
 
     /** The booklet's own buttons ("העמוד הבא"…): they open the right page, with its top in view. */

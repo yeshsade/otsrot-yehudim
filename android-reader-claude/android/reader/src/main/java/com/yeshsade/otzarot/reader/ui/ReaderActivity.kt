@@ -60,6 +60,8 @@ class ReaderActivity : AppCompatActivity() {
     private lateinit var redoButton: ImageButton
     private lateinit var bookmarks: Bookmarks
     private lateinit var header: View
+    private lateinit var barTitle: TextView
+    private lateinit var barPage: TextView
     private lateinit var toolbar: View
     private lateinit var scrubber: Scrubber
     private lateinit var infoLine: InfoLine
@@ -201,6 +203,24 @@ class ReaderActivity : AppCompatActivity() {
         extras.addView(undoButton)
         extras.addView(redoButton)
         updateUndoButtons()
+        // the booklet's name in the middle, and under it the page (owner, 2026-10-22: "התכוונתי לכפתורים" —
+        // the empty bar of 18.10 meant no buttons, not no name). A long name is cut with "…".
+        val titles = ui.column().apply {
+            gravity = Gravity.CENTER
+            layoutDirection = View.LAYOUT_DIRECTION_LOCALE
+            setPadding(ui.dp(4), 0, ui.dp(4), 0)
+        }
+        barTitle = ui.label("", 16f, Color.WHITE, true).apply {
+            gravity = Gravity.CENTER; maxLines = 1; ellipsize = android.text.TextUtils.TruncateAt.END; tag = "bar_title"
+            textDirection = View.TEXT_DIRECTION_LOCALE
+        }
+        barPage = ui.label("", 12f, 0xC0FFFFFF.toInt()).apply {
+            gravity = Gravity.CENTER; maxLines = 1; tag = "bar_page"; visibility = View.GONE
+        }
+        titles.addView(barTitle, LinearLayout.LayoutParams(-1, -2))
+        titles.addView(barPage, LinearLayout.LayoutParams(-1, -2))
+        header.removeViewAt(1)
+        header.addView(titles, 1, LinearLayout.LayoutParams(0, -2, 1f))
         header.elevation = ui.dp(4).toFloat()
 
         // The frame can hide: then the top bar floats over the page, so hiding it never resizes (and moves) the page.
@@ -221,7 +241,7 @@ class ReaderActivity : AppCompatActivity() {
             undo.push(step)
             marked()
         }
-        dayName = DayName(pdfView, Fonts.heading(this), ui.night)
+        dayName = DayName(pdfView, Fonts.heading(this), ui.night).apply { centered = { settings.dayNameCentered } }
         pdfView.setOverlayDrawer { canvas -> bookmarks.draw(canvas); dayName.draw(canvas) }
         body.addView(Bookmarks.TouchLayer(this, bookmarks), FrameLayout.LayoutParams(-1, -1))
 
@@ -419,6 +439,7 @@ class ReaderActivity : AppCompatActivity() {
     private fun show(target: Doc) {
         if (doc?.id == target.id && pageCount > 0) return
         doc = target
+        barTitle.text = target.name
         bookmarks.clear()
         // undo and redo belong to the document they were made in
         undo.clear()
@@ -777,6 +798,8 @@ class ReaderActivity : AppCompatActivity() {
     private fun showPage(page: Int) {
         val text = getString(R.string.reader_page, page + 1, pageCount)
         infoLine.setPage(text)
+        barPage.text = text
+        barPage.visibility = View.VISIBLE
         scrubber.follow(pdfView.positionOffset)
     }
 

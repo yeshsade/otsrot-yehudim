@@ -133,4 +133,6 @@
     <string name="pr_select_all">Select all</string>
     <string name="pr_save">Save</string>
     <string name="pr_reading">Reading…</string>
+    <string name="menu_version">Version %1$s</string>
+    <string name="pr_page_n">Page %1$d</string>
 </resources>
