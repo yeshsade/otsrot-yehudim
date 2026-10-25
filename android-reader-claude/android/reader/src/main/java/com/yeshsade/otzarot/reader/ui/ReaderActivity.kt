@@ -807,7 +807,7 @@ class ReaderActivity : AppCompatActivity() {
 
     /** "יום ראשון · עמוד 26 מתוך 175" — or only the page, on a page that is no day's (owner, 2026-10-25). */
     private fun showPage(page: Int) {
-        barDay = if (::dayName.isInitialized) dayName.dayAtCenter() else null
+        barDay = if (::dayName.isInitialized) dayName.currentDay(page) else null
         val label = barDay?.let { parsedMap?.day(it)?.label }
         val text = if (label != null) getString(R.string.reader_day_page, label, page + 1, pageCount)
             else getString(R.string.reader_page, page + 1, pageCount)

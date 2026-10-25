@@ -28,7 +28,7 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
      * (owner, 2026-10-25: "כדי שלא יעצבן" — not at every touch). Returns the day now in the middle, if any.
      */
     fun moved(): String? {
-        val day = dayAtCenter() ?: return null
+        val day = currentDay(pdfView.currentPage) ?: return null
         if (day != lastDay) { lastDay = day; touched() }
         return day
     }
@@ -111,6 +111,16 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
         paint.textSize = minOf(pdfView.width * 0.62f / w, pdfView.height * 0.12f, MAX_TEXT_PX)
         paint.alpha = (255 * OPACITY * strength).toInt()
         canvas.drawText(label, cx, cy - (paint.descent() + paint.ascent()) / 2, paint)
+    }
+
+    /**
+     * The day of what is in the middle of the screen; while the engine has not opened the page yet, the day the
+     * map gives the page (a split page: its first day).
+     */
+    fun currentDay(page: Int): String? {
+        dayAtCenter()?.let { return it }
+        val info = map?.pageInfo(page)?.takeIf { it.weekOffset == 0 } ?: return null
+        return info.dayId ?: info.regions.firstNotNullOfOrNull { it.dayId }
     }
 
     /** The day of what is in the middle of the screen (a split page: the half there), or null. */
