@@ -241,7 +241,8 @@ class ReaderActivity : AppCompatActivity() {
             undo.push(step)
             marked()
         }
-        dayName = DayName(pdfView, Fonts.heading(this), ui.night).apply { centered = { settings.dayNameCentered } }
+        // always in the middle of the screen; the setting turns it off (owner, 2026-10-25: "במרכז")
+        dayName = DayName(pdfView, Fonts.heading(this), ui.night).apply { allowed = { settings.dayNameCentered } }
         pdfView.setOverlayDrawer { canvas -> bookmarks.draw(canvas); dayName.draw(canvas) }
         body.addView(Bookmarks.TouchLayer(this, bookmarks), FrameLayout.LayoutParams(-1, -1))
 
@@ -313,7 +314,6 @@ class ReaderActivity : AppCompatActivity() {
     /** Touching the top bar, the toolbar or the handle keeps the frame up for its full time again. */
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (event.actionMasked == MotionEvent.ACTION_DOWN && ::pageTurn.isInitialized) pageTurn.finish()
-        if (event.actionMasked == MotionEvent.ACTION_DOWN && ::dayName.isInitialized) dayName.touched()
         if (event.actionMasked == MotionEvent.ACTION_DOWN && ::chrome.isInitialized) {
             edgeSwipe = false
             edgeStart = if (!chrome.shown && FramePolicy.canHide(app.settings.frameMode) && fromPhoneEdge(event))
@@ -574,7 +574,12 @@ class ReaderActivity : AppCompatActivity() {
             .pageSnap(settings.singlePage)
             .pageFling(settings.singlePage)
             .onTap { event -> tap(event) }
-            .onPageScroll { _, offset -> scrubber.follow(offset); scrubber.pagesMoved() }
+            .onPageScroll { _, offset ->
+                scrubber.follow(offset); scrubber.pagesMoved()
+                // a new day in the middle of the screen: its name shows, and the bars say it
+                val now = dayName.moved()
+                if (now != barDay) showPage(pdfView.currentPage)
+            }
             .onLoad { pages ->
                 pageCount = pages
                 readMap(target)
@@ -620,6 +625,8 @@ class ReaderActivity : AppCompatActivity() {
                     if (isDestroyed || doc?.id != target.id || generation != mapGeneration) return@post
                     dayName.map = read
                     parsedMap = read
+                    dayName.moved()
+                    if (pageCount > 0) showPage(pdfView.currentPage)
                     refreshProgressViews()
                 }
                 // the same file as last time: what is known about its boxes is used as is
@@ -795,8 +802,15 @@ class ReaderActivity : AppCompatActivity() {
     private var toolbarGauge: Gauge? = null
     private var toolbarGaugeIcon: View? = null
 
+    /** The day the bars name now (so they change only when it does). */
+    private var barDay: String? = null
+
+    /** "יום ראשון · עמוד 26 מתוך 175" — or only the page, on a page that is no day's (owner, 2026-10-25). */
     private fun showPage(page: Int) {
-        val text = getString(R.string.reader_page, page + 1, pageCount)
+        barDay = if (::dayName.isInitialized) dayName.dayAtCenter() else null
+        val label = barDay?.let { parsedMap?.day(it)?.label }
+        val text = if (label != null) getString(R.string.reader_day_page, label, page + 1, pageCount)
+            else getString(R.string.reader_page, page + 1, pageCount)
         infoLine.setPage(text)
         barPage.text = text
         barPage.visibility = View.VISIBLE

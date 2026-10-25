@@ -18,7 +18,20 @@ import com.yeshsade.otzarot.reader.data.ProgressMap
  */
 class DayName(private val pdfView: PDFView, typeface: Typeface, private val night: Boolean) {
     var map: ProgressMap? = null
-        set(value) { field = value; pdfView.invalidate() }
+        set(value) { field = value; lastDay = null; pdfView.invalidate() }
+
+    /** The day last seen in the middle of the screen: the name shows again only when this changes. */
+    private var lastDay: String? = null
+
+    /**
+     * The pages moved. When the middle of the screen reaches another day the name shows for a few seconds
+     * (owner, 2026-10-25: "כדי שלא יעצבן" — not at every touch). Returns the day now in the middle, if any.
+     */
+    fun moved(): String? {
+        val day = dayAtCenter() ?: return null
+        if (day != lastDay) { lastDay = day; touched() }
+        return day
+    }
 
     /** Whether it may show now (the setting, and whether the frame is shown). */
     var allowed: () -> Boolean = { true }
@@ -90,6 +103,24 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
 
     /** The day whose part of a page is nearest the middle of the screen, written in the middle of the screen. */
     private fun drawCentered(canvas: Canvas, map: ProgressMap, range: IntArray) {
+        val label = dayAtCenter(map, range)?.let { map.day(it)?.label } ?: return
+        val cx = pdfView.width / 2f
+        val cy = pdfView.height / 2f
+        paint.textSize = 1f
+        val w = paint.measureText(label).coerceAtLeast(1f)
+        paint.textSize = minOf(pdfView.width * 0.62f / w, pdfView.height * 0.12f, MAX_TEXT_PX)
+        paint.alpha = (255 * OPACITY * strength).toInt()
+        canvas.drawText(label, cx, cy - (paint.descent() + paint.ascent()) / 2, paint)
+    }
+
+    /** The day of what is in the middle of the screen (a split page: the half there), or null. */
+    fun dayAtCenter(): String? {
+        val map = map ?: return null
+        val range = pdfView.visiblePageRange ?: return null
+        return dayAtCenter(map, range)
+    }
+
+    private fun dayAtCenter(map: ProgressMap, range: IntArray): String? {
         val cx = pdfView.width / 2f
         val cy = pdfView.height / 2f
         var best: String? = null
@@ -106,12 +137,7 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
                 if (distance < bestDistance) { bestDistance = distance; best = dayId }
             }
         }
-        val label = best?.let { map.day(it)?.label } ?: return
-        paint.textSize = 1f
-        val w = paint.measureText(label).coerceAtLeast(1f)
-        paint.textSize = minOf(pdfView.width * 0.62f / w, pdfView.height * 0.12f, MAX_TEXT_PX)
-        paint.alpha = (255 * OPACITY * strength).toInt()
-        canvas.drawText(label, cx, cy - (paint.descent() + paint.ascent()) / 2, paint)
+        return best
     }
 
     private fun drawName(canvas: Canvas, label: String, box: RectF) {

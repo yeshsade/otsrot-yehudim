@@ -1435,15 +1435,32 @@ class LeanProbe : Instrumentation() {
             title = (reader.window.decorView.findViewWithTag<View>("bar_title") as android.widget.TextView).text.toString()
             page = (reader.window.decorView.findViewWithTag<View>("bar_page") as android.widget.TextView).text.toString()
         }
-        check(title.isNotBlank() && page.contains("25")) { "top bar: '$title' / '$page'" }
+        check(title.isNotBlank() && page.contains("25") && page.contains("יום ראשון")) { "top bar: '$title' / '$page'" }
         onMainChecked { snapshot(reader, "15-reader.png") }
+        // the day's name: shows when another day comes to the middle of the screen, not at every touch
+        val dn = reader.javaClass.getDeclaredField("dayName").apply { isAccessible = true }.get(reader)
+        fun strength(): Float { var f = 0f; onMain { f = dn.javaClass.getDeclaredField("strength").apply { isAccessible = true }.getFloat(dn) }; return f }
+        SystemClock.sleep(5000)
+        check(strength() == 0f) { "the name did not fade" }
+        tapPage(reader)
+        SystemClock.sleep(400)
+        check(strength() == 0f) { "a touch showed the name" }
+        onMainChecked { v.jumpTo(47, false) }
+        SystemClock.sleep(600)
+        check(strength() > 0f) { "a new day did not show its name" }
+        var monday = ""
+        onMain { monday = (reader.window.decorView.findViewWithTag<View>("bar_page") as android.widget.TextView).text.toString() }
+        check(monday.contains("יום שני")) { "bar after moving: '$monday'" }
+        record("The day's name shows only when a new day comes, not at a touch; the bar follows ($monday)")
+        onMainChecked { v.jumpTo(24, false) }
+        settle()
         record("The top bar shows the booklet's name and the page ($title · $page)")
         onMainChecked { reader.javaClass.getDeclaredMethod("openMenu").apply { isAccessible = true }.invoke(reader) }
         waitFor("menu", 20_000) { reader.lastMenu != null && reader.lastMenu!!.dialog.isShowing }
         settle()
         var version = ""
         onMain { version = (reader.lastMenu!!.root.findViewWithTag<View>("drawer_version") as android.widget.TextView).text.toString() }
-        check(version.contains("0.2.15")) { "version: '$version'" }
+        check(version.contains("0.2.16")) { "version: '$version'" }
         onMainChecked { snapshotView(reader.lastMenu!!.dialog.window!!.decorView, "15-drawer.png") }
         record("The drawer shows the version at the bottom ($version)")
         onMainChecked { reader.lastMenu!!.root.findViewWithTag<View>("menu_quick_mark").performClick() }

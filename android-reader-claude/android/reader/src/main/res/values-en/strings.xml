@@ -135,4 +135,5 @@
     <string name="pr_reading">Reading…</string>
     <string name="menu_version">Version %1$s</string>
     <string name="pr_page_n">Page %1$d</string>
+    <string name="reader_day_page">%1$s · Page %2$d of %3$d</string>
 </resources>

@@ -103,7 +103,7 @@ class Settings(context: Context) {
         get() = ScrubberPolicy.clampHold(prefs.getInt(SCRUB_HOLD, ScrubberPolicy.DEFAULT_HOLD_MS))
         set(v) = prefs.edit().putInt(SCRUB_HOLD, ScrubberPolicy.clampHold(v)).apply()
     /** The page handle stays on screen even while the frame is hidden (default: no, it comes and goes with the frame). */
-    /** The day's name in the middle of the screen, the same size at any zoom (owner, 2026-10-21); off: on the page, as before. */
+    /** The day's name in the middle of the screen when a new day comes (owner, 2026-10-21/25); off: not shown. */
     var dayNameCentered: Boolean
         get() = prefs.getBoolean(DAY_NAME_CENTERED, true)
         set(v) = prefs.edit().putBoolean(DAY_NAME_CENTERED, v).apply()
