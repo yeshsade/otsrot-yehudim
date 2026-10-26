@@ -1461,7 +1461,7 @@ class LeanProbe : Instrumentation() {
         settle()
         var version = ""
         onMain { version = (reader.lastMenu!!.root.findViewWithTag<View>("drawer_version") as android.widget.TextView).text.toString() }
-        check(version.contains("0.2.16")) { "version: '$version'" }
+        check(version.contains("0.2.17")) { "version: '$version'" }
         onMainChecked { snapshotView(reader.lastMenu!!.dialog.window!!.decorView, "15-drawer.png") }
         record("The drawer shows the version at the bottom ($version)")
         onMainChecked { reader.lastMenu!!.root.findViewWithTag<View>("menu_quick_mark").performClick() }
@@ -1503,7 +1503,10 @@ class LeanProbe : Instrumentation() {
         check(folds == 7 && boxes == 4) { "week folds=$folds boxes=$boxes" }
         onMainChecked { snapshotView(decor, "15-week-nach.png") }
         record("In כל השבוע each day is a bar; only the opening day is open ($boxes boxes shown)")
-        onMainChecked { (decor.findViewWithTag<View>("progress_topic_nach") as android.view.ViewGroup).findViewWithTag<View>("progress_fold_monday").performClick() }
+        // a day that is not the one the screen opened on (that one is open already)
+        var closed = "tuesday"
+        onMain { if (field<Any?>(reader.lastProgress!!, "firstDay") == "tuesday") closed = "wednesday" }
+        onMainChecked { (decor.findViewWithTag<View>("progress_topic_nach") as android.view.ViewGroup).findViewWithTag<View>("progress_fold_$closed").performClick() }
         settle()
         onMain {
             val card = decor.findViewWithTag<View>("progress_topic_nach")
@@ -1516,7 +1519,7 @@ class LeanProbe : Instrumentation() {
             dump = if (card == null) "no card" else (0 until card.childCount).joinToString(",") { card.getChildAt(it).tag?.toString() ?: card.getChildAt(it).javaClass.simpleName } +
                 " attached=${card.isAttachedToWindow} day=${field<Any?>(reader.lastProgress!!, "day")}"
         }
-        check(boxes == 8) { "after opening monday: $boxes [$dump]" }
+        check(boxes == 8) { "after opening $closed: $boxes [$dump]" }
         scrollTo("progress_topic_nach")
         settle()
         onMainChecked { snapshotView(decor, "15-week-nach-open.png") }
