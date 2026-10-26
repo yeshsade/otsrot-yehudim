@@ -329,6 +329,21 @@ class PdfFile {
         for (Size size : originalPageSizes) {
             pageSizes.add(calculator.calculate(size));
         }
+        if (effectiveFitEachPage) {
+            // Each page is fitted on its own, so the widest page on the screen is not always the widest page of the
+            // file fitted by the calculator's ratios: with a landscape screen and both upright and lying pages the
+            // calculator's "widest" came out much narrower than the lying pages really are. The limits of moving
+            // and of what is drawn sharp come from these two sizes, so a zoomed lying page could not be moved to its
+            // edges and its edge stayed blurred (owner, 2026-10-26). Take them from the pages themselves.
+            SizeF widest = new SizeF(0, 0);
+            SizeF tallest = new SizeF(0, 0);
+            for (SizeF size : pageSizes) {
+                if (size.getWidth() > widest.getWidth()) widest = size;
+                if (size.getHeight() > tallest.getHeight()) tallest = size;
+            }
+            if (widest.getWidth() > 0) maxWidthPageSize = widest;
+            if (tallest.getHeight() > 0) maxHeightPageSize = tallest;
+        }
         if (autoSpacing) {
             prepareAutoSpacing(viewSize);
         }

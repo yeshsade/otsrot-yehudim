@@ -40,7 +40,7 @@ class LeanProbe : Instrumentation() {
 
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
-        mode = arguments?.getString("mode"); fileArg = arguments?.getString("file"); start()
+        mode = arguments?.getString("mode"); fileArg = arguments?.getString("file"); extraArgs = arguments; start()
     }
 
     override fun onStart() {
@@ -60,6 +60,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "pending") { cutOffSave(); return }
         if (mode == "stage2") { stageTwo(); return }
         if (mode == "s843") { vayera843(); return }
+        if (mode == "edges") { edges(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -1525,6 +1526,92 @@ class LeanProbe : Instrumentation() {
         record("The day's name shows in the middle of the screen when zoomed in")
         waitFor("pictures written", 120_000) { pendingPngs.get() == 0 }
     }
+
+    /** Owner, 2026-10-26: lying down the edges blur and stay so; zoomed in, the page's edges can't be reached. */
+    private fun edges() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            app.settings.whatsAppPromptDismissed = true; app.settings.bookmarkHintNever = true
+            app.settings.language = "he"
+            app.settings.pages = arguments("pages") ?: app.settings.pages
+            app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP
+            val land = arguments("orient") == "land"
+            if (land) app.settings.lockedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            val reader = openDoc()
+            waitLoaded(reader)
+            val v = pdfView(reader)
+            fun settle(ms: Long = 3000) { SystemClock.sleep(ms); waitForIdleSync() }
+            onMainChecked { v.jumpTo(if (land) 55 else 24, false) }
+            settle(if (land) 8000 else 3000)
+            fun drag(dx: Float, dy: Float) {
+                val cx = v.width / 2f; val cy = v.height / 2f
+                val at = IntArray(2); onMain { v.getLocationOnScreen(at) }
+                val x0 = at[0] + cx - dx / 2; val y0 = at[1] + cy - dy / 2
+                touch(reader, MotionEvent.ACTION_DOWN, x0, y0)
+                for (i in 1..12) { touch(reader, MotionEvent.ACTION_MOVE, x0 + dx * i / 12, y0 + dy * i / 12); SystemClock.sleep(16) }
+                touch(reader, MotionEvent.ACTION_UP, x0 + dx, y0 + dy)
+                SystemClock.sleep(400)
+            }
+            fun state(name: String): String {
+                var t = ""
+                onMain {
+                    val page = v.currentPage
+                    val size = v.getPageSize(page)
+                    t = "$name: view=${v.width}x${v.height} zoom=${"%.2f".format(v.zoom)} x=${"%.0f".format(v.currentXOffset)} y=${"%.0f".format(v.currentYOffset)} " +
+                        "pageW=${"%.0f".format(v.toCurrentScale(size.width))} minX=${"%.0f".format(v.width - v.toCurrentScale(size.width))} page=$page"
+                }
+                android.util.Log.i("ProbeEdges", t); return t
+            }
+            fun edgesNow(tag: String, zoom: Float = 3f): String {
+                onMainChecked { v.zoomCenteredTo(zoom, android.graphics.PointF(v.width / 2f, v.height / 2f)); v.loadPages() }
+                settle(15000)
+                onMainChecked { snapshot(reader, "edge-$tag-zoomed.png") }
+                repeat(10) { drag(-v.width * .6f, 0f) }
+                settle(20000)
+                val right = state("$tag far side (dragged left)")
+                onMainChecked { snapshot(reader, "edge-$tag-a.png") }
+                repeat(10) { drag(v.width * .6f, 0f) }
+                settle(20000)
+                val left = state("$tag near side (dragged right)")
+                onMainChecked { snapshot(reader, "edge-$tag-b.png") }
+                onMainChecked { v.resetZoomWithAnimation() }
+                settle()
+                return "$right | $left"
+            }
+            if (land) {
+                record(state("landscape opened"))
+                onMainChecked { snapshot(reader, "land-open.png") }
+                record(edgesNow("land15", 1.5f))
+                waitFor("pictures written", 120_000) { pendingPngs.get() == 0 }
+                onMainChecked { reader.finish() }
+                result.putString("stream", "Passed $passed checks.\n")
+                finish(Activity.RESULT_OK, result)
+                return
+            }
+            record(edgesNow("portrait"))
+            onMainChecked { reader.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
+            settle(8000)
+            onMainChecked { snapshot(reader, "land-1.png") }
+            settle(15000)
+            onMainChecked { snapshot(reader, "land-2.png") }
+            record(state("landscape"))
+            record(edgesNow("land"))
+            onMainChecked { reader.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+            settle(8000)
+            onMainChecked { snapshot(reader, "back-portrait.png") }
+            waitFor("pictures written", 120_000) { pendingPngs.get() == 0 }
+            onMainChecked { reader.finish() }
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    private fun arguments(key: String): String? = extraArgs?.getString(key)
+    private var extraArgs: Bundle? = null
 
     /** The booklet's own buttons ("העמוד הבא"…): they open the right page, with its top in view. */
     private fun bookletButtons(reader: ReaderActivity) {
