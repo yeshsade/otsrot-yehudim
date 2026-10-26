@@ -1,0 +1,433 @@
+{
+  "passed": true,
+  "all_previous_week_pages_without_widgets_or_progress": true,
+  "all_three_cross_edition_signatures_equal": true,
+  "editions": {
+    "843-days": {
+      "passed": true,
+      "pages": 175,
+      "logical_checks": 848,
+      "physical_widgets": 849,
+      "prior_pages": [
+        {
+          "topic": "likutey_moharan",
+          "prior_source": 105,
+          "prior_final": 171,
+          "current_final": 34,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "gemara",
+          "prior_source": 157,
+          "prior_final": 172,
+          "current_final": 22,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "mishnah_berurah",
+          "prior_source": 158,
+          "prior_final": 173,
+          "current_final": 29,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "likutey_halakhot",
+          "prior_source": 159,
+          "prior_final": 174,
+          "current_final": 35,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        }
+      ],
+      "no_prior_checks_in_map": true,
+      "all_internal_links_land_at_top": 320,
+      "external_links": 3,
+      "tehillim_regions": 37,
+      "tehillim_boxes": 96,
+      "shared_gemara": [
+        {
+          "field": "vcheck_gemara_843_monday_adda8f4e9b64a2e9",
+          "pages": [
+            44,
+            46
+          ],
+          "saved_states": [
+            "Yes",
+            "Yes"
+          ]
+        }
+      ],
+      "topic_counts": {
+        "gemara": 14,
+        "nach": 28,
+        "mishnah": 48,
+        "shulchan_aruch": 84,
+        "mishnah_berurah": 7,
+        "zohar": 109,
+        "tehillim": 96,
+        "likutey_moharan": 42,
+        "likutey_halakhot": 84,
+        "sifrei_rabeinu": 168,
+        "sefer_hamidot": 42,
+        "shemot_tzadikim": 42,
+        "likutey_tefilot": 84
+      },
+      "sha256": "531185cf5c6cc2e58406f4375b2664cdd4f5abc119622eeb2b6bc4db1c820b5c"
+    },
+    "843-topics": {
+      "passed": true,
+      "pages": 162,
+      "logical_checks": 848,
+      "physical_widgets": 849,
+      "prior_pages": [
+        {
+          "topic": "likutey_moharan",
+          "prior_source": 105,
+          "prior_final": 107,
+          "current_final": 108,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "gemara",
+          "prior_source": 157,
+          "prior_final": 159,
+          "current_final": 5,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "mishnah_berurah",
+          "prior_source": 158,
+          "prior_final": 160,
+          "current_final": 78,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "likutey_halakhot",
+          "prior_source": 159,
+          "prior_final": 161,
+          "current_final": 115,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        }
+      ],
+      "no_prior_checks_in_map": true,
+      "all_internal_links_land_at_top": 182,
+      "external_links": 3,
+      "tehillim_regions": 37,
+      "tehillim_boxes": 96,
+      "shared_gemara": [
+        {
+          "field": "vcheck_gemara_843_monday_adda8f4e9b64a2e9",
+          "pages": [
+            10,
+            12
+          ],
+          "saved_states": [
+            "Yes",
+            "Yes"
+          ]
+        }
+      ],
+      "topic_counts": {
+        "gemara": 14,
+        "nach": 28,
+        "mishnah": 48,
+        "shulchan_aruch": 84,
+        "mishnah_berurah": 7,
+        "zohar": 109,
+        "tehillim": 96,
+        "likutey_moharan": 42,
+        "likutey_halakhot": 84,
+        "sifrei_rabeinu": 168,
+        "sefer_hamidot": 42,
+        "shemot_tzadikim": 42,
+        "likutey_tefilot": 84
+      },
+      "sha256": "6cd33ab9fbc3bfe02fc4d65b1a9e03c5d13e494284f80fa0861f379e158948f3"
+    },
+    "844-days": {
+      "passed": true,
+      "pages": 168,
+      "logical_checks": 842,
+      "physical_widgets": 843,
+      "prior_pages": [
+        {
+          "topic": "likutey_moharan",
+          "prior_source": 98,
+          "prior_final": 164,
+          "current_final": 27,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "likutey_halakhot",
+          "prior_source": 106,
+          "prior_final": 165,
+          "current_final": 28,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "gemara",
+          "prior_source": 151,
+          "prior_final": 166,
+          "current_final": 15,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "mishnah_berurah",
+          "prior_source": 152,
+          "prior_final": 167,
+          "current_final": 22,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        }
+      ],
+      "no_prior_checks_in_map": true,
+      "all_internal_links_land_at_top": 313,
+      "external_links": 3,
+      "tehillim_regions": 36,
+      "tehillim_boxes": 93,
+      "shared_gemara": [
+        {
+          "field": "vcheck_gemara_844_monday_d67e620e78b45d77",
+          "pages": [
+            37,
+            39
+          ],
+          "saved_states": [
+            "Yes",
+            "Yes"
+          ]
+        }
+      ],
+      "topic_counts": {
+        "gemara": 14,
+        "nach": 28,
+        "mishnah": 50,
+        "shulchan_aruch": 79,
+        "mishnah_berurah": 7,
+        "zohar": 109,
+        "tehillim": 93,
+        "likutey_moharan": 42,
+        "likutey_halakhot": 84,
+        "sifrei_rabeinu": 168,
+        "sefer_hamidot": 42,
+        "shemot_tzadikim": 42,
+        "likutey_tefilot": 84
+      },
+      "sha256": "f387740c28c0d053b07382e064303bbff9ba1ef240d0178522a966dae51030b9"
+    },
+    "844-topics": {
+      "passed": true,
+      "pages": 155,
+      "logical_checks": 842,
+      "physical_widgets": 843,
+      "prior_pages": [
+        {
+          "topic": "likutey_moharan",
+          "prior_source": 98,
+          "prior_final": 100,
+          "current_final": 101,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "likutey_halakhot",
+          "prior_source": 106,
+          "prior_final": 108,
+          "current_final": 109,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "gemara",
+          "prior_source": 151,
+          "prior_final": 153,
+          "current_final": 5,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "mishnah_berurah",
+          "prior_source": 152,
+          "prior_final": 154,
+          "current_final": 71,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        }
+      ],
+      "no_prior_checks_in_map": true,
+      "all_internal_links_land_at_top": 175,
+      "external_links": 3,
+      "tehillim_regions": 36,
+      "tehillim_boxes": 93,
+      "shared_gemara": [
+        {
+          "field": "vcheck_gemara_844_monday_d67e620e78b45d77",
+          "pages": [
+            10,
+            12
+          ],
+          "saved_states": [
+            "Yes",
+            "Yes"
+          ]
+        }
+      ],
+      "topic_counts": {
+        "gemara": 14,
+        "nach": 28,
+        "mishnah": 50,
+        "shulchan_aruch": 79,
+        "mishnah_berurah": 7,
+        "zohar": 109,
+        "tehillim": 93,
+        "likutey_moharan": 42,
+        "likutey_halakhot": 84,
+        "sifrei_rabeinu": 168,
+        "sefer_hamidot": 42,
+        "shemot_tzadikim": 42,
+        "likutey_tefilot": 84
+      },
+      "sha256": "bd1f3a4feb36e83521ea190eda801c1b0ac590ed51fe63fd6186c8aef07739b7"
+    },
+    "845-days": {
+      "passed": true,
+      "pages": 166,
+      "logical_checks": 833,
+      "physical_widgets": 833,
+      "prior_pages": [
+        {
+          "topic": "mishnah_berurah",
+          "prior_source": 67,
+          "prior_final": 162,
+          "current_final": 22,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "likutey_moharan",
+          "prior_source": 99,
+          "prior_final": 163,
+          "current_final": 27,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "gemara",
+          "prior_source": 151,
+          "prior_final": 164,
+          "current_final": 15,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "likutey_halakhot",
+          "prior_source": 152,
+          "prior_final": 165,
+          "current_final": 28,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        }
+      ],
+      "no_prior_checks_in_map": true,
+      "all_internal_links_land_at_top": 311,
+      "external_links": 3,
+      "tehillim_regions": 38,
+      "tehillim_boxes": 103,
+      "shared_gemara": [],
+      "topic_counts": {
+        "gemara": 14,
+        "nach": 28,
+        "mishnah": 36,
+        "shulchan_aruch": 79,
+        "mishnah_berurah": 7,
+        "zohar": 110,
+        "tehillim": 103,
+        "likutey_moharan": 42,
+        "likutey_halakhot": 84,
+        "sifrei_rabeinu": 166,
+        "sefer_hamidot": 38,
+        "shemot_tzadikim": 42,
+        "likutey_tefilot": 84
+      },
+      "sha256": "71965aabe7284643736d5b30f1bffda333abd7636ffc3b38c56001a184b4edf7"
+    },
+    "845-topics": {
+      "passed": true,
+      "pages": 155,
+      "logical_checks": 833,
+      "physical_widgets": 833,
+      "prior_pages": [
+        {
+          "topic": "mishnah_berurah",
+          "prior_source": 67,
+          "prior_final": 69,
+          "current_final": 70,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "likutey_moharan",
+          "prior_source": 99,
+          "prior_final": 101,
+          "current_final": 102,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "gemara",
+          "prior_source": 151,
+          "prior_final": 153,
+          "current_final": 5,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        },
+        {
+          "topic": "likutey_halakhot",
+          "prior_source": 152,
+          "prior_final": 154,
+          "current_final": 109,
+          "checkboxes": 0,
+          "reciprocal_links": true
+        }
+      ],
+      "no_prior_checks_in_map": true,
+      "all_internal_links_land_at_top": 175,
+      "external_links": 3,
+      "tehillim_regions": 38,
+      "tehillim_boxes": 103,
+      "shared_gemara": [],
+      "topic_counts": {
+        "gemara": 14,
+        "nach": 28,
+        "mishnah": 36,
+        "shulchan_aruch": 79,
+        "mishnah_berurah": 7,
+        "zohar": 110,
+        "tehillim": 103,
+        "likutey_moharan": 42,
+        "likutey_halakhot": 84,
+        "sifrei_rabeinu": 166,
+        "sefer_hamidot": 38,
+        "shemot_tzadikim": 42,
+        "likutey_tefilot": 84
+      },
+      "sha256": "05b4b2bda120974c45a09122ed225b9e5b3e5b0d197b8520118e7ce15f959751"
+    }
+  },
+  "vayera_current_week_placements_unchanged": true,
+  "checker": {
+    "branch": "claude/android-reader",
+    "commit": "d5d0b463f40e311153aec819004845ff73113c29",
+    "sha256": "8b88335f57631fb69f91ab708035abe7622d4b47c1eba7dbd85ce33759b68001"
+  }
+}

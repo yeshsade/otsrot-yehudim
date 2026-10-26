@@ -1,0 +1,43 @@
+{
+  "source_sha256": "fc5b83b8fa5e8560283df405330300cab38e1748f5e529b42d4e0c3e6952045d",
+  "cover_sha256": "2df86d89f6f304c2fc5e97d0f86b38aa1189494790f06ffa52c67a6632f0b494",
+  "booklet": {
+    "issue": "844",
+    "parsha": "חיי שרה",
+    "week_start": "2026-11-01",
+    "date_label": "כ״א חשון – כ״ז חשון תשפ״ז"
+  },
+  "previous_week": {
+    "mishnah_berurah": 152,
+    "likutey_moharan": 98,
+    "likutey_halakhot": 106,
+    "gemara": 151
+  },
+  "tehillim": {
+    "boundaries_reviewed": true,
+    "exclude_after_psalms": [],
+    "review_provenance": "Visual review of source90–97 and all seven black weekly tabs. Current Psalms104–134; source90 gray prior text and source97 gray Psalm135 onward excluded. Psalm134 ends in the first black lines of source97 column3. No Psalm150 or post-Psalm150 prayers in this weekly source."
+  },
+  "owner_answers_provenance": {
+    "mishnah_berurah": {
+      "source_page": 152,
+      "confirmed_by_owner": true,
+      "date": "2026-10-23"
+    },
+    "likutey_moharan": {
+      "source_page": 98,
+      "confirmed_by_owner": true,
+      "date": "2026-10-23"
+    },
+    "likutey_halakhot": {
+      "source_page": 106,
+      "confirmed_by_owner": true,
+      "date": "2026-10-23"
+    },
+    "gemara": {
+      "source_page": 151,
+      "confirmed_by_owner": true,
+      "date": "2026-10-23"
+    }
+  }
+}

@@ -1,0 +1,340 @@
+{
+  "passed": true,
+  "method": "Original raw glyph bounds compared with measured regions, using visually reviewed weekly tabs and explicit gray rectangles. No production font selector or region measurement used to calculate expected bounds.",
+  "psalms": "104–134",
+  "regions": [
+    {
+      "day_id": "sunday",
+      "source_page": 90,
+      "column": 2,
+      "y0": 115.28225708007812,
+      "y1": 440.1135559082031,
+      "full_height": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "sunday",
+      "source_page": 90,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 440.1135559082031,
+      "full_height": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "sunday",
+      "source_page": 90,
+      "column": 4,
+      "y0": 45.158294677734375,
+      "y1": 440.1169128417969,
+      "full_height": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "sunday",
+      "source_page": 91,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 383.5889587402344,
+      "full_height": 394.9620056152344,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "monday",
+      "source_page": 91,
+      "column": 1,
+      "y0": 400.4904479980469,
+      "y1": 440.11676025390625,
+      "full_height": 394.9620056152344,
+      "expected_boxes": 1
+    },
+    {
+      "day_id": "monday",
+      "source_page": 91,
+      "column": 2,
+      "y0": 45.158294677734375,
+      "y1": 440.12030029296875,
+      "full_height": 394.9620056152344,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "monday",
+      "source_page": 91,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 440.1135559082031,
+      "full_height": 394.9620056152344,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "monday",
+      "source_page": 91,
+      "column": 4,
+      "y0": 45.158294677734375,
+      "y1": 440.1136474609375,
+      "full_height": 394.9620056152344,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "monday",
+      "source_page": 92,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 440.1169128417969,
+      "full_height": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "monday",
+      "source_page": 92,
+      "column": 2,
+      "y0": 45.159271240234375,
+      "y1": 98.09521484375,
+      "full_height": 394.9586181640625,
+      "expected_boxes": 1
+    },
+    {
+      "day_id": "tuesday",
+      "source_page": 92,
+      "column": 2,
+      "y0": 114.9251708984375,
+      "y1": 440.1135559082031,
+      "full_height": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "tuesday",
+      "source_page": 92,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 440.1169128417969,
+      "full_height": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "tuesday",
+      "source_page": 92,
+      "column": 4,
+      "y0": 45.158294677734375,
+      "y1": 440.1162109375,
+      "full_height": 394.9586181640625,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "tuesday",
+      "source_page": 93,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 343.375,
+      "full_height": 394.9610290527344,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "wednesday",
+      "source_page": 93,
+      "column": 1,
+      "y0": 360.2023620605469,
+      "y1": 440.1162109375,
+      "full_height": 394.9610290527344,
+      "expected_boxes": 1
+    },
+    {
+      "day_id": "wednesday",
+      "source_page": 93,
+      "column": 2,
+      "y0": 45.158294677734375,
+      "y1": 440.1162109375,
+      "full_height": 394.9610290527344,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "wednesday",
+      "source_page": 93,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 440.11639404296875,
+      "full_height": 394.9610290527344,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "wednesday",
+      "source_page": 93,
+      "column": 4,
+      "y0": 45.159271240234375,
+      "y1": 440.11932373046875,
+      "full_height": 394.9610290527344,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "wednesday",
+      "source_page": 94,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 273.4872131347656,
+      "full_height": 394.95526123046875,
+      "expected_boxes": 2
+    },
+    {
+      "day_id": "thursday",
+      "source_page": 94,
+      "column": 1,
+      "y0": 290.31695556640625,
+      "y1": 440.1135559082031,
+      "full_height": 394.95526123046875,
+      "expected_boxes": 2
+    },
+    {
+      "day_id": "thursday",
+      "source_page": 94,
+      "column": 2,
+      "y0": 45.158294677734375,
+      "y1": 440.1135559082031,
+      "full_height": 394.95526123046875,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "thursday",
+      "source_page": 94,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 436.2125244140625,
+      "full_height": 394.95526123046875,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "thursday",
+      "source_page": 94,
+      "column": 4,
+      "y0": 45.159271240234375,
+      "y1": 436.2158203125,
+      "full_height": 394.95526123046875,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "thursday",
+      "source_page": 95,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 397.51849365234375,
+      "full_height": 394.9582824707031,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "friday",
+      "source_page": 95,
+      "column": 1,
+      "y0": 414.25384521484375,
+      "y1": 440.1165771484375,
+      "full_height": 394.9582824707031,
+      "expected_boxes": 1
+    },
+    {
+      "day_id": "friday",
+      "source_page": 95,
+      "column": 2,
+      "y0": 45.158294677734375,
+      "y1": 440.1162109375,
+      "full_height": 394.9582824707031,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "friday",
+      "source_page": 95,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 436.2124328613281,
+      "full_height": 394.9582824707031,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "friday",
+      "source_page": 95,
+      "column": 4,
+      "y0": 45.159271240234375,
+      "y1": 436.20843505859375,
+      "full_height": 394.9582824707031,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "friday",
+      "source_page": 96,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 281.5392761230469,
+      "full_height": 394.9642639160156,
+      "expected_boxes": 2
+    },
+    {
+      "day_id": "saturday",
+      "source_page": 96,
+      "column": 1,
+      "y0": 315.4614562988281,
+      "y1": 438.6644287109375,
+      "full_height": 394.9642639160156,
+      "expected_boxes": 1
+    },
+    {
+      "day_id": "saturday",
+      "source_page": 96,
+      "column": 2,
+      "y0": 45.159271240234375,
+      "y1": 438.6698913574219,
+      "full_height": 394.9642639160156,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "saturday",
+      "source_page": 96,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 440.12255859375,
+      "full_height": 394.9642639160156,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "saturday",
+      "source_page": 96,
+      "column": 4,
+      "y0": 45.158294677734375,
+      "y1": 440.1135559082031,
+      "full_height": 394.9642639160156,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "saturday",
+      "source_page": 97,
+      "column": 1,
+      "y0": 45.159271240234375,
+      "y1": 440.1165771484375,
+      "full_height": 394.9613037109375,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "saturday",
+      "source_page": 97,
+      "column": 2,
+      "y0": 45.159271240234375,
+      "y1": 440.1162109375,
+      "full_height": 394.9613037109375,
+      "expected_boxes": 3
+    },
+    {
+      "day_id": "saturday",
+      "source_page": 97,
+      "column": 3,
+      "y0": 45.159271240234375,
+      "y1": 84.78506469726562,
+      "full_height": 394.9613037109375,
+      "expected_boxes": 1
+    }
+  ],
+  "counts_by_day": {
+    "sunday": 12,
+    "monday": 14,
+    "tuesday": 12,
+    "wednesday": 12,
+    "thursday": 14,
+    "friday": 12,
+    "saturday": 17
+  }
+}
