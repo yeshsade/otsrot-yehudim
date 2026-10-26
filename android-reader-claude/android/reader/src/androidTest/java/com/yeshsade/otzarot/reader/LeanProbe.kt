@@ -1510,7 +1510,13 @@ class LeanProbe : Instrumentation() {
             fun count(g: View): Int = if (g.tag == "progress_box") 1 else if (g is android.view.ViewGroup) (0 until g.childCount).sumOf { count(g.getChildAt(it)) } else 0
             boxes = count(card)
         }
-        check(boxes == 8) { "after opening monday: $boxes" }
+        var dump = ""
+        onMain {
+            val card = decor.findViewWithTag<View>("progress_topic_nach") as? android.view.ViewGroup
+            dump = if (card == null) "no card" else (0 until card.childCount).joinToString(",") { card.getChildAt(it).tag?.toString() ?: card.getChildAt(it).javaClass.simpleName } +
+                " attached=${card.isAttachedToWindow} day=${field<Any?>(reader.lastProgress!!, "day")}"
+        }
+        check(boxes == 8) { "after opening monday: $boxes [$dump]" }
         scrollTo("progress_topic_nach")
         settle()
         onMainChecked { snapshotView(decor, "15-week-nach-open.png") }
@@ -1571,6 +1577,8 @@ class LeanProbe : Instrumentation() {
                 settle(20000)
                 val right = state("$tag far side (dragged left)")
                 onMainChecked { snapshot(reader, "edge-$tag-a.png") }
+                settle(60000)
+                onMainChecked { snapshot(reader, "edge-$tag-a60.png") }
                 repeat(10) { drag(v.width * .6f, 0f) }
                 settle(20000)
                 val left = state("$tag near side (dragged right)")
