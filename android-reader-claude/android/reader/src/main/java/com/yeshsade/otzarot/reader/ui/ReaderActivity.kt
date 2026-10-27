@@ -808,8 +808,10 @@ class ReaderActivity : AppCompatActivity() {
      * another day, a bubble offers to go there, for half a minute; after going, it turns into "ביטול" for ten
      * seconds (owner, 2026-10-27).
      */
-    private fun offerToday(m: com.yeshsade.otzarot.reader.data.ProgressMap) {
-        if (offered || pageCount == 0) return
+    private fun offerToday(m: com.yeshsade.otzarot.reader.data.ProgressMap, tries: Int = 0) {
+        if (offered) return
+        // the pages may still be opening: try again shortly
+        if (pageCount == 0) { if (tries < 40 && !isDestroyed) main.postDelayed({ offerToday(m, tries + 1) }, 250); return }
         offered = true
         val (y, mo, d) = com.yeshsade.otzarot.reader.data.OpenDay.today()
         val start = m.booklet.weekStart
@@ -819,6 +821,7 @@ class ReaderActivity : AppCompatActivity() {
             if (diff !in 0..6) return
         }
         val today = com.yeshsade.otzarot.reader.data.OpenDay.choose(m.days.map { it.id }, start, y, mo, d, false) ?: return
+        android.util.Log.i("ReaderOffer", "today=$today here=${dayName.currentDay(pdfView.currentPage)} page=${pdfView.currentPage}")
         if (today == dayName.currentDay(pdfView.currentPage)) return
         val label = m.day(today)?.label ?: return
         val first = m.pages.filter { it.dayId == today && it.weekOffset == 0 }.minOfOrNull { it.page }
