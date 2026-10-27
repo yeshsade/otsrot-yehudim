@@ -1384,14 +1384,12 @@ class LeanProbe : Instrumentation() {
             app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP
             val reader = openDoc()
             waitLoaded(reader)
-            waitFor("map read", 900_000) { field<Any?>(reader, "map") != null }
-            val map = field<com.yeshsade.otzarot.reader.data.ProgressMap>(reader, "map")
-            app.settings.studyTopics = map.topics.map { it.id }.toSet()
-            record("843's map is read and verified (${map.checks.size} boxes)")
+            waitFor("map parsed", 300_000) { field<Any?>(reader, "parsedMap") != null }
+            val pm = field<com.yeshsade.otzarot.reader.data.ProgressMap>(reader, "parsedMap")
             // opening: today (by the phone's date, inside the booklet's week) is offered in a bubble
             val (ty, tm, td) = com.yeshsade.otzarot.reader.data.OpenDay.today()
-            val today = com.yeshsade.otzarot.reader.data.OpenDay.choose(map.days.map { it.id }, map.booklet.weekStart, ty, tm, td, false)
-            val inWeek = map.booklet.weekStart?.split("-")?.map { it.toInt() }?.let { (y, m, d) ->
+            val today = com.yeshsade.otzarot.reader.data.OpenDay.choose(pm.days.map { it.id }, pm.booklet.weekStart, ty, tm, td, false)
+            val inWeek = pm.booklet.weekStart?.split("-")?.map { it.toInt() }?.let { (y, m, d) ->
                 com.yeshsade.otzarot.reader.data.OpenDay.epochDay(ty, tm, td) - com.yeshsade.otzarot.reader.data.OpenDay.epochDay(y, m, d) in 0..6 } ?: true
             if (inWeek && today != null) {
                 fun hasTag(t: String): Boolean { var ok = false; onMain { ok = reader.window.decorView.findViewWithTag<View>(t) != null }; return ok }
@@ -1402,7 +1400,7 @@ class LeanProbe : Instrumentation() {
                 onMainChecked { (reader.window.decorView.findViewWithTag<View>("offer_go") as android.view.ViewGroup).getChildAt(1).performClick() }
                 SystemClock.sleep(1500); waitForIdleSync()
                 var at = 0; onMain { at = pdfView(reader).currentPage }
-                val first = map.pages.filter { it.dayId == today && it.weekOffset == 0 }.minOf { it.page }
+                val first = pm.pages.filter { it.dayId == today && it.weekOffset == 0 }.minOf { it.page }
                 check(at == first) { "went to page ${at + 1}, not ${first + 1}" }
                 check(hasTag("offer_undo")) { "no undo after going" }
                 onMainChecked { snapshot(reader, "18-offer-undo.png") }
@@ -1412,6 +1410,11 @@ class LeanProbe : Instrumentation() {
                 check(at == before) { "undo went to page ${at + 1}, not ${before + 1}" }
                 record("On opening, a bubble offers today ($today): it goes to its first page, and \"ביטול\" comes back")
             }
+            waitFor("map read", 900_000) { field<Any?>(reader, "map") != null }
+            val map = field<com.yeshsade.otzarot.reader.data.ProgressMap>(reader, "map")
+            app.settings.studyTopics = map.topics.map { it.id }.toSet()
+            record("843's map is read and verified (${map.checks.size} boxes)")
+
             // the screen, opened with the topics already chosen
             onMainChecked { reader.javaClass.getDeclaredMethod("openMenu").apply { isAccessible = true }.invoke(reader) }
             waitFor("menu", 20_000) { reader.lastMenu != null }
