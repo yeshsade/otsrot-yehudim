@@ -228,6 +228,7 @@ class ReaderActivity : AppCompatActivity() {
         if (!hides) root.addView(header)
 
         val body = FrameLayout(this)
+        frame = body
         pdfView = PDFView(this, null).apply {
             setBackgroundColor(ui.colors.canvas)
             // two-finger zoom reaches 20 times the whole page, like Xodo (measured from the owner's screenshots,
@@ -242,7 +243,12 @@ class ReaderActivity : AppCompatActivity() {
             marked()
         }
         // always in the middle of the screen; the setting turns it off (owner, 2026-10-25: "במרכז")
-        dayName = DayName(pdfView, Fonts.heading(this), ui.night).apply { allowed = { settings.dayNameCentered } }
+        dayName = DayName(pdfView, Fonts.heading(this), ui.night).apply {
+            allowed = { settings.dayNamePlace != "off" }
+            place = { settings.dayNamePlace }
+            topInset = { statusInset + ui.dp(30) }
+            bottomInset = { navInset + runCatching { toolbar.height }.getOrDefault(0) + ui.dp(28) }
+        }
         pdfView.setOverlayDrawer { canvas -> bookmarks.draw(canvas); dayName.draw(canvas) }
         body.addView(Bookmarks.TouchLayer(this, bookmarks), FrameLayout.LayoutParams(-1, -1))
 
@@ -314,6 +320,8 @@ class ReaderActivity : AppCompatActivity() {
     /** Touching the top bar, the toolbar or the handle keeps the frame up for its full time again. */
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (event.actionMasked == MotionEvent.ACTION_DOWN && ::pageTurn.isInitialized) pageTurn.finish()
+        // the day's name at every touch, if that is what the reader chose (owner, 2026-10-27)
+        if (event.actionMasked == MotionEvent.ACTION_DOWN && ::dayName.isInitialized && app.settings.dayNameWhen == "touch") dayName.touched()
         if (event.actionMasked == MotionEvent.ACTION_DOWN && ::chrome.isInitialized) {
             edgeSwipe = false
             edgeStart = if (!chrome.shown && FramePolicy.canHide(app.settings.frameMode) && fromPhoneEdge(event))
@@ -440,6 +448,9 @@ class ReaderActivity : AppCompatActivity() {
         if (doc?.id == target.id && pageCount > 0) return
         doc = target
         barTitle.text = target.name
+        readingDay = null
+        offered = false
+        offer?.let { frame.removeView(it) }; offer = null
         bookmarks.clear()
         // undo and redo belong to the document they were made in
         undo.clear()
@@ -627,6 +638,8 @@ class ReaderActivity : AppCompatActivity() {
                     parsedMap = read
                     dayName.moved()
                     if (pageCount > 0) showPage(pdfView.currentPage)
+                    // once the place the reader stopped at is shown: offer today's day if that is elsewhere
+                    main.postDelayed({ if (!isDestroyed && doc?.id == target.id) offerToday(read) }, OFFER_DELAY_MS)
                     refreshProgressViews()
                 }
                 // the same file as last time: what is known about its boxes is used as is
@@ -767,7 +780,7 @@ class ReaderActivity : AppCompatActivity() {
         }
         val m = map ?: parsedMap ?: return
         chrome.hold()
-        lastProgress = ProgressScreen(this, ui, app.settings, m, ticked, waiting = mapState != MapState.READY) { changes ->
+        lastProgress = ProgressScreen(this, ui, app.settings, m, ticked, waiting = mapState != MapState.READY, startDay = readingDay) { changes ->
             for ((name, on) in changes) widgets[name]?.forEach { (page, annotation) -> mark(page, annotation, on) }
         }.show(tab)
         lastProgress?.shown?.setOnDismissListener { chrome.used(); pdfView.invalidate(); refreshProgressViews() }
@@ -780,9 +793,69 @@ class ReaderActivity : AppCompatActivity() {
         val chosen = app.settings.studyTopics.orEmpty()
         val p = com.yeshsade.otzarot.reader.data.Progress(m, chosen) { ticked[it] == true }
         val (y, mo, d) = com.yeshsade.otzarot.reader.data.OpenDay.today()
-        val day = com.yeshsade.otzarot.reader.data.OpenDay.choose(p.days.map { it.id }, m.booklet.weekStart, y, mo, d, ticked.values.any { it })
+        // the day of the page the reader is on; before any day was read, the phone's date (owner, 2026-10-27)
+        val day = readingDay?.takeIf { r -> p.days.any { it.id == r } }
+            ?: com.yeshsade.otzarot.reader.data.OpenDay.choose(p.days.map { it.id }, m.booklet.weekStart, y, mo, d, ticked.values.any { it })
         return (day?.let { p.day(it) } ?: p.week()).fraction
     }
+
+    private lateinit var frame: FrameLayout
+    private var offer: View? = null
+    private var offered = false
+
+    /**
+     * The booklet opens where the reader stopped. If today (by the phone's date, within the booklet's week) is
+     * another day, a bubble offers to go there, for half a minute; after going, it turns into "ביטול" for ten
+     * seconds (owner, 2026-10-27).
+     */
+    private fun offerToday(m: com.yeshsade.otzarot.reader.data.ProgressMap) {
+        if (offered || pageCount == 0) return
+        offered = true
+        val (y, mo, d) = com.yeshsade.otzarot.reader.data.OpenDay.today()
+        val start = m.booklet.weekStart
+        if (start != null) {
+            val (sy, sm, sd) = runCatching { start.split("-").map { it.toInt() } }.getOrNull()?.takeIf { it.size == 3 } ?: return
+            val diff = com.yeshsade.otzarot.reader.data.OpenDay.epochDay(y, mo, d) - com.yeshsade.otzarot.reader.data.OpenDay.epochDay(sy, sm, sd)
+            if (diff !in 0..6) return
+        }
+        val today = com.yeshsade.otzarot.reader.data.OpenDay.choose(m.days.map { it.id }, start, y, mo, d, false) ?: return
+        if (today == dayName.currentDay(pdfView.currentPage)) return
+        val label = m.day(today)?.label ?: return
+        val first = m.pages.filter { it.dayId == today && it.weekOffset == 0 }.minOfOrNull { it.page }
+            ?: m.checks.filter { it.dayId == today }.flatMap { it.pages }.minOrNull() ?: return
+        showOffer(getString(R.string.reader_go_day, label), getString(R.string.reader_go), OFFER_MS, "offer_go") {
+            val back = pdfView.positionOffset
+            pdfView.jumpTo(first, false)
+            showOffer(null, getString(R.string.reader_go_undo), UNDO_OFFER_MS, "offer_undo") { pdfView.setPositionOffset(back, true) }
+        }
+    }
+
+    /** A dark bubble above the reading bar: a line and a button, gone after [millis]. */
+    private fun showOffer(text: String?, button: String, millis: Long, tagName: String, action: () -> Unit) {
+        offer?.let { frame.removeView(it) }
+        val pill = ui.row().apply {
+            tag = tagName
+            background = ui.rounded(OFFER_BG, 24f)
+            elevation = ui.dp(8).toFloat()
+            setPadding(ui.dp(18), ui.dp(6), ui.dp(8), ui.dp(6))
+        }
+        if (text != null) pill.addView(ui.label(text, 15f, Color.WHITE).apply { setPadding(0, 0, ui.dp(10), 0) })
+        pill.addView(ui.label(button, 15f, OFFER_BUTTON, true).apply {
+            gravity = Gravity.CENTER
+            minimumHeight = ui.dp(40)
+            setPadding(ui.dp(12), 0, ui.dp(12), 0)
+            background = android.graphics.drawable.RippleDrawable(ColorStateList.valueOf(0x33FFFFFF), null, ui.rounded(Color.WHITE, 18f))
+            setOnClickListener { frame.removeView(pill); if (offer === pill) offer = null; action() }
+        })
+        frame.addView(pill, FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL).apply {
+            bottomMargin = ui.dp(14) + navInset + toolbar.height + ui.dp(14)
+        })
+        offer = pill
+        pill.postDelayed({ if (offer === pill) { frame.removeView(pill); offer = null } }, millis)
+    }
+
+    /** The day of the last page read that belongs to a day (a cover or contents page keeps the one before). */
+    private var readingDay: String? = null
 
     private fun weekFraction(): Float? {
         val m = map ?: return null
@@ -808,6 +881,7 @@ class ReaderActivity : AppCompatActivity() {
     /** "יום ראשון · עמוד 26 מתוך 175" — or only the page, on a page that is no day's (owner, 2026-10-25). */
     private fun showPage(page: Int) {
         barDay = if (::dayName.isInitialized) dayName.currentDay(page) else null
+        if (barDay != null && barDay != readingDay) { readingDay = barDay; refreshProgressViews() }
         val label = barDay?.let { parsedMap?.day(it)?.label }
         val text = if (label != null) getString(R.string.reader_day_page, label, page + 1, pageCount)
             else getString(R.string.reader_page, page + 1, pageCount)
@@ -831,6 +905,7 @@ class ReaderActivity : AppCompatActivity() {
                 if (FramePolicy.canHide(app.settings.frameMode)) chrome.hide() else chrome.used()
                 return false
             }
+            if (app.settings.dayNameWhen == "tap") dayName.touched()
             chrome.toggle(); return true
         }
         if (field.readOnly) return false
@@ -1100,6 +1175,11 @@ class ReaderActivity : AppCompatActivity() {
 
 
     companion object {
+        const val OFFER_DELAY_MS = 900L
+        const val OFFER_MS = 30_000L
+        const val UNDO_OFFER_MS = 10_000L
+        private val OFFER_BG = Color.parseColor("#2E2A3D")
+        private val OFFER_BUTTON = Color.parseColor("#C5B8FF")
         /** Two-finger zoom limit, relative to the whole page (Xodo allows about the same). */
         const val MAX_ZOOM = 20f
         const val EXTRA_DOC = "doc"

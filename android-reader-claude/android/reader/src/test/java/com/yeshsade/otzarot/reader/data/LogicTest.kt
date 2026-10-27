@@ -129,9 +129,9 @@ class LogicTest {
     @Test fun sizeBarCoversOwnersRange() {
         val pageHeight = 842f // A4
         val max = Bookmark.maxThickness(pageHeight)
-        // smallest = half the old "small"; largest = a ribbon a third of the page long
+        // smallest = half the old "small"; largest = a ribbon half the page long (owner, 2026-10-27)
         assertEquals(6.5f, Bookmark.thicknessAt(0, max), 0.01f)
-        assertEquals(pageHeight / 3, Bookmark.thicknessAt(100, max) * Bookmark.LENGTH_RATIO, 0.1f)
+        assertEquals(pageHeight / 2, Bookmark.thicknessAt(100, max) * Bookmark.LENGTH_RATIO, 0.1f)
         // the default sits on the bar, and the bar goes back and forth without drift
         val p = Bookmark.progressOf(Bookmark.DEFAULT_THICKNESS, max)
         assertTrue(p in 1..99)

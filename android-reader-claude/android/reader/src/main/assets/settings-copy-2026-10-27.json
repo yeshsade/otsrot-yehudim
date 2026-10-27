@@ -1,0 +1,20 @@
+{
+  "version": "2026-10-27",
+  "status": "approved",
+  "note": "Approved by the owner on 2026-10-27 ('כן'): where and when the day's name shows; replaces the 2026-10-21 row. No description lines. English is Claude's translation.",
+  "entries": [
+    {"id": "dayplace_label", "he": "שם היום – איפה", "en": "Day name – where"},
+    {"id": "dayplace_desc", "he": "", "en": ""},
+    {"id": "dayplace_center", "he": "באמצע המסך", "en": "Middle of the screen"},
+    {"id": "dayplace_corner", "he": "בפינה", "en": "In the corner"},
+    {"id": "dayplace_top", "he": "למעלה באמצע", "en": "Top, centred"},
+    {"id": "dayplace_bubble_top", "he": "בועה למעלה", "en": "Bubble at the top"},
+    {"id": "dayplace_bubble_bottom", "he": "בועה למטה", "en": "Bubble at the bottom"},
+    {"id": "dayplace_off", "he": "כבוי", "en": "Off"},
+    {"id": "daywhen_label", "he": "שם היום – מתי", "en": "Day name – when"},
+    {"id": "daywhen_desc", "he": "", "en": ""},
+    {"id": "daywhen_touch", "he": "בכל נגיעה", "en": "At every touch"},
+    {"id": "daywhen_tap", "he": "בהקשה ובמעבר ליום חדש", "en": "On a tap and on a new day"},
+    {"id": "daywhen_day", "he": "רק במעבר ליום חדש", "en": "Only on a new day"}
+  ]
+}

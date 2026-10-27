@@ -47,6 +47,19 @@
   <item type="id" name="otzr_language_desc" />
   <item type="id" name="otzr_language_he" />
   <item type="id" name="otzr_language_en" />
+  <item type="id" name="otzr_dayplace_label" />
+  <item type="id" name="otzr_dayplace_desc" />
+  <item type="id" name="otzr_dayplace_center" />
+  <item type="id" name="otzr_dayplace_corner" />
+  <item type="id" name="otzr_dayplace_top" />
+  <item type="id" name="otzr_dayplace_bubble_top" />
+  <item type="id" name="otzr_dayplace_bubble_bottom" />
+  <item type="id" name="otzr_dayplace_off" />
+  <item type="id" name="otzr_daywhen_label" />
+  <item type="id" name="otzr_daywhen_desc" />
+  <item type="id" name="otzr_daywhen_touch" />
+  <item type="id" name="otzr_daywhen_tap" />
+  <item type="id" name="otzr_daywhen_day" />
   <item type="id" name="otzr_dayname_label" />
   <item type="id" name="otzr_dayname_desc" />
   <item type="id" name="otzr_dayname_on" />

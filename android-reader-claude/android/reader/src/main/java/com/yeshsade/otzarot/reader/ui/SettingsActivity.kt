@@ -87,11 +87,16 @@ class SettingsActivity : AppCompatActivity() {
         val seventh = JSONObject(assets.open("settings-copy-2026-10-21.json").bufferedReader().use { it.readText() })
         require(seventh.getString("status") == "approved")
         val dayWording = seventh.getJSONArray("entries")
+        // and on 2026-10-27 (where and when the day's name shows)
+        val eighth = JSONObject(assets.open("settings-copy-2026-10-27.json").bufferedReader().use { it.readText() })
+        require(eighth.getString("status") == "approved")
+        val dayWording2 = eighth.getJSONArray("entries")
         wording = ((0 until entries.length()).map { entries.getJSONObject(it) } + (0 until extra.length()).map { extra.getJSONObject(it) } +
             (0 until more.length()).map { more.getJSONObject(it) } + (0 until latest.length()).map { latest.getJSONObject(it) } +
             (0 until newest.length()).map { newest.getJSONObject(it) } +
             (0 until turnWording.length()).map { turnWording.getJSONObject(it) } +
-            (0 until dayWording.length()).map { dayWording.getJSONObject(it) })
+            (0 until dayWording.length()).map { dayWording.getJSONObject(it) } +
+            (0 until dayWording2.length()).map { dayWording2.getJSONObject(it) })
             .associateBy { it.getString("id") }
         font = Fonts.regular(this)
         mediumFont = Fonts.medium(this)
@@ -122,7 +127,11 @@ class SettingsActivity : AppCompatActivity() {
     private fun groups() = listOf(
         Group("reading", R.id.otzr_group_reading, listOf(
             Setting("resume", R.id.otzr_resume_label, R.id.otzr_resume_desc, listOf(Choice("last", R.id.otzr_resume_last), Choice("start", R.id.otzr_resume_start))),
-            Setting("dayname", R.id.otzr_dayname_label, R.id.otzr_dayname_desc, listOf(Choice("on", R.id.otzr_dayname_on), Choice("off", R.id.otzr_dayname_off))),
+            Setting("dayplace", R.id.otzr_dayplace_label, R.id.otzr_dayplace_desc, listOf(Choice("center", R.id.otzr_dayplace_center),
+                Choice("corner", R.id.otzr_dayplace_corner), Choice("top", R.id.otzr_dayplace_top), Choice("bubble_top", R.id.otzr_dayplace_bubble_top),
+                Choice("bubble_bottom", R.id.otzr_dayplace_bubble_bottom), Choice("off", R.id.otzr_dayplace_off))),
+            Setting("daywhen", R.id.otzr_daywhen_label, R.id.otzr_daywhen_desc, listOf(Choice("touch", R.id.otzr_daywhen_touch),
+                Choice("tap", R.id.otzr_daywhen_tap), Choice("day", R.id.otzr_daywhen_day)), enabled = settings.dayNamePlace != "off"),
             // Repeat marking requires the forthcoming inline pen/highlighter tools; do not offer a no-op control.
             Setting("marks", R.id.otzr_marks_label, R.id.otzr_marks_desc, listOf(Choice("once", R.id.otzr_marks_once), Choice("repeat", R.id.otzr_marks_repeat)), enabled = false),
         ), subgroups = listOf(Group("paging", R.id.otzr_group_paging, listOf(
@@ -170,7 +179,8 @@ class SettingsActivity : AppCompatActivity() {
         "language" -> settings.language ?: if (resources.configuration.localesLanguage() in setOf("he", "iw")) "he" else "en"
         "frame" -> settings.frameMode
         "sortsize" -> if (settings.sortBySize) "on" else "off"
-        "dayname" -> if (settings.dayNameCentered) "on" else "off"
+        "dayplace" -> settings.dayNamePlace
+        "daywhen" -> settings.dayNameWhen
         else -> error("Unknown setting")
     }
 
@@ -192,7 +202,8 @@ class SettingsActivity : AppCompatActivity() {
             }
             "frame" -> settings.frameMode = value
             "sortsize" -> settings.sortBySize = value == "on"
-            "dayname" -> settings.dayNameCentered = value == "on"
+            "dayplace" -> settings.dayNamePlace = value
+            "daywhen" -> settings.dayNameWhen = value
         }
         scrollPosition = scroll.scrollY
         sheet?.dismiss()

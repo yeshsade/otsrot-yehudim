@@ -73,7 +73,7 @@ class Settings(context: Context) {
         get() = prefs.getInt(BM_COLOR, Bookmark.DEFAULT_COLOR)
         set(v) = prefs.edit().putInt(BM_COLOR, v).apply()
     var bookmarkThickness: Float
-        get() = prefs.getFloat(BM_THICKNESS, Bookmark.DEFAULT_THICKNESS)
+        get() = prefs.getFloat(BM_THICKNESS, Bookmark.DEFAULT_THICKNESS).let { if (it == Bookmark.OLD_DEFAULT_THICKNESS) Bookmark.DEFAULT_THICKNESS else it }
         set(v) = prefs.edit().putFloat(BM_THICKNESS, v).apply()
     var bookmarkHorizontal: Boolean
         get() = prefs.getBoolean(BM_HORIZONTAL, false)
@@ -107,6 +107,19 @@ class Settings(context: Context) {
     var dayNameCentered: Boolean
         get() = prefs.getBoolean(DAY_NAME_CENTERED, true)
         set(v) = prefs.edit().putBoolean(DAY_NAME_CENTERED, v).apply()
+
+    /**
+     * Where the day's name shows (owner, 2026-10-27, "ה-כ-ל"): center · corner · top · bubble_top · bubble_bottom · off.
+     * Someone who had turned the old row off keeps it off.
+     */
+    var dayNamePlace: String
+        get() = prefs.getString(DAY_NAME_PLACE, null) ?: if (dayNameCentered) "center" else "off"
+        set(v) = prefs.edit().putString(DAY_NAME_PLACE, v).apply()
+
+    /** When: touch (at every touch) · tap (a tap on the page, and a new day) · day (only a new day). */
+    var dayNameWhen: String
+        get() = prefs.getString(DAY_NAME_WHEN, "touch") ?: "touch"
+        set(v) = prefs.edit().putString(DAY_NAME_WHEN, v).apply()
 
     var scrubberAlways: Boolean
         get() = prefs.getBoolean(SCRUB_ALWAYS, false)
@@ -145,6 +158,8 @@ class Settings(context: Context) {
         const val SCRUB_HOLD = "scrubber_hold_ms"
         const val SCRUB_ALWAYS = "scrubber_always"
         const val DAY_NAME_CENTERED = "day_name_centered"
+        const val DAY_NAME_PLACE = "day_name_place"
+        const val DAY_NAME_WHEN = "day_name_when"
         const val BM_HORIZONTAL = "bookmark_horizontal"
         const val SORT_REVERSED = "sort_reversed"
         const val SORT_SIZE = "sort_by_size"

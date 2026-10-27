@@ -1388,6 +1388,30 @@ class LeanProbe : Instrumentation() {
             val map = field<com.yeshsade.otzarot.reader.data.ProgressMap>(reader, "map")
             app.settings.studyTopics = map.topics.map { it.id }.toSet()
             record("843's map is read and verified (${map.checks.size} boxes)")
+            // opening: today (by the phone's date, inside the booklet's week) is offered in a bubble
+            val (ty, tm, td) = com.yeshsade.otzarot.reader.data.OpenDay.today()
+            val today = com.yeshsade.otzarot.reader.data.OpenDay.choose(map.days.map { it.id }, map.booklet.weekStart, ty, tm, td, false)
+            val inWeek = map.booklet.weekStart?.split("-")?.map { it.toInt() }?.let { (y, m, d) ->
+                com.yeshsade.otzarot.reader.data.OpenDay.epochDay(ty, tm, td) - com.yeshsade.otzarot.reader.data.OpenDay.epochDay(y, m, d) in 0..6 } ?: true
+            if (inWeek && today != null) {
+                fun hasTag(t: String): Boolean { var ok = false; onMain { ok = reader.window.decorView.findViewWithTag<View>(t) != null }; return ok }
+                waitFor("the offer to go to today", 30_000) { hasTag("offer_go") }
+                SystemClock.sleep(1000); waitForIdleSync()
+                onMainChecked { snapshot(reader, "18-offer.png") }
+                var before = 0; onMain { before = pdfView(reader).currentPage }
+                onMainChecked { (reader.window.decorView.findViewWithTag<View>("offer_go") as android.view.ViewGroup).getChildAt(1).performClick() }
+                SystemClock.sleep(1500); waitForIdleSync()
+                var at = 0; onMain { at = pdfView(reader).currentPage }
+                val first = map.pages.filter { it.dayId == today && it.weekOffset == 0 }.minOf { it.page }
+                check(at == first) { "went to page ${at + 1}, not ${first + 1}" }
+                check(hasTag("offer_undo")) { "no undo after going" }
+                onMainChecked { snapshot(reader, "18-offer-undo.png") }
+                onMainChecked { (reader.window.decorView.findViewWithTag<View>("offer_undo") as android.view.ViewGroup).getChildAt(0).performClick() }
+                SystemClock.sleep(1500); waitForIdleSync()
+                onMain { at = pdfView(reader).currentPage }
+                check(at == before) { "undo went to page ${at + 1}, not ${before + 1}" }
+                record("On opening, a bubble offers today ($today): it goes to its first page, and \"ביטול\" comes back")
+            }
             // the screen, opened with the topics already chosen
             onMainChecked { reader.javaClass.getDeclaredMethod("openMenu").apply { isAccessible = true }.invoke(reader) }
             waitFor("menu", 20_000) { reader.lastMenu != null }
@@ -1424,6 +1448,7 @@ class LeanProbe : Instrumentation() {
 
     /** 0.2.15: the name in the top bar, the version in the drawer, the new progress screen, the day name in the middle. */
     private var result15 = ""
+    private fun dn0(reader: ReaderActivity): Any = reader.javaClass.getDeclaredField("dayName").apply { isAccessible = true }.get(reader)
     private fun version15(reader: ReaderActivity) {
         fun settle() { SystemClock.sleep(2500); waitForIdleSync() }
         val v = pdfView(reader)
@@ -1438,7 +1463,8 @@ class LeanProbe : Instrumentation() {
         }
         check(title.isNotBlank() && page.contains("25") && page.contains("יום ראשון")) { "top bar: '$title' / '$page'" }
         onMainChecked { snapshot(reader, "15-reader.png") }
-        // the day's name: shows when another day comes to the middle of the screen, not at every touch
+        // the day's name, set to "only on a new day": shows when another day comes to the middle, not at a touch
+        app.settings.dayNameWhen = "day"
         val dn = reader.javaClass.getDeclaredField("dayName").apply { isAccessible = true }.get(reader)
         fun strength(): Float { var f = 0f; onMain { f = dn.javaClass.getDeclaredField("strength").apply { isAccessible = true }.getFloat(dn) }; return f }
         SystemClock.sleep(5000)
@@ -1453,6 +1479,7 @@ class LeanProbe : Instrumentation() {
         onMain { monday = (reader.window.decorView.findViewWithTag<View>("bar_page") as android.widget.TextView).text.toString() }
         check(monday.contains("יום שני")) { "bar after moving: '$monday'" }
         record("The day's name shows only when a new day comes, not at a touch; the bar follows ($monday)")
+        app.settings.dayNameWhen = "touch"
         onMainChecked { v.jumpTo(24, false) }
         settle()
         record("The top bar shows the booklet's name and the page ($title · $page)")
@@ -1461,7 +1488,7 @@ class LeanProbe : Instrumentation() {
         settle()
         var version = ""
         onMain { version = (reader.lastMenu!!.root.findViewWithTag<View>("drawer_version") as android.widget.TextView).text.toString() }
-        check(version.contains("0.2.17")) { "version: '$version'" }
+        check(version.contains("0.2.18")) { "version: '$version'" }
         onMainChecked { snapshotView(reader.lastMenu!!.dialog.window!!.decorView, "15-drawer.png") }
         record("The drawer shows the version at the bottom ($version)")
         onMainChecked { reader.lastMenu!!.root.findViewWithTag<View>("menu_quick_mark").performClick() }
@@ -1470,6 +1497,10 @@ class LeanProbe : Instrumentation() {
         fun has(tag: String): Boolean { var ok = false; onMain { ok = decor.findViewWithTag<View>(tag) != null }; return ok }
         waitFor("cards", 60_000) { has("progress_topic_nach") }
         settle()
+        var opened: Any? = null
+        onMain { opened = field<Any?>(reader.lastProgress!!, "firstDay") }
+        check(opened == "sunday") { "the screen opened on $opened, not on the day being read (sunday)" }
+        record("Read on Sunday's page, the progress screen opens on Sunday, whatever the phone's date")
         check(has("progress_day_saturday") && has("progress_day_week")) { "day letters missing" }
         onMainChecked { snapshotView(decor, "15-mark-day.png") }
         uiAutomation.takeScreenshot()?.let { writePng(it, "15-real-mark.png") }
@@ -1533,6 +1564,16 @@ class LeanProbe : Instrumentation() {
         SystemClock.sleep(300)
         onMainChecked { snapshot(reader, "15-dayname-zoom.png") }
         record("The day's name shows in the middle of the screen when zoomed in")
+        onMainChecked { v.resetZoom() }
+        SystemClock.sleep(2000)
+        for (place in listOf("corner", "top", "bubble_top", "bubble_bottom")) {
+            app.settings.dayNamePlace = place
+            onMainChecked { dn0(reader).let { d -> d.javaClass.getMethod("touched").invoke(d) } }
+            SystemClock.sleep(400)
+            onMainChecked { snapshot(reader, "18-place-$place.png") }
+        }
+        app.settings.dayNamePlace = "center"
+        record("The day's name drawn in each of the places")
         waitFor("pictures written", 120_000) { pendingPngs.get() == 0 }
     }
 

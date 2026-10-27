@@ -43,6 +43,8 @@ class ProgressScreen(
     private val ticked: MutableMap<String, Boolean>,
     /** The boxes are still being read: the screen shows "קורא…" until [becameReady]. */
     waiting: Boolean = false,
+    /** The day of the page the reader is on: the screen opens there (owner, 2026-10-27: "לפי המיקום הנוכחי שלי בקובץ, לא לפי התאריך"). */
+    private val startDay: String? = null,
     private val write: (Map<String, Boolean>) -> Unit,
 ) {
     var waiting = waiting
@@ -53,7 +55,8 @@ class ProgressScreen(
         waiting = false
         if (!::dialog.isInitialized || !dialog.isShowing) return
         val (y, m, d) = OpenDay.today()
-        day = OpenDay.choose(progress().days.map { it.id }, map.booklet.weekStart, y, m, d, ticked.values.any { it })
+        day = startDay?.takeIf { s -> progress().days.any { it.id == s } }
+            ?: OpenDay.choose(progress().days.map { it.id }, map.booklet.weekStart, y, m, d, ticked.values.any { it })
         firstDay = day
         render()
     }
@@ -87,7 +90,7 @@ class ProgressScreen(
         tab = start
         val days = progress().days.map { it.id }
         val (y, m, d) = OpenDay.today()
-        day = OpenDay.choose(days, map.booklet.weekStart, y, m, d, ticked.values.any { it })
+        day = startDay?.takeIf { it in days } ?: OpenDay.choose(days, map.booklet.weekStart, y, m, d, ticked.values.any { it })
         firstDay = day
         build()
         // the first time: "what do you learn?" — on the next turn of the main thread, so neither window waits for the other

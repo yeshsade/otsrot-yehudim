@@ -144,4 +144,7 @@
     <string name="menu_version">גרסה %1$s</string>
     <string name="pr_page_n">עמוד %1$d</string>
     <string name="reader_day_page">%1$s · עמוד %2$d מתוך %3$d</string>
+    <string name="reader_go_day">לעבור ל%1$s?</string>
+    <string name="reader_go">מעבר</string>
+    <string name="reader_go_undo">ביטול</string>
 </resources>

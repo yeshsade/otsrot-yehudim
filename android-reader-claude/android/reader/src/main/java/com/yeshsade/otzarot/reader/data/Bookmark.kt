@@ -48,14 +48,16 @@ data class Bookmark(
         /** Owner's decision: purple (the app colour) at about 80% opacity. */
         const val DEFAULT_COLOR = 0xCC57479F.toInt()
 
-        /** Owner's decisions (2026-10-14): start as the old "small"; the bar goes from half of that up to
-         *  a ribbon as long as a third of the page's height. */
-        const val DEFAULT_THICKNESS = 13f
-        const val MIN_THICKNESS = DEFAULT_THICKNESS / 2
+        /** Owner's decisions: the bar goes from 6.5 up to a ribbon as long as half the page's height; a new bookmark
+         *  starts at twice the first size, 13 (2026-10-26: "הסימנייה הראשונית היא פיצית"). */
+        const val DEFAULT_THICKNESS = 26f
+        /** The first size (2026-10-14), still the saved one for whoever never moved the bar. */
+        const val OLD_DEFAULT_THICKNESS = 13f
+        const val MIN_THICKNESS = 6.5f
         /** Sizes written by 0.2.2 (s/m/l). */
         private val OLD_SIZES = mapOf("s" to 13f, "m" to 19f, "l" to 27f)
 
-        fun maxThickness(pageHeight: Float): Float = (pageHeight / 3f / LENGTH_RATIO).coerceAtLeast(MIN_THICKNESS)
+        fun maxThickness(pageHeight: Float): Float = (pageHeight / 2f / LENGTH_RATIO).coerceAtLeast(MIN_THICKNESS)
 
         /**
          * The size bar (0..100). The scale grows by the same factor at every step, so the small sizes that

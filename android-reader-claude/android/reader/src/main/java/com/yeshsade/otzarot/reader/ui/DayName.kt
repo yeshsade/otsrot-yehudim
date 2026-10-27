@@ -18,7 +18,7 @@ import com.yeshsade.otzarot.reader.data.ProgressMap
  */
 class DayName(private val pdfView: PDFView, typeface: Typeface, private val night: Boolean) {
     var map: ProgressMap? = null
-        set(value) { field = value; lastDay = null; pdfView.invalidate() }
+        set(value) { field = value; lastDay = null; lastCenter = null; pdfView.invalidate() }
 
     /** The day last seen in the middle of the screen: the name shows again only when this changes. */
     private var lastDay: String? = null
@@ -37,10 +37,23 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
     var allowed: () -> Boolean = { true }
 
     /**
-     * In the middle of the screen, the same size at any zoom, naming the day of what is in the middle of the screen
-     * (owner, 2026-10-21: "יישאר תמיד במרכז המסך גם אם אני זז והגדלתי בענק"). Off: in the middle of each page, as before.
+     * Where on the screen (owner, 2026-10-27, all of them, to try): center · corner · top (a faint name, the same
+     * size at any zoom) · bubble_top · bubble_bottom (a dark bubble, like the phone's own messages). Always fixed
+     * to the screen, naming the day of what is in the middle of the screen.
      */
-    var centered: () -> Boolean = { true }
+    var place: () -> String = { "center" }
+
+    /** Room the phone's bar and the thin line take at the top, and the reading bar at the bottom (pixels). */
+    var topInset: () -> Int = { 0 }
+    var bottomInset: () -> Int = { 0 }
+
+    private val density = pdfView.resources.displayMetrics.density
+    private val bubble = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF2E2A3D.toInt() }
+    private val bubbleText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        this.typeface = typeface; textAlign = Paint.Align.CENTER; color = 0xFFFFFFFF.toInt()
+    }
+    /** The day chosen for the middle of the screen last time: kept while the middle is between two days' parts. */
+    private var lastCenter: String? = null
 
     private var strength = 0f
     private var animator: ValueAnimator? = null
@@ -74,16 +87,7 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
         val map = map ?: return
         if (strength <= 0f) return
         val range = pdfView.visiblePageRange ?: return
-        if (centered()) { drawCentered(canvas, map, range); return }
-        for (page in range[0]..range[1]) {
-            val info = map.pageInfo(page) ?: continue
-            if (info.weekOffset != 0) continue
-            for ((dayId, frame) in parts(info, page)) {
-                val label = map.day(dayId)?.label ?: continue
-                val box = pdfView.frameRectToView(page, frame) ?: continue
-                drawName(canvas, label, box)
-            }
-        }
+        drawCentered(canvas, map, range)
     }
 
     /** Each day on this page and the part of the page (in points of the page as seen) that is that day's. */
@@ -101,16 +105,47 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
         return listOf(day to RectF(0f, 0f, size[0], size[1]))
     }
 
-    /** The day whose part of a page is nearest the middle of the screen, written in the middle of the screen. */
+    /** The day of what is in the middle of the screen, written where [place] says. */
     private fun drawCentered(canvas: Canvas, map: ProgressMap, range: IntArray) {
         val label = dayAtCenter(map, range)?.let { map.day(it)?.label } ?: return
-        val cx = pdfView.width / 2f
-        val cy = pdfView.height / 2f
-        paint.textSize = 1f
-        val w = paint.measureText(label).coerceAtLeast(1f)
-        paint.textSize = minOf(pdfView.width * 0.62f / w, pdfView.height * 0.12f, MAX_TEXT_PX)
-        paint.alpha = (255 * OPACITY * strength).toInt()
-        canvas.drawText(label, cx, cy - (paint.descent() + paint.ascent()) / 2, paint)
+        val w = pdfView.width.toFloat(); val h = pdfView.height.toFloat()
+        val margin = 14 * density
+        when (val where = place()) {
+            "bubble_top", "bubble_bottom" -> {
+                bubbleText.textSize = 15 * density
+                bubbleText.alpha = (255 * strength).toInt()
+                val tw = bubbleText.measureText(label)
+                val bw = tw + 36 * density; val bh = 40 * density
+                val cy = if (where == "bubble_top") topInset() + margin + bh / 2 else h - bottomInset() - margin - bh / 2
+                bubble.alpha = (235 * strength).toInt()
+                canvas.drawRoundRect(w / 2 - bw / 2, cy - bh / 2, w / 2 + bw / 2, cy + bh / 2, bh / 2, bh / 2, bubble)
+                canvas.drawText(label, w / 2, cy - (bubbleText.descent() + bubbleText.ascent()) / 2, bubbleText)
+            }
+            else -> {
+                paint.textSize = 1f
+                val one = paint.measureText(label).coerceAtLeast(1f)
+                paint.alpha = (255 * OPACITY * strength).toInt()
+                when (where) {
+                    "corner" -> {
+                        paint.textSize = minOf(w * 0.34f / one, h * 0.05f, MAX_TEXT_PX)
+                        val tw = paint.measureText(label)
+                        // the corner where a line starts: the right one in Hebrew
+                        val rtl = pdfView.layoutDirection == android.view.View.LAYOUT_DIRECTION_RTL ||
+                            android.text.TextUtils.getLayoutDirectionFromLocale(java.util.Locale.getDefault()) == android.view.View.LAYOUT_DIRECTION_RTL
+                        val x = if (rtl) w - margin - tw / 2 else margin + tw / 2
+                        canvas.drawText(label, x, topInset() + margin - paint.ascent(), paint)
+                    }
+                    "top" -> {
+                        paint.textSize = minOf(w * 0.5f / one, h * 0.07f, MAX_TEXT_PX)
+                        canvas.drawText(label, w / 2, topInset() + margin - paint.ascent(), paint)
+                    }
+                    else -> {
+                        paint.textSize = minOf(w * 0.62f / one, h * 0.12f, MAX_TEXT_PX)
+                        canvas.drawText(label, w / 2, h / 2 - (paint.descent() + paint.ascent()) / 2, paint)
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -133,21 +168,53 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
     private fun dayAtCenter(map: ProgressMap, range: IntArray): String? {
         val cx = pdfView.width / 2f
         val cy = pdfView.height / 2f
+        // each part of each page in view: a split Tehillim page gives each of its pieces, not a box around all
+        // of one day's pieces (those boxes overlap, and the middle of the screen sat in both — the name went
+        // "שניה ככה שניה ככה", owner 2026-10-27)
+        val inside = mutableSetOf<String>()
         var best: String? = null
         var bestDistance = Float.MAX_VALUE
         for (page in range[0]..range[1]) {
             val info = map.pageInfo(page) ?: continue
             if (info.weekOffset != 0) continue
-            for ((dayId, frame) in parts(info, page)) {
+            for ((dayId, frame) in pieces(info, page)) {
                 val box = pdfView.frameRectToView(page, frame) ?: continue
-                // 0 inside the part; otherwise how far its edge is from the middle of the screen
                 val dx = maxOf(box.left - cx, 0f, cx - box.right)
                 val dy = maxOf(box.top - cy, 0f, cy - box.bottom)
                 val distance = dx * dx + dy * dy
+                if (distance == 0f) inside += dayId
                 if (distance < bestDistance) { bestDistance = distance; best = dayId }
             }
         }
-        return best
+        // the middle is in one day's piece: that day. Between pieces (or in two): stay with the day before, if it
+        // is still in view, so the name does not flicker at the border
+        val chosen = when {
+            inside.size == 1 -> inside.first()
+            inside.size > 1 && lastCenter in inside -> lastCenter
+            inside.isEmpty() && lastCenter != null && bestDistance < Float.MAX_VALUE && lastCenter in visibleDays(map, range) -> lastCenter
+            else -> best
+        }
+        lastCenter = chosen
+        return chosen
+    }
+
+    private fun visibleDays(map: ProgressMap, range: IntArray): Set<String> {
+        val days = mutableSetOf<String>()
+        for (page in range[0]..range[1]) {
+            val info = map.pageInfo(page)?.takeIf { it.weekOffset == 0 } ?: continue
+            info.dayId?.let { days += it }
+            info.regions.mapNotNullTo(days) { it.dayId }
+        }
+        return days
+    }
+
+    /** Each piece of a split page with its day; a page of one day is one piece, the whole page. */
+    private fun pieces(info: ProgressMap.PageInfo, page: Int): List<Pair<String, RectF>> {
+        val withDay = info.regions.filter { it.dayId != null }
+        if (withDay.map { it.dayId }.distinct().size > 1) {
+            return withDay.map { it.dayId!! to RectF(it.left, it.top, it.right, it.bottom) }
+        }
+        return parts(info, page)
     }
 
     private fun drawName(canvas: Canvas, label: String, box: RectF) {
