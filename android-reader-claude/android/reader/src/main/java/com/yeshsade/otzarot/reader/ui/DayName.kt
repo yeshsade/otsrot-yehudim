@@ -153,9 +153,12 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
      * map gives the page (a split page: its first day).
      */
     fun currentDay(page: Int): String? {
-        dayAtCenter()?.let { return it }
-        val info = map?.pageInfo(page)?.takeIf { it.weekOffset == 0 } ?: return null
-        return info.dayId ?: info.regions.firstNotNullOfOrNull { it.dayId }
+        val info = map?.pageInfo(page)?.takeIf { it.weekOffset == 0 }
+        val onPage = info?.let { i -> listOfNotNull(i.dayId) + i.regions.mapNotNull { it.dayId } }.orEmpty()
+        // right after a jump the engine may still report the pages of before: a day that is not on the page now
+        // in the middle is not taken (owner's check: the name stayed on the old day)
+        dayAtCenter()?.let { if (onPage.isEmpty() || it in onPage) return it }
+        return info?.let { it.dayId ?: it.regions.firstNotNullOfOrNull { r -> r.dayId } }
     }
 
     /** The day of what is in the middle of the screen (a split page: the half there), or null. */
@@ -172,6 +175,7 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
         // of one day's pieces (those boxes overlap, and the middle of the screen sat in both — the name went
         // "שניה ככה שניה ככה", owner 2026-10-27)
         val inside = mutableSetOf<String>()
+        val nearest = HashMap<String, Float>()
         var best: String? = null
         var bestDistance = Float.MAX_VALUE
         for (page in range[0]..range[1]) {
@@ -183,6 +187,7 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
                 val dy = maxOf(box.top - cy, 0f, cy - box.bottom)
                 val distance = dx * dx + dy * dy
                 if (distance == 0f) inside += dayId
+                nearest[dayId] = minOf(nearest[dayId] ?: Float.MAX_VALUE, distance)
                 if (distance < bestDistance) { bestDistance = distance; best = dayId }
             }
         }
@@ -191,12 +196,16 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
         val chosen = when {
             inside.size == 1 -> inside.first()
             inside.size > 1 && lastCenter in inside -> lastCenter
-            inside.isEmpty() && lastCenter != null && bestDistance < Float.MAX_VALUE && lastCenter in visibleDays(map, range) -> lastCenter
+            // only right at the border (a gap between pieces), not after a jump far away
+            inside.isEmpty() && (nearest[lastCenter] ?: Float.MAX_VALUE) < border() -> lastCenter
             else -> best
         }
         lastCenter = chosen
         return chosen
     }
+
+    /** How near (squared pixels) the middle must stay to the last day's piece to keep it: a gap between pieces. */
+    private fun border(): Float = (pdfView.height * 0.08f).let { it * it }
 
     private fun visibleDays(map: ProgressMap, range: IntArray): Set<String> {
         val days = mutableSetOf<String>()

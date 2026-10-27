@@ -1477,7 +1477,14 @@ class LeanProbe : Instrumentation() {
         check(strength() == 0f) { "a touch showed the name" }
         onMainChecked { v.jumpTo(47, false) }
         SystemClock.sleep(600)
-        check(strength() > 0f) { "a new day did not show its name" }
+        if (strength() == 0f) {
+            var why = ""
+            onMain {
+                why = "page=${v.currentPage} lastDay=${dn.javaClass.getDeclaredField("lastDay").apply { isAccessible = true }.get(dn)} " +
+                    "now=${dn.javaClass.getMethod("currentDay", Int::class.java).invoke(dn, v.currentPage)} place=${app.settings.dayNamePlace} when=${app.settings.dayNameWhen}"
+            }
+            error("a new day did not show its name: $why")
+        }
         var monday = ""
         onMain { monday = (reader.window.decorView.findViewWithTag<View>("bar_page") as android.widget.TextView).text.toString() }
         check(monday.contains("יום שני")) { "bar after moving: '$monday'" }

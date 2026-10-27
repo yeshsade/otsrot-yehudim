@@ -246,7 +246,7 @@ class ReaderActivity : AppCompatActivity() {
         dayName = DayName(pdfView, Fonts.heading(this), ui.night).apply {
             allowed = { settings.dayNamePlace != "off" }
             place = { settings.dayNamePlace }
-            topInset = { statusInset + ui.dp(30) }
+            topInset = { maxOf(statusInset, runCatching { infoLine.bottom }.getOrDefault(0)) + ui.dp(6) }
             bottomInset = { navInset + runCatching { toolbar.height }.getOrDefault(0) + ui.dp(28) }
         }
         pdfView.setOverlayDrawer { canvas -> bookmarks.draw(canvas); dayName.draw(canvas) }
@@ -600,6 +600,8 @@ class ReaderActivity : AppCompatActivity() {
             }
             .onPageChange { page, pages ->
                 pageCount = pages
+                // a jump reports the move before the new page: the day is looked at again now
+                dayName.moved()
                 showPage(page)
                 app.io.execute { app.library.update(target.id) { it.copy(page = page) } }
             }
@@ -821,7 +823,6 @@ class ReaderActivity : AppCompatActivity() {
             if (diff !in 0..6) return
         }
         val today = com.yeshsade.otzarot.reader.data.OpenDay.choose(m.days.map { it.id }, start, y, mo, d, false) ?: return
-        android.util.Log.i("ReaderOffer", "today=$today here=${dayName.currentDay(pdfView.currentPage)} page=${pdfView.currentPage}")
         if (today == dayName.currentDay(pdfView.currentPage)) return
         val label = m.day(today)?.label ?: return
         val first = m.pages.filter { it.dayId == today && it.weekOffset == 0 }.minOfOrNull { it.page }
