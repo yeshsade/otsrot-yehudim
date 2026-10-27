@@ -13,6 +13,8 @@ import fitz
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "days/scripts"))
 import build_lefi_yamim as legacy
+from layout_rules import gemara_identity
+from gemara_review import inspect_runs, resolve_runs
 
 DAYS = [("sunday", "יום ראשון"), ("monday", "יום שני"),
         ("tuesday", "יום שלישי"), ("wednesday", "יום רביעי"),
@@ -133,13 +135,18 @@ def discover(interior, cover):
     ordered, ranges, total = legacy.build_topic_ranges(str(interior), topics)
     with fitz.open(interior) as doc:
         blanks = [page.number + 1 for page in doc if blank_body(page)]
+        day_pages = legacy.assign_days(str(interior), blanks, ranges,
+            [(n, start) for n, start in ordered if n not in {"פרשת השבוע", "תיקון הכללי", "השלמות"}])
+        start, end = ranges["הדף היומי"]
+        gemara_days = {slug: [n for n in day_pages[name] if start <= n <= end]
+                       for slug, name in DAYS}
+        identities = {n: gemara_identity(doc[n - 1]) for n in range(start, end + 1) if n not in blanks}
     return {"input_pdf": str(Path(interior).resolve()), "cover_pdf": str(Path(cover).resolve()),
             "source_sha256": sha256(interior), "cover_sha256": sha256(cover),
             "rotated_original": rotated, "topics": topics,
             "topic_ranges": {k: list(v) for k, v in ranges.items()},
             "total_original_pages": total, "blank_pages": blanks,
-            "day_pages": legacy.assign_days(str(interior), blanks, ranges,
-                [(n, start) for n, start in ordered if n not in {"פרשת השבוע", "תיקון הכללי", "השלמות"}])}
+            "day_pages": day_pages, "gemara_review_required": inspect_runs(gemara_days, identities)}
 
 
 def validate_answers(base, answers):
@@ -240,6 +247,11 @@ def model(base, answers, doc):
     for name, numbers in base["day_pages"].items():
         current[heb_days[name]] = [n for n in numbers if n not in context
                 and n not in base["blank_pages"] and owners.get(n) not in {"tehillim", "parsha", "tikkun_haklali", "supplements"}]
+    gemara_days = {day: [n for n in numbers if owners[n] == "gemara"] for day, numbers in current.items()}
+    identities = {n: gemara_identity(doc[n - 1]) for numbers in gemara_days.values() for n in numbers}
+    reviewed_gemara, gemara_audit = resolve_runs(gemara_days, identities, answers.get("gemara_review"))
+    for day in current:
+        current[day] = [n for n in current[day] if owners[n] != "gemara"] + reviewed_gemara[day]
     teh_pages = sorted(n for n, topic in owners.items() if topic == "tehillim" and n not in context)
     teh = tehillim_regions(doc, teh_pages, answers.get("tehillim", {}))
     for day in current:
@@ -256,4 +268,5 @@ def model(base, answers, doc):
     if assigned != expected:
         raise ValueError(f"Missing or unexpected current-week source ownership: {sorted(expected ^ assigned)}")
     return {"owners": owners, "contexts": context, "days": current, "tehillim": teh,
+            "gemara_review_audit": gemara_audit, "gemara_identities": identities,
             "blank_pages": base["blank_pages"], "booklet": answers["booklet"]}

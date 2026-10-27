@@ -42,6 +42,9 @@ def validate(path, source, source_model, placements, rows, navigation, before_ha
     if progress["pages"] != rows:
         raise ValueError("Embedded page map differs from actual build provenance")
     validate_progress_scope(progress, placements, rows)
+    if "gemara_identities" in source_model:
+        from gemara_review import validate_progress
+        validate_progress(progress, rows, source_model["days"], source_model["gemara_identities"])
     actual, planned = defaultdict(list), defaultdict(list)
     for item in placements:
         planned[item["field"]].append(item["pages"][0])

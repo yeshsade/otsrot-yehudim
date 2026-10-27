@@ -22,6 +22,7 @@ def main():
         "booklet": {"issue": "ASK_OWNER_OR_READ_COVER", "parsha": "ASK_OWNER_OR_READ_COVER",
                     "week_start": "YYYY-MM-DD", "date_label": "EXACT_COVER_DATE_LABEL"},
         "previous_week": {topic: "ASK_OWNER_SOURCE_PAGE_OR_EXPLICIT_NULL" for topic in PREVIOUS},
+        "gemara_review": None,
         "tehillim": {"boundaries_reviewed": False, "exclude_after_psalms": [],
                      "review_provenance": "Inspect the seven black weekly tabs and the last Psalm150 verse; exclude helpers/prayers and future gray reading."},
         "owner_answers_provenance": {}

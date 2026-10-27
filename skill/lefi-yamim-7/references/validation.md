@@ -6,6 +6,8 @@ Required checks: unchanged source hashes; expected source coverage; source-text 
 
 Previous-week completion pages retain content and reciprocal links but must have zero widgets and zero progress checks. The saved-PDF validator must reject both a `week_offset: -1` check and a check incorrectly labeled current-week whose page belongs to the previous week. This owner correction applies to every topic and both editions.
 
+Gemara source review must pass before layout, including duplication across daily boundaries. The saved-PDF map must contain exactly one progress unit for each actual amud on its confirmed day, including every physical copy. Reject two independent fields for a confirmed duplicate, missing copies, wrong-day assignment, or omitted commentary in the source partition. Save `qa/gemara-review.json` alongside the source model.
+
 Render representative Nach, Gemara, Mishnah Berurah, landscape and straight study pages, continuation buttons and complete daily Tehillim boundaries. Pixel collisions detect raster ink as well as extracted glyphs. A known source-selection or visual failure must remain a failed candidate until resolved.
 
 The embedded schema is `otzarot.progress-map/1`, attachment name `otzarot-progress-map.v1.json`. Extra `reading_regions` identifies exact study geometry where two days share a column/half. The reader must interpret this when assigning reading portions; a half-only page map is insufficient for such sources.

@@ -15,3 +15,11 @@ Daily 845 source spans: Sunday 89–90, Monday 90, Tuesday 91–92, Wednesday 93
 Raster pages are not blank because text extraction returns little text. Preserve the introduction in the topic edition; the historical day edition omits it. Keep all actual source text on included pages. Gray future text can remain visible but must not become current study progress.
 
 A newly structured or unreadable source requires review/OCR and a tested recognition change. Do not assert universal recognition based on a single validated booklet.
+
+## Gemara duplicates and day ownership
+
+`discovery.json` includes `gemara_review_required`: actual repeated amud identities, unusual daily page counts and the provisional daily runs. This restores the manual-confirmation gate from Skill 6 and also catches repeated amudim split across normal-size runs. One amud printed with two commentaries is retained in full; it is not automatically reference-only material.
+
+When review is required, ask which amud (A, B or both) is duplicated and confirm the affected day's original source run. The answers file uses `gemara_review: {"confirmed_by_owner": true, "day_runs": [{"day_id": "sunday", "source_pages": [2,3,4,5], "duplicate_amud": null}, ...]}`. Include all seven runs in chronological order, with `duplicate_amud` equal to null, `a`, `b` or `both` as verified against the source. Record how the owner's answer resolved the boundary. This is review input; the source model recomputes ownership from it. Every Gemara/commentary source page must remain exactly once in the daily partition. All copies of a duplicated amud must belong to its confirmed day; one shared PDF field covers all physical copies. Never invent confirmation or reuse a different source hash's review.
+
+For Vayetze 846, the owner confirmed Thursday's doubled A (Arakhin2a, sources17/19), with all sources16–21 on Thursday. The preceding Wednesday therefore ends at source15. These are an exact-input regression case, not defaults for another issue.

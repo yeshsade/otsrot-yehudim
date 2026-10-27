@@ -29,6 +29,8 @@ Ask the owner which SOURCE pages belong to the preceding week's Mishnah Berurah,
 
 Review the seven real Tehillim day boundaries and the end of Psalm 150. Set `tehillim.boundaries_reviewed` only after inspection; record post-Psalm exclusions as described in the source review. Extra prayers and helpful verses are preserved but receive no study boxes. Do not invent sample day sequences. Keep provenance for manual answers and semantic review.
 
+Before layout, inspect the actual Gemara amud identities as well as daily page counts. Restore the Skill 6 manual gate: any duplicated amud or unusual daily run requires one owner question at a time confirming whether A, B or both are duplicated and the affected daily source range. A duplicate can straddle two apparently normal four-page runs, so counts alone are insufficient. Never call a duplicate an auxiliary page or remove its progress box without the owner's source classification. Preserve both copies and all their commentary; copies of the same amud on the confirmed day share one field and one progress unit. Record the complete reviewed daily partition in `gemara_review` in the source-hash-bound answers, never by editing derived `day_pages` or PDF pages. Unconfirmed, incomplete or contradictory review stops before layout. See `references/source-review.md` for the input contract.
+
 ## Agreed placement rules
 
 All checkbox rules below apply to current-week study pages only. Previous-week completion pages keep their content and navigation without progress boxes.

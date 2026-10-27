@@ -85,6 +85,8 @@ def build(interior, cover, answers, output, checker, edition="days"):
     date_label = booklet["date_label"]
     color = legacy.detect_circle_hex(str(cover))
     write_json(work / "source-model.json", src)
+    if "gemara_review_audit" in src:
+        write_json(work / "gemara-review.json", src["gemara_review_audit"])
     print("SOURCE_OWNERSHIP_VALIDATED", flush=True)
 
     doc = fitz.open()

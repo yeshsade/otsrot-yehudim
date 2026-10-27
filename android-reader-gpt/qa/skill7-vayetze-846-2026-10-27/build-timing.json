@@ -1,0 +1,22 @@
+{
+  "days-01": {
+    "elapsed_seconds_until_final_validation": 302.303,
+    "technical_checks_passed": true,
+    "approved_for_delivery": false
+  },
+  "topics-01": {
+    "elapsed_seconds_until_final_validation": 291.373,
+    "technical_checks_passed": true,
+    "approved_for_delivery": false
+  },
+  "days-02": {
+    "elapsed_seconds_until_final_validation": 211.081,
+    "technical_checks_passed": true,
+    "approved_for_delivery": true
+  },
+  "topics-02": {
+    "elapsed_seconds_until_final_validation": 221.02,
+    "technical_checks_passed": true,
+    "approved_for_delivery": true
+  }
+}
