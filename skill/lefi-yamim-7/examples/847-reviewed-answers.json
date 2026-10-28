@@ -1,0 +1,133 @@
+{
+  "source_sha256": "213fe9dc0a231eb36c4240dbd8607d83971a53ff6ce3e008fda6f16965410cda",
+  "cover_sha256": "eaad357a1350929034ae2f4ba5d8c32eda0eea53bca875dc28c3ae7053fd6aa0",
+  "booklet": {
+    "issue": "847",
+    "parsha": "וישלח",
+    "week_start": "2026-11-22",
+    "date_label": "י״ב כסלו – י״ח כסלו תשפ״ז"
+  },
+  "previous_week": {
+    "mishnah_berurah": 73,
+    "likutey_moharan": 154,
+    "likutey_halakhot": 155,
+    "gemara": 153
+  },
+  "gemara_review": {
+    "confirmed_by_owner": true,
+    "date": "2026-10-28",
+    "day_runs": [
+      {
+        "day_id": "sunday",
+        "source_pages": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "duplicate_amud": null
+      },
+      {
+        "day_id": "monday",
+        "source_pages": [
+          6,
+          7,
+          8,
+          9
+        ],
+        "duplicate_amud": null
+      },
+      {
+        "day_id": "tuesday",
+        "source_pages": [
+          10,
+          11,
+          12,
+          13
+        ],
+        "duplicate_amud": null
+      },
+      {
+        "day_id": "wednesday",
+        "source_pages": [
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "duplicate_amud": "a"
+      },
+      {
+        "day_id": "thursday",
+        "source_pages": [
+          20,
+          21,
+          22,
+          23
+        ],
+        "duplicate_amud": null
+      },
+      {
+        "day_id": "friday",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27
+        ],
+        "duplicate_amud": null
+      },
+      {
+        "day_id": "saturday",
+        "source_pages": [
+          28,
+          29,
+          30,
+          31
+        ],
+        "duplicate_amud": null
+      }
+    ],
+    "review_provenance": "The duplicate comparison showed source15 on the left (Wednesday tab), source17 on the right. In response to the Wednesday doubled-A/run14–19 question, the owner replied: השמאלי ראשון. Recorded the left copy/source15 first, then right/source17; retain both copies and all commentary in the source-marked Wednesday run14–19, with one shared A field. Other runs follow their source weekday tabs.",
+    "owner_response": "השמאלי ראשון",
+    "page_preview_shown": true,
+    "confirmed_copy_order": [
+      15,
+      17
+    ]
+  },
+  "tehillim": {
+    "boundaries_reviewed": true,
+    "exclude_after_psalms": [],
+    "review_provenance": "Visual review of all seven Tehillim sources95–101, all seven weekly tabs in RTL reading order, and the ends of the current portion. Current Psalms65–89. Source95 gray previous reading above Sunday and source101 gray Psalm90 onward excluded. Psalm89 ends in the first black lines of source101 column4. No Psalm150 or post-Psalm150 prayers in this portion."
+  },
+  "owner_answers_provenance": {
+    "mishnah_berurah": {
+      "source_page": 73,
+      "confirmed_by_owner": true,
+      "date": "2026-10-28",
+      "page_preview_shown": true
+    },
+    "likutey_moharan": {
+      "source_page": 154,
+      "confirmed_by_owner": true,
+      "date": "2026-10-28",
+      "page_preview_shown": true,
+      "sunday_previous_page_note_verified": true
+    },
+    "likutey_halakhot": {
+      "source_page": 155,
+      "confirmed_by_owner": true,
+      "date": "2026-10-28",
+      "page_preview_shown": true
+    },
+    "gemara": {
+      "source_page": 153,
+      "confirmed_by_owner": true,
+      "date": "2026-10-28",
+      "page_preview_shown": true
+    }
+  }
+}
