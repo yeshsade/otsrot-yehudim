@@ -1,0 +1,594 @@
+{
+  "edition": "days",
+  "passed": true,
+  "audit": {
+    "passed": true,
+    "pages": 168,
+    "checkbox_widgets": 843,
+    "logical_fields": 842,
+    "links": 316,
+    "source_sha256": "fc5b83b8fa5e8560283df405330300cab38e1748f5e529b42d4e0c3e6952045d",
+    "cover_sha256": "2df86d89f6f304c2fc5e97d0f86b38aa1189494790f06ffa52c67a6632f0b494",
+    "output_sha256": "f387740c28c0d053b07382e064303bbff9ba1ef240d0178522a966dae51030b9",
+    "output_to_source_size_ratio": 0.6916902875208146,
+    "source_text_preserved": true,
+    "source_coverage_verified": true,
+    "zero_text_overlaps": true,
+    "zero_widget_overlaps": true,
+    "zero_widget_link_overlaps": true,
+    "navigation_matches_manifest": true,
+    "navigation_uses_fixed_anchors": true,
+    "all_internal_links_land_at_target_top": true,
+    "previous_week_pages_have_no_checkboxes": true,
+    "progress_checks_cover_current_week_only": true,
+    "transparent_navigation_over_source_text_allowed": true,
+    "progress_map_matches_widgets": true,
+    "source_files_unchanged": true,
+    "shulchan_source_coverage": [
+      {
+        "page": 21,
+        "source_page": 62,
+        "passed": true,
+        "columns": [
+          {
+            "column": 1,
+            "learning_rect": [
+              497.3231201171875,
+              46.3797492980957,
+              629.7379150390625,
+              368.3931884765625
+            ],
+            "full_height": 394.26214599609375,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 994
+          },
+          {
+            "column": 2,
+            "learning_rect": [
+              355.24945068359375,
+              45.749908447265625,
+              487.6902770996094,
+              368.14300537109375
+            ],
+            "full_height": 394.26214599609375,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 1130
+          },
+          {
+            "column": 3,
+            "learning_rect": [
+              185.511962890625,
+              49.09575271606445,
+              318.3194274902344,
+              376.13873291015625
+            ],
+            "full_height": 394.26214599609375,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 1286
+          },
+          {
+            "column": 4,
+            "learning_rect": [
+              43.41925048828125,
+              47.58386993408203,
+              176.01803588867188,
+              376.391845703125
+            ],
+            "full_height": 394.26214599609375,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 1189
+          }
+        ],
+        "boundaries": [
+          {
+            "x0": 0.0,
+            "x1": 340.0,
+            "cutoff_y": 374.09090909090907,
+            "score": 0.8662933707237244,
+            "template": "shulchan_aruch_left.png",
+            "template_sha256": "21831b21991ad0a10c9118e48b577fa98c789311a0d7ee2b97f227e4df310f1a"
+          },
+          {
+            "x0": 340.0,
+            "x1": 680.3150024414062,
+            "cutoff_y": 365.9090909090909,
+            "score": 0.8114474415779114,
+            "template": "shulchan_aruch_right.png",
+            "template_sha256": "972b271468e3da89ebf4a316549ffa7b8d052eebb256f506a16ee2bb5fb0f1cd"
+          }
+        ],
+        "gray_regions": []
+      },
+      {
+        "page": 44,
+        "source_page": 63,
+        "passed": true,
+        "columns": [
+          {
+            "column": 1,
+            "learning_rect": [
+              497.3231506347656,
+              45.78508377075195,
+              629.756103515625,
+              360.479248046875
+            ],
+            "full_height": 394.2257499694824,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 793
+          },
+          {
+            "column": 2,
+            "learning_rect": [
+              355.24249267578125,
+              45.79335403442383,
+              487.68121337890625,
+              360.4742431640625
+            ],
+            "full_height": 394.2257499694824,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 811
+          },
+          {
+            "column": 3,
+            "learning_rect": [
+              185.52056884765625,
+              45.78508377075195,
+              317.9369812011719,
+              371.839599609375
+            ],
+            "full_height": 394.2257499694824,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 815
+          },
+          {
+            "column": 4,
+            "learning_rect": [
+              43.408935546875,
+              46.37956619262695,
+              175.85528564453125,
+              371.927490234375
+            ],
+            "full_height": 394.2257499694824,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 915
+          }
+        ],
+        "boundaries": [
+          {
+            "x0": 0.0,
+            "x1": 340.0,
+            "cutoff_y": 374.09090909090907,
+            "score": 0.8664262890815735,
+            "template": "shulchan_aruch_left.png",
+            "template_sha256": "21831b21991ad0a10c9118e48b577fa98c789311a0d7ee2b97f227e4df310f1a"
+          },
+          {
+            "x0": 340.0,
+            "x1": 680.3150024414062,
+            "cutoff_y": 365.9090909090909,
+            "score": 0.8102226853370667,
+            "template": "shulchan_aruch_right.png",
+            "template_sha256": "972b271468e3da89ebf4a316549ffa7b8d052eebb256f506a16ee2bb5fb0f1cd"
+          }
+        ],
+        "gray_regions": []
+      },
+      {
+        "page": 65,
+        "source_page": 64,
+        "passed": true,
+        "columns": [
+          {
+            "column": 1,
+            "learning_rect": [
+              497.311767578125,
+              45.749908447265625,
+              630.0903930664062,
+              344.3419494628906
+            ],
+            "full_height": 396.2654914855957,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 772
+          },
+          {
+            "column": 2,
+            "learning_rect": [
+              355.2452392578125,
+              45.391571044921875,
+              488.067626953125,
+              344.09210205078125
+            ],
+            "full_height": 396.2654914855957,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 857
+          },
+          {
+            "column": 3,
+            "learning_rect": [
+              185.51214599609375,
+              43.74534225463867,
+              317.9645080566406,
+              366.5928649902344
+            ],
+            "full_height": 396.2654914855957,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 788
+          },
+          {
+            "column": 4,
+            "learning_rect": [
+              43.431640625,
+              45.7872200012207,
+              175.87225341796875,
+              366.5928649902344
+            ],
+            "full_height": 396.2654914855957,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 749
+          }
+        ],
+        "boundaries": [
+          {
+            "x0": 0.0,
+            "x1": 340.0,
+            "cutoff_y": 366.3636363636363,
+            "score": 0.8267252445220947,
+            "template": "shulchan_aruch_left.png",
+            "template_sha256": "21831b21991ad0a10c9118e48b577fa98c789311a0d7ee2b97f227e4df310f1a"
+          },
+          {
+            "x0": 340.0,
+            "x1": 680.3150024414062,
+            "cutoff_y": 341.8181818181818,
+            "score": 0.797137439250946,
+            "template": "shulchan_aruch_right.png",
+            "template_sha256": "972b271468e3da89ebf4a316549ffa7b8d052eebb256f506a16ee2bb5fb0f1cd"
+          }
+        ],
+        "gray_regions": []
+      },
+      {
+        "page": 86,
+        "source_page": 65,
+        "passed": true,
+        "columns": [
+          {
+            "column": 1,
+            "learning_rect": [
+              497.3231201171875,
+              45.78508377075195,
+              629.7459106445312,
+              360.4025573730469
+            ],
+            "full_height": 394.25933837890625,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 870
+          },
+          {
+            "column": 2,
+            "learning_rect": [
+              355.2395324707031,
+              45.78773880004883,
+              487.6697998046875,
+              360.4044189453125
+            ],
+            "full_height": 394.25933837890625,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 811
+          },
+          {
+            "column": 3,
+            "learning_rect": [
+              185.51211547851562,
+              45.749725341796875,
+              317.9633483886719,
+              344.091796875
+            ],
+            "full_height": 394.25933837890625,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 841
+          },
+          {
+            "column": 4,
+            "learning_rect": [
+              43.431640625,
+              47.59204864501953,
+              175.8566436767578,
+              344.091796875
+            ],
+            "full_height": 394.25933837890625,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 833
+          }
+        ],
+        "boundaries": [
+          {
+            "x0": 0.0,
+            "x1": 340.0,
+            "cutoff_y": 342.27272727272725,
+            "score": 0.7874264717102051,
+            "template": "shulchan_aruch_left.png",
+            "template_sha256": "21831b21991ad0a10c9118e48b577fa98c789311a0d7ee2b97f227e4df310f1a"
+          },
+          {
+            "x0": 340.0,
+            "x1": 680.3150024414062,
+            "cutoff_y": 357.7272727272727,
+            "score": 0.8861144781112671,
+            "template": "shulchan_aruch_right.png",
+            "template_sha256": "972b271468e3da89ebf4a316549ffa7b8d052eebb256f506a16ee2bb5fb0f1cd"
+          }
+        ],
+        "gray_regions": []
+      },
+      {
+        "page": 107,
+        "source_page": 66,
+        "passed": true,
+        "columns": [
+          {
+            "column": 1,
+            "learning_rect": [
+              497.311767578125,
+              47.59223175048828,
+              629.7435913085938,
+              368.4266357421875
+            ],
+            "full_height": 398.9827690124512,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 860
+          },
+          {
+            "column": 2,
+            "learning_rect": [
+              355.2425231933594,
+              41.0280647277832,
+              487.692626953125,
+              368.427978515625
+            ],
+            "full_height": 398.9827690124512,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 820
+          },
+          {
+            "column": 3,
+            "learning_rect": [
+              185.5120849609375,
+              45.413551330566406,
+              318.03155517578125,
+              344.34210205078125
+            ],
+            "full_height": 398.9827690124512,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 767
+          },
+          {
+            "column": 4,
+            "learning_rect": [
+              43.431640625,
+              45.74884033203125,
+              175.83482360839844,
+              344.34356689453125
+            ],
+            "full_height": 398.9827690124512,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 871
+          }
+        ],
+        "boundaries": [
+          {
+            "x0": 0.0,
+            "x1": 340.0,
+            "cutoff_y": 342.27272727272725,
+            "score": 0.8321617245674133,
+            "template": "shulchan_aruch_left.png",
+            "template_sha256": "21831b21991ad0a10c9118e48b577fa98c789311a0d7ee2b97f227e4df310f1a"
+          },
+          {
+            "x0": 340.0,
+            "x1": 680.3150024414062,
+            "cutoff_y": 365.9090909090909,
+            "score": 0.7916174530982971,
+            "template": "shulchan_aruch_right.png",
+            "template_sha256": "972b271468e3da89ebf4a316549ffa7b8d052eebb256f506a16ee2bb5fb0f1cd"
+          }
+        ],
+        "gray_regions": []
+      },
+      {
+        "page": 128,
+        "source_page": 67,
+        "passed": true,
+        "columns": [
+          {
+            "column": 1,
+            "learning_rect": [
+              497.3231506347656,
+              45.749725341796875,
+              629.7640991210938,
+              384.4413757324219
+            ],
+            "full_height": 394.2611083984375,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 844
+          },
+          {
+            "column": 2,
+            "learning_rect": [
+              355.23114013671875,
+              47.59125518798828,
+              487.6982116699219,
+              384.4393615722656
+            ],
+            "full_height": 394.2611083984375,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 1032
+          },
+          {
+            "column": 3,
+            "learning_rect": [
+              185.51214599609375,
+              45.749725341796875,
+              317.96337890625,
+              348.96295166015625
+            ],
+            "full_height": 394.2611083984375,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 788
+          },
+          {
+            "column": 4,
+            "learning_rect": [
+              43.43157958984375,
+              45.7530517578125,
+              176.01197814941406,
+              348.71099853515625
+            ],
+            "full_height": 394.2611083984375,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 799
+          }
+        ],
+        "boundaries": [
+          {
+            "x0": 0.0,
+            "x1": 340.0,
+            "cutoff_y": 358.18181818181813,
+            "score": 0.8805105686187744,
+            "template": "shulchan_aruch_left.png",
+            "template_sha256": "21831b21991ad0a10c9118e48b577fa98c789311a0d7ee2b97f227e4df310f1a"
+          },
+          {
+            "x0": 340.0,
+            "x1": 680.3150024414062,
+            "cutoff_y": 381.8181818181818,
+            "score": 0.8282662034034729,
+            "template": "shulchan_aruch_right.png",
+            "template_sha256": "972b271468e3da89ebf4a316549ffa7b8d052eebb256f506a16ee2bb5fb0f1cd"
+          }
+        ],
+        "gray_regions": []
+      },
+      {
+        "page": 149,
+        "source_page": 68,
+        "passed": true,
+        "columns": [
+          {
+            "column": 1,
+            "learning_rect": [
+              497.3117980957031,
+              47.59223175048828,
+              629.8004760742188,
+              366.5585021972656
+            ],
+            "full_height": 398.9827690124512,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 950
+          },
+          {
+            "column": 2,
+            "learning_rect": [
+              355.25311279296875,
+              41.0280647277832,
+              488.0771484375,
+              366.5596008300781
+            ],
+            "full_height": 398.9827690124512,
+            "expected_checkboxes": 3,
+            "glyphs_checked": 889
+          },
+          {
+            "column": 3,
+            "learning_rect": [
+              185.52349853515625,
+              44.19016647338867,
+              317.9372863769531,
+              82.18485260009766
+            ],
+            "full_height": 398.9827690124512,
+            "expected_checkboxes": 1,
+            "glyphs_checked": 84
+          }
+        ],
+        "boundaries": [
+          {
+            "x0": 0.0,
+            "x1": 340.0,
+            "cutoff_y": 342.27272727272725,
+            "score": 0.7970672845840454,
+            "template": "shulchan_aruch_left.png",
+            "template_sha256": "21831b21991ad0a10c9118e48b577fa98c789311a0d7ee2b97f227e4df310f1a"
+          },
+          {
+            "x0": 340.0,
+            "x1": 680.3150024414062,
+            "cutoff_y": 365.9090909090909,
+            "score": 0.812263011932373,
+            "template": "shulchan_aruch_right.png",
+            "template_sha256": "972b271468e3da89ebf4a316549ffa7b8d052eebb256f506a16ee2bb5fb0f1cd"
+          }
+        ],
+        "gray_regions": [
+          [
+            183.54302978515625,
+            86.45700073242188,
+            322.4410095214844,
+            350.78802490234375
+          ],
+          [
+            40.39300537109375,
+            45.355010986328125,
+            179.291015625,
+            350.78802490234375
+          ]
+        ]
+      }
+    ]
+  },
+  "source_coverage_independently_checked": true,
+  "gemara_units_per_day": {
+    "sunday": 2,
+    "monday": 2,
+    "tuesday": 2,
+    "wednesday": 2,
+    "thursday": 2,
+    "friday": 2,
+    "saturday": 2
+  },
+  "shared_gemara_sources": [
+    8,
+    10
+  ],
+  "shared_gemara_day": "monday",
+  "shared_saved_states": [
+    "Yes",
+    "Yes"
+  ],
+  "previous_pages": [
+    {
+      "source": 98,
+      "checkboxes": 0,
+      "reciprocal_links": true
+    },
+    {
+      "source": 106,
+      "checkboxes": 0,
+      "reciprocal_links": true
+    },
+    {
+      "source": 151,
+      "checkboxes": 0,
+      "reciprocal_links": true
+    },
+    {
+      "source": 152,
+      "checkboxes": 0,
+      "reciprocal_links": true
+    }
+  ],
+  "tehillim_regions": 36,
+  "tehillim_boxes": 93,
+  "review_confirmation_record_missing": true,
+  "no_output_modified": true
+}
