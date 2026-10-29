@@ -24,11 +24,31 @@ android {
         jniLibs { useLegacyPackaging = true }
     }
 
+    // The permanent release key never enters the repository: its details come from a file outside it, named by
+    // the OTZAROT_SIGNING property or environment variable (owner, 2026-10-29). Without it, no release signing.
+    def signingFile = System.getenv('OTZAROT_SIGNING') ?: (project.findProperty('OTZAROT_SIGNING') ?: '')
+    def signing = new Properties()
+    if (signingFile && file(signingFile).isFile()) file(signingFile).withInputStream { signing.load(it) }
+
+    signingConfigs {
+        if (signing.getProperty('storeFile')) {
+            release {
+                storeFile file(signing.getProperty('storeFile'))
+                storePassword signing.getProperty('storePassword')
+                keyAlias signing.getProperty('keyAlias')
+                keyPassword signing.getProperty('keyPassword')
+            }
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources = true
+            // not shrunk yet: the engine reaches the PDF library through native calls that shrinking can break,
+            // and the release must behave exactly like the versions tested
+            minifyEnabled false
+            shrinkResources = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (signing.getProperty('storeFile')) signingConfig signingConfigs.release
         }
     }
 
