@@ -14,7 +14,7 @@
     "gemara": 153
   },
   "gemara_review": {
-    "confirmed_by_owner": true,
+    "confirmed_by_owner": false,
     "date": "2026-10-28",
     "day_runs": [
       {
@@ -90,13 +90,14 @@
         "duplicate_amud": null
       }
     ],
-    "review_provenance": "The duplicate comparison showed source15 on the left (Wednesday tab), source17 on the right. In response to the Wednesday doubled-A/run14–19 question, the owner replied: השמאלי ראשון. Recorded the left copy/source15 first, then right/source17; retain both copies and all commentary in the source-marked Wednesday run14–19, with one shared A field. Other runs follow their source weekday tabs.",
+    "review_provenance": "Source15 precedes source17 in the original PDF. The owner asked whether the left copy was first. The prior interpretation as confirmation was incorrect. Keep the source-derived day_runs for inspection, but they are not an owner-confirmed review and must not bypass the build confirmation gate.",
     "owner_response": "השמאלי ראשון",
     "page_preview_shown": true,
-    "confirmed_copy_order": [
+    "source_copy_order": [
       15,
       17
-    ]
+    ],
+    "owner_clarification": "The owner clarified that השמאלי ראשון was a question, not an instruction or approval of copy order."
   },
   "tehillim": {
     "boundaries_reviewed": true,

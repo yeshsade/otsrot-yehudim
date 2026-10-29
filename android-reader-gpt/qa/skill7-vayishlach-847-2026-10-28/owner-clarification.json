@@ -1,0 +1,13 @@
+{
+  "recorded": "2026-10-29",
+  "owner_message": "לא ביקשתי שתשמור אותו בסדר שלי שאלתי",
+  "earlier_message": "השמאלי ראשון",
+  "confirmed_by_owner": false,
+  "source_copy_order": [
+    15,
+    17
+  ],
+  "pdfs_modified": false,
+  "historical_build_review_flag_was_incorrect": true,
+  "explanation": "The original run audit records the input consumed during that build. Its confirmed_by_owner=true was based on a mistaken interpretation and is superseded by this clarification. The example answers now have confirmed_by_owner=false. No owner-directed order change took place."
+}
