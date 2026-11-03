@@ -109,7 +109,8 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
 
     /** The day of what is in the middle of the screen, written where [place] says. */
     private fun drawCentered(canvas: Canvas, map: ProgressMap, range: IntArray) {
-        val label = dayAtCenter(map, range)?.let { map.day(it)?.label } ?: return
+        // the same day the bars name (the page now, not a page the engine still reports from before)
+        val label = currentDay(pdfView.currentPage)?.let { map.day(it)?.label } ?: return
         val w = pdfView.width.toFloat(); val h = pdfView.height.toFloat()
         val margin = 14 * density
         when (val where = place()) {
