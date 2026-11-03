@@ -91,12 +91,17 @@ class SettingsActivity : AppCompatActivity() {
         val eighth = JSONObject(assets.open("settings-copy-2026-10-27.json").bufferedReader().use { it.readText() })
         require(eighth.getString("status") == "approved")
         val dayWording2 = eighth.getJSONArray("entries")
+        // and on 2026-11-03 ("רקע צהבהב")
+        val ninth = JSONObject(assets.open("settings-copy-2026-11-03.json").bufferedReader().use { it.readText() })
+        require(ninth.getString("status") == "approved")
+        val warmWording = ninth.getJSONArray("entries")
         wording = ((0 until entries.length()).map { entries.getJSONObject(it) } + (0 until extra.length()).map { extra.getJSONObject(it) } +
             (0 until more.length()).map { more.getJSONObject(it) } + (0 until latest.length()).map { latest.getJSONObject(it) } +
             (0 until newest.length()).map { newest.getJSONObject(it) } +
             (0 until turnWording.length()).map { turnWording.getJSONObject(it) } +
             (0 until dayWording.length()).map { dayWording.getJSONObject(it) } +
-            (0 until dayWording2.length()).map { dayWording2.getJSONObject(it) })
+            (0 until dayWording2.length()).map { dayWording2.getJSONObject(it) } +
+            (0 until warmWording.length()).map { warmWording.getJSONObject(it) })
             .associateBy { it.getString("id") }
         font = Fonts.regular(this)
         mediumFont = Fonts.medium(this)
@@ -160,6 +165,7 @@ class SettingsActivity : AppCompatActivity() {
             Setting("frame", R.id.otzr_frame_label, R.id.otzr_frame_desc, listOf(Choice(FramePolicy.AUTO, R.id.otzr_frame_auto), Choice(FramePolicy.TAP, R.id.otzr_frame_tap), Choice(FramePolicy.ALWAYS, R.id.otzr_frame_always)), kind = Kind.FRAME),
             Setting("rotation", R.id.otzr_rotation_label, R.id.otzr_rotation_desc, listOf(Choice("phone", R.id.otzr_rotation_phone), Choice("lock", R.id.otzr_rotation_lock))),
             Setting("theme", R.id.otzr_theme_label, R.id.otzr_theme_desc, listOf(Choice("day", R.id.otzr_theme_day), Choice("night", R.id.otzr_theme_dark))),
+            Setting("warm", R.id.otzr_warm_label, R.id.otzr_warm_desc, listOf(Choice("on", R.id.otzr_warm_on), Choice("off", R.id.otzr_warm_off))),
         ),
         R.id.otzr_group_app to listOf(
             Setting("language", R.id.otzr_language_label, R.id.otzr_language_desc, listOf(Choice("he", R.id.otzr_language_he), Choice("en", R.id.otzr_language_en))),
@@ -181,6 +187,7 @@ class SettingsActivity : AppCompatActivity() {
         "sortsize" -> if (settings.sortBySize) "on" else "off"
         "dayplace" -> settings.dayNamePlace
         "daywhen" -> settings.dayNameWhen
+        "warm" -> if (settings.warmPaper) "on" else "off"
         else -> error("Unknown setting")
     }
 
@@ -204,6 +211,7 @@ class SettingsActivity : AppCompatActivity() {
             "sortsize" -> settings.sortBySize = value == "on"
             "dayplace" -> settings.dayNamePlace = value
             "daywhen" -> settings.dayNameWhen = value
+            "warm" -> settings.warmPaper = value == "on"
         }
         scrollPosition = scroll.scrollY
         sheet?.dismiss()

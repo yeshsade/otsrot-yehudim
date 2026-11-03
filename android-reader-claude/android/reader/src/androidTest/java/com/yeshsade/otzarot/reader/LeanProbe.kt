@@ -1394,6 +1394,7 @@ class LeanProbe : Instrumentation() {
             if (inWeek && today != null) {
                 fun hasTag(t: String): Boolean { var ok = false; onMain { ok = reader.window.decorView.findViewWithTag<View>(t) != null }; return ok }
                 waitFor("the offer to go to today", 30_000) { hasTag("offer_go") }
+                check(hasTag("offer_go_1")) { "no \"התעלם\" in the first bubble" }
                 SystemClock.sleep(1000); waitForIdleSync()
                 onMainChecked { snapshot(reader, "18-offer.png") }
                 var before = 0; onMain { before = pdfView(reader).currentPage }
@@ -1403,6 +1404,7 @@ class LeanProbe : Instrumentation() {
                 val first = pm.pages.filter { it.dayId == today && it.weekOffset == 0 }.minOf { it.page }
                 check(at == first) { "went to page ${at + 1}, not ${first + 1}" }
                 check(hasTag("offer_undo")) { "no undo after going" }
+                check(!hasTag("offer_go")) { "the first bubble stayed" }
                 onMainChecked { snapshot(reader, "18-offer-undo.png") }
                 onMainChecked { (reader.window.decorView.findViewWithTag<View>("offer_undo") as android.view.ViewGroup).getChildAt(0).performClick() }
                 SystemClock.sleep(1500); waitForIdleSync()
@@ -1489,6 +1491,13 @@ class LeanProbe : Instrumentation() {
         onMain { monday = (reader.window.decorView.findViewWithTag<View>("bar_page") as android.widget.TextView).text.toString() }
         check(monday.contains("יום שני")) { "bar after moving: '$monday'" }
         record("The day's name shows only when a new day comes, not at a touch; the bar follows ($monday)")
+        // a Tehillim page in Monday's part, with a piece of Sunday on it, is Monday's (owner, 2026-11-03)
+        onMainChecked { v.jumpTo(55, false) }
+        SystemClock.sleep(1500); waitForIdleSync()
+        var tehillim = ""
+        onMain { tehillim = (reader.window.decorView.findViewWithTag<View>("bar_page") as android.widget.TextView).text.toString() }
+        check(tehillim.contains("יום שני") && !tehillim.contains("ראשון")) { "Tehillim page in Monday's part: '$tehillim'" }
+        record("A Tehillim page in Monday's part is named Monday only ($tehillim)")
         app.settings.dayNameWhen = "touch"
         onMainChecked { v.jumpTo(24, false) }
         settle()
@@ -1498,7 +1507,7 @@ class LeanProbe : Instrumentation() {
         settle()
         var version = ""
         onMain { version = (reader.lastMenu!!.root.findViewWithTag<View>("drawer_version") as android.widget.TextView).text.toString() }
-        check(version.contains("0.2.18")) { "version: '$version'" }
+        check(version.contains("0.2.19")) { "version: '$version'" }
         onMainChecked { snapshotView(reader.lastMenu!!.dialog.window!!.decorView, "15-drawer.png") }
         record("The drawer shows the version at the bottom ($version)")
         onMainChecked { reader.lastMenu!!.root.findViewWithTag<View>("menu_quick_mark").performClick() }
@@ -1578,6 +1587,7 @@ class LeanProbe : Instrumentation() {
         SystemClock.sleep(2000)
         for (place in listOf("corner", "top", "bubble_top", "bubble_bottom")) {
             app.settings.dayNamePlace = place
+            if (place == "bubble_bottom") onMainChecked { reader.javaClass.getDeclaredField("chrome").apply { isAccessible = true }.get(reader).let { c -> c.javaClass.getMethod("show").invoke(c) } }
             onMainChecked { dn0(reader).let { d -> d.javaClass.getMethod("touched").invoke(d) } }
             SystemClock.sleep(400)
             onMainChecked { snapshot(reader, "18-place-$place.png") }

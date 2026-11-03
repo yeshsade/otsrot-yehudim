@@ -139,4 +139,7 @@
     <string name="reader_go_day">Go to %1$s?</string>
     <string name="reader_go">Go</string>
     <string name="reader_go_undo">Undo</string>
+    <string name="reader_ignore">Ignore</string>
+    <string name="reader_back_day">Back to %1$s</string>
+    <string name="reader_back_page">Back to page %1$d</string>
 </resources>

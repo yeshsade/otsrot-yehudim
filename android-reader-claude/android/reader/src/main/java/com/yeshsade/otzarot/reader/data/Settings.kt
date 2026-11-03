@@ -121,6 +121,11 @@ class Settings(context: Context) {
         get() = prefs.getString(DAY_NAME_WHEN, "touch") ?: "touch"
         set(v) = prefs.edit().putString(DAY_NAME_WHEN, v).apply()
 
+    /** A hint of warm paper over the pages by day (owner, 2026-11-03), on unless turned off. */
+    var warmPaper: Boolean
+        get() = prefs.getBoolean(WARM_PAPER, true)
+        set(v) = prefs.edit().putBoolean(WARM_PAPER, v).apply()
+
     var scrubberAlways: Boolean
         get() = prefs.getBoolean(SCRUB_ALWAYS, false)
         set(v) = prefs.edit().putBoolean(SCRUB_ALWAYS, v).apply()
@@ -160,6 +165,7 @@ class Settings(context: Context) {
         const val DAY_NAME_CENTERED = "day_name_centered"
         const val DAY_NAME_PLACE = "day_name_place"
         const val DAY_NAME_WHEN = "day_name_when"
+        const val WARM_PAPER = "warm_paper"
         const val BM_HORIZONTAL = "bookmark_horizontal"
         const val SORT_REVERSED = "sort_reversed"
         const val SORT_SIZE = "sort_by_size"

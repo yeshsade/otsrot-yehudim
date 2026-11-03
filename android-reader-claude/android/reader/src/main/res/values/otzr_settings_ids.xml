@@ -60,6 +60,10 @@
   <item type="id" name="otzr_daywhen_touch" />
   <item type="id" name="otzr_daywhen_tap" />
   <item type="id" name="otzr_daywhen_day" />
+  <item type="id" name="otzr_warm_label" />
+  <item type="id" name="otzr_warm_desc" />
+  <item type="id" name="otzr_warm_on" />
+  <item type="id" name="otzr_warm_off" />
   <item type="id" name="otzr_dayname_label" />
   <item type="id" name="otzr_dayname_desc" />
   <item type="id" name="otzr_dayname_on" />

@@ -249,7 +249,8 @@ class ReaderActivity : AppCompatActivity() {
             topInset = { maxOf(statusInset, runCatching { infoLine.bottom }.getOrDefault(0)) + ui.dp(6) }
             bottomInset = { navInset + runCatching { toolbar.height }.getOrDefault(0) + ui.dp(28) }
         }
-        pdfView.setOverlayDrawer { canvas -> bookmarks.draw(canvas); dayName.draw(canvas) }
+        val tint = PaperTint(pdfView, ui.night).apply { on = { settings.warmPaper } }
+        pdfView.setOverlayDrawer { canvas -> tint.draw(canvas); bookmarks.draw(canvas); dayName.draw(canvas) }
         body.addView(Bookmarks.TouchLayer(this, bookmarks), FrameLayout.LayoutParams(-1, -1))
 
         val toolbar = toolbar()
@@ -827,35 +828,59 @@ class ReaderActivity : AppCompatActivity() {
         val label = m.day(today)?.label ?: return
         val first = m.pages.filter { it.dayId == today && it.weekOffset == 0 }.minOfOrNull { it.page }
             ?: m.checks.filter { it.dayId == today }.flatMap { it.pages }.minOrNull() ?: return
-        showOffer(getString(R.string.reader_go_day, label), getString(R.string.reader_go), OFFER_MS, "offer_go") {
-            val back = pdfView.positionOffset
-            pdfView.jumpTo(first, false)
-            showOffer(null, getString(R.string.reader_go_undo), UNDO_OFFER_MS, "offer_undo") { pdfView.setPositionOffset(back, true) }
-        }
+        showOffer(getString(R.string.reader_go_day, label), listOf(
+            getString(R.string.reader_go) to {
+                val back = pdfView.positionOffset
+                pdfView.jumpTo(first, false)
+                showOffer(null, listOf(getString(R.string.reader_go_undo) to { pdfView.setPositionOffset(back, true) }), UNDO_OFFER_MS, "offer_undo")
+            },
+            getString(R.string.reader_ignore) to null), OFFER_MS, "offer_go")
     }
 
-    /** A dark bubble above the reading bar: a line and a button, gone after [millis]. */
-    private fun showOffer(text: String?, button: String, millis: Long, tagName: String, action: () -> Unit) {
+    /**
+     * A dark bubble above the reading bar: a line (or none) and its buttons, gone after [millis]. Every bubble
+     * can be dismissed with "התעלם" (owner, 2026-11-03), except "ביטול", which is its own way out.
+     */
+    private fun showOffer(text: String?, buttons: List<Pair<String, (() -> Unit)?>>, millis: Long, tagName: String) {
         offer?.let { frame.removeView(it) }
         val pill = ui.row().apply {
             tag = tagName
+            gravity = Gravity.CENTER
             background = ui.rounded(OFFER_BG, 24f)
             elevation = ui.dp(8).toFloat()
-            setPadding(ui.dp(18), ui.dp(6), ui.dp(8), ui.dp(6))
+            // the same on both sides, so a bubble of one button has it in the middle (owner: "לא ממורכז")
+            setPadding(ui.dp(if (text != null) 18 else 6), ui.dp(6), ui.dp(6), ui.dp(6))
         }
-        if (text != null) pill.addView(ui.label(text, 15f, Color.WHITE).apply { setPadding(0, 0, ui.dp(10), 0) })
-        pill.addView(ui.label(button, 15f, OFFER_BUTTON, true).apply {
-            gravity = Gravity.CENTER
-            minimumHeight = ui.dp(40)
-            setPadding(ui.dp(12), 0, ui.dp(12), 0)
-            background = android.graphics.drawable.RippleDrawable(ColorStateList.valueOf(0x33FFFFFF), null, ui.rounded(Color.WHITE, 18f))
-            setOnClickListener { frame.removeView(pill); if (offer === pill) offer = null; action() }
-        })
+        if (text != null) pill.addView(ui.label(text, 15f, Color.WHITE).apply { setPadding(0, 0, ui.dp(8), 0) })
+        buttons.forEachIndexed { i, (label, action) ->
+            pill.addView(ui.label(label, 15f, if (action == null) OFFER_IGNORE else OFFER_BUTTON, action != null).apply {
+                gravity = Gravity.CENTER
+                minimumHeight = ui.dp(40)
+                setPadding(ui.dp(12), 0, ui.dp(12), 0)
+                tag = "${tagName}_$i"
+                background = android.graphics.drawable.RippleDrawable(ColorStateList.valueOf(0x33FFFFFF), null, ui.rounded(Color.WHITE, 18f))
+                setOnClickListener { frame.removeView(pill); if (offer === pill) offer = null; action?.invoke() }
+            })
+        }
         frame.addView(pill, FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL).apply {
             bottomMargin = ui.dp(14) + navInset + toolbar.height + ui.dp(14)
         })
         offer = pill
         pill.postDelayed({ if (offer === pill) { frame.removeView(pill); offer = null } }, millis)
+    }
+
+    /**
+     * A booklet button took the reader to another page: a bubble offers the way back, for half a minute
+     * ("חזרה ליום שני" · "התעלם", owner 2026-10-29 / 11-03).
+     */
+    private fun offerBack(fromOffset: Float, fromPage: Int, fromDay: String?) {
+        main.postDelayed({
+            if (isDestroyed || pdfView.currentPage == fromPage) return@postDelayed
+            val label = fromDay?.let { parsedMap?.day(it)?.label }
+            val back = if (label != null) getString(R.string.reader_back_day, label) else getString(R.string.reader_back_page, fromPage + 1)
+            showOffer(null, listOf(back to { pdfView.setPositionOffset(fromOffset, true) }, getString(R.string.reader_ignore) to null),
+                OFFER_MS, "offer_back")
+        }, BACK_DELAY_MS)
     }
 
     /** The day of the last page read that belongs to a day (a cover or contents page keeps the one before). */
@@ -903,7 +928,10 @@ class ReaderActivity : AppCompatActivity() {
         // Boxes are found from what the screen already knows, so a tap never waits for a save in progress.
         val known = pdfView.canPeekFormFieldAt(event.x, event.y)
         val field = (if (known) pdfView.peekFormFieldAt(event.x, event.y) else pdfView.findFormFieldAt(event.x, event.y)) ?: run {
-            if (pdfView.findLinkAt(event.x, event.y) != null) {
+            val linkTap = pdfView.findLinkAt(event.x, event.y)
+            if (linkTap != null) {
+                // a jump inside the booklet: offer the way back
+                if (linkTap.link.destPageIdx != null) offerBack(pdfView.positionOffset, pdfView.currentPage, dayName.currentDay(pdfView.currentPage))
                 // a booklet button: the page it opens starts at the top of the screen, not under the floating
                 // top bar (owner, 2026-10-20: the buttons felt like they landed "at the bottom of the page")
                 if (FramePolicy.canHide(app.settings.frameMode)) chrome.hide() else chrome.used()
@@ -1182,6 +1210,8 @@ class ReaderActivity : AppCompatActivity() {
         const val OFFER_DELAY_MS = 900L
         const val OFFER_MS = 30_000L
         const val UNDO_OFFER_MS = 10_000L
+        const val BACK_DELAY_MS = 700L
+        private val OFFER_IGNORE = Color.parseColor("#D9D6E3")
         private val OFFER_BG = Color.parseColor("#2E2A3D")
         private val OFFER_BUTTON = Color.parseColor("#C5B8FF")
         /** Two-finger zoom limit, relative to the whole page (Xodo allows about the same). */

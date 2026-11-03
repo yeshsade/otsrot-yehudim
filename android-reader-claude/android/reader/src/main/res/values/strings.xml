@@ -147,4 +147,7 @@
     <string name="reader_go_day">לעבור ל%1$s?</string>
     <string name="reader_go">מעבר</string>
     <string name="reader_go_undo">ביטול</string>
+    <string name="reader_ignore">התעלם</string>
+    <string name="reader_back_day">חזרה ל%1$s</string>
+    <string name="reader_back_page">חזרה לעמוד %1$d</string>
 </resources>

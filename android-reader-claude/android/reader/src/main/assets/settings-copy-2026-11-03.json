@@ -1,0 +1,11 @@
+{
+  "version": "2026-11-03",
+  "status": "approved",
+  "note": "Approved by the owner on 2026-11-03 ('כן'): a warm paper tint, on by default. No description line. English is Claude's translation.",
+  "entries": [
+    {"id": "warm_label", "he": "רקע צהבהב", "en": "Warm paper"},
+    {"id": "warm_desc", "he": "", "en": ""},
+    {"id": "warm_on", "he": "פועל", "en": "On"},
+    {"id": "warm_off", "he": "כבוי", "en": "Off"}
+  ]
+}

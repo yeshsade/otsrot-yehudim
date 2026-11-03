@@ -93,7 +93,9 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
     /** Each day on this page and the part of the page (in points of the page as seen) that is that day's. */
     private fun parts(info: ProgressMap.PageInfo, page: Int): List<Pair<String, RectF>> {
         val byDay = info.regions.filter { it.dayId != null }.groupBy { it.dayId!! }
-        if (byDay.size > 1) {
+        // the days edition files each page under its own day: a Tehillim page in Monday's part is Monday's, even
+        // with a piece of Sunday on it (owner, 2026-11-03). Split only where the page has no day (the topics edition).
+        if (byDay.size > 1 && info.dayId == null) {
             return byDay.map { (day, regions) ->
                 day to RectF(regions.minOf { it.left }, regions.minOf { it.top }, regions.maxOf { it.right }, regions.maxOf { it.bottom })
             }
@@ -154,7 +156,7 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
      */
     fun currentDay(page: Int): String? {
         val info = map?.pageInfo(page)?.takeIf { it.weekOffset == 0 }
-        val onPage = info?.let { i -> listOfNotNull(i.dayId) + i.regions.mapNotNull { it.dayId } }.orEmpty()
+        val onPage = info?.let { i -> i.dayId?.let { listOf(it) } ?: i.regions.mapNotNull { it.dayId } }.orEmpty()
         // right after a jump the engine may still report the pages of before: a day that is not on the page now
         // in the middle is not taken (owner's check: the name stayed on the old day)
         dayAtCenter()?.let { if (onPage.isEmpty() || it in onPage) return it }
@@ -220,7 +222,7 @@ class DayName(private val pdfView: PDFView, typeface: Typeface, private val nigh
     /** Each piece of a split page with its day; a page of one day is one piece, the whole page. */
     private fun pieces(info: ProgressMap.PageInfo, page: Int): List<Pair<String, RectF>> {
         val withDay = info.regions.filter { it.dayId != null }
-        if (withDay.map { it.dayId }.distinct().size > 1) {
+        if (withDay.map { it.dayId }.distinct().size > 1 && info.dayId == null) {
             return withDay.map { it.dayId!! to RectF(it.left, it.top, it.right, it.bottom) }
         }
         return parts(info, page)
