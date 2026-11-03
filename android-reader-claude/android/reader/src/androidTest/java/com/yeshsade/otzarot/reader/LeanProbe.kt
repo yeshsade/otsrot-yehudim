@@ -1584,7 +1584,9 @@ class LeanProbe : Instrumentation() {
         onMainChecked { snapshot(reader, "15-dayname-zoom.png") }
         record("The day's name shows in the middle of the screen when zoomed in")
         onMainChecked { v.resetZoom() }
-        SystemClock.sleep(2000)
+        // the page drawn first: the name needs the page open to know its day
+        waitFor("page drawn", 120_000) { var open = false; onMain { open = v.isPageOpen(v.currentPage) }; open }
+        SystemClock.sleep(20_000)
         for (place in listOf("corner", "top", "bubble_top", "bubble_bottom")) {
             app.settings.dayNamePlace = place
             if (place == "bubble_bottom") onMainChecked { reader.javaClass.getDeclaredField("chrome").apply { isAccessible = true }.get(reader).let { c -> c.javaClass.getMethod("show").invoke(c) } }
