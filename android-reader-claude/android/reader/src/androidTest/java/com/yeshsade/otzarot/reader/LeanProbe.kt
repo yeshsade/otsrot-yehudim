@@ -62,6 +62,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "s843") { vayera843(); return }
         if (mode == "edges") { edges(); return }
         if (mode == "hostile") { hostile(); return }
+        if (mode == "sharp") { sharp(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -1508,7 +1509,7 @@ class LeanProbe : Instrumentation() {
         settle()
         var version = ""
         onMain { version = (reader.lastMenu!!.root.findViewWithTag<View>("drawer_version") as android.widget.TextView).text.toString() }
-        check(version.contains("0.2.20")) { "version: '$version'" }
+        check(version.contains("0.2.21")) { "version: '$version'" }
         onMainChecked { snapshotView(reader.lastMenu!!.dialog.window!!.decorView, "15-drawer.png") }
         record("The drawer shows the version at the bottom ($version)")
         onMainChecked { reader.lastMenu!!.root.findViewWithTag<View>("menu_quick_mark").performClick() }
@@ -1750,6 +1751,47 @@ class LeanProbe : Instrumentation() {
             SystemClock.sleep(3000); waitForIdleSync()
             onMainChecked { list.finish() }
             record("the list opens after the broken files")
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /**
+     * Owner, 2026-11-04 (issue #9): the text looks a little less clear than in Xodo. A screenshot of one page at
+     * rest, and where the page sits on the screen, so it can be compared with the page drawn exactly at that size.
+     */
+    private fun sharp() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            app.settings.whatsAppPromptDismissed = true; app.settings.bookmarkHintNever = true
+            app.settings.warmPaper = false
+            app.settings.frameMode = com.yeshsade.otzarot.reader.data.FramePolicy.TAP
+            val reader = openDoc()
+            waitLoaded(reader)
+            val v = pdfView(reader)
+            val page = (arguments("page") ?: "23").toInt()
+            onMainChecked { v.jumpTo(page, false) }
+            for (zoom in listOf(1f, (arguments("zoom") ?: "1.6").toFloat())) {
+                if (zoom != 1f) onMainChecked { v.zoomCenteredTo(zoom, android.graphics.PointF(v.width / 2f, v.height / 2f)); v.loadPages() }
+                SystemClock.sleep(30_000); waitForIdleSync()
+                var info = ""
+                onMain {
+                    val size = v.getFrameSize(page)
+                    val box = v.frameRectToView(page, android.graphics.RectF(0f, 0f, size[0], size[1]))
+                    val at = IntArray(2); v.getLocationOnScreen(at)
+                    info = "page=$page zoom=${v.zoom} frame=${size[0]}x${size[1]} box=${box?.left},${box?.top},${box?.right},${box?.bottom} viewAt=${at[0]},${at[1]}"
+                }
+                val tag = "sharp-${arguments("tag") ?: "x"}-${"%.1f".format(zoom)}"
+                onMainChecked { snapshot(reader, "$tag.png") }
+                File(targetContext.filesDir, "$tag.txt").writeText(info)
+                record("$tag: $info")
+            }
+            while (pendingPngs.get() > 0) SystemClock.sleep(100)
+            onMainChecked { reader.finish() }
             result.putString("stream", "Passed $passed checks.\n")
             finish(Activity.RESULT_OK, result)
         } catch (error: Throwable) {

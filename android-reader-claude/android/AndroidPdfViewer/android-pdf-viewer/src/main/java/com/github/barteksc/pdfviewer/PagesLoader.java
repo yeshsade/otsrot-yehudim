@@ -105,11 +105,15 @@ class PagesLoader {
         grid.cols = MathUtils.ceil(1f / partWidth);
     }
 
-    private void calculatePartSize(GridSize grid) {
+    private void calculatePartSize(GridSize grid, int pageIndex) {
         pageRelativePartWidth = 1f / (float) grid.cols;
         pageRelativePartHeight = 1f / (float) grid.rows;
-        partRenderWidth = Constants.PART_SIZE / pageRelativePartWidth;
-        partRenderHeight = Constants.PART_SIZE / pageRelativePartHeight;
+        // The whole page is drawn at exactly its size on the screen, so every pixel of a part lands on one pixel
+        // of the screen. Before, the page was drawn a little bigger (whole parts of 256) and then shrunk on the
+        // screen, and the shrinking softened the letters (owner, 2026-11-04: "באקסודו אני רואה מעט יותר ברור").
+        SizeF size = pdfView.pdfFile.getPageSize(pageIndex);
+        partRenderWidth = pdfView.toCurrentScale(size.getWidth());
+        partRenderHeight = pdfView.toCurrentScale(size.getHeight());
     }
 
 
@@ -247,7 +251,7 @@ class PagesLoader {
         }
 
         for (RenderRange range : rangeList) {
-            calculatePartSize(range.gridSize);
+            calculatePartSize(range.gridSize, range.page);
             parts += loadPage(range.page, range.leftTop.row, range.rightBottom.row, range.leftTop.col, range.rightBottom.col, CACHE_SIZE - parts);
             if (parts >= CACHE_SIZE) {
                 break;
@@ -334,7 +338,7 @@ class PagesLoader {
     }
 
     private void loadSnapshotPart(RenderRange range) {
-        calculatePartSize(range.gridSize);
+        calculatePartSize(range.gridSize, range.page);
         float relLeft = range.leftTop.col * pageRelativePartWidth;
         float relTop = range.leftTop.row * pageRelativePartHeight;
         float relRight = Math.min((range.rightBottom.col + 1) * pageRelativePartWidth, 1f);

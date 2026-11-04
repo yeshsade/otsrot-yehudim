@@ -1983,15 +1983,18 @@ public class PDFView extends RelativeLayout {
             float width = toCurrentScale(pageRelativeBounds.width() * size.getWidth());
             float height = toCurrentScale(pageRelativeBounds.height() * size.getHeight());
 
-            // If we use float values for this rectangle, there will be a possible gap between
-            // page parts, especially when the zoom level is high.
-            RectF dstRect = new RectF((int) offsetX, (int) offsetY,
-                (int) (offsetX + width),
-                (int) (offsetY + height));
-
             // Check if bitmap is in the screen
             float translationX = currentXOffset + localTranslationX;
             float translationY = currentYOffset + localTranslationY;
+
+            // The part's edges fall on whole pixels of the screen (not only of the page): a part that starts
+            // between two pixels is smeared over both, and the letters look soft (owner, 2026-11-04). Neighbouring
+            // parts share their rounded edge, so there is still no gap between them.
+            RectF dstRect = new RectF(
+                Math.round(translationX + offsetX) - translationX,
+                Math.round(translationY + offsetY) - translationY,
+                Math.round(translationX + offsetX + width) - translationX,
+                Math.round(translationY + offsetY + height) - translationY);
             if (translationX + dstRect.left >= getWidth() || translationX + dstRect.right <= 0 ||
                 translationY + dstRect.top >= getHeight() || translationY + dstRect.bottom <= 0) {
                 canvas.translate(-localTranslationX, -localTranslationY);
