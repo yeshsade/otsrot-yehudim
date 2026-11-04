@@ -61,6 +61,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "stage2") { stageTwo(); return }
         if (mode == "s843") { vayera843(); return }
         if (mode == "edges") { edges(); return }
+        if (mode == "hostile") { hostile(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -1507,7 +1508,7 @@ class LeanProbe : Instrumentation() {
         settle()
         var version = ""
         onMain { version = (reader.lastMenu!!.root.findViewWithTag<View>("drawer_version") as android.widget.TextView).text.toString() }
-        check(version.contains("0.2.19")) { "version: '$version'" }
+        check(version.contains("0.2.20")) { "version: '$version'" }
         onMainChecked { snapshotView(reader.lastMenu!!.dialog.window!!.decorView, "15-drawer.png") }
         record("The drawer shows the version at the bottom ($version)")
         onMainChecked { reader.lastMenu!!.root.findViewWithTag<View>("menu_quick_mark").performClick() }
@@ -1676,6 +1677,79 @@ class LeanProbe : Instrumentation() {
             onMainChecked { snapshot(reader, "back-portrait.png") }
             waitFor("pictures written", 120_000) { pendingPngs.get() == 0 }
             onMainChecked { reader.finish() }
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /**
+     * Security review, 2026-11-04: broken or strange files never bring the app down; links of other kinds in a
+     * PDF are not followed; another app can't make the reader open the app's own private files.
+     * Files are put in /sdcard/Download/hostile/ by the run script (names given in "files", comma-separated).
+     */
+    private fun hostile() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            app.settings.whatsAppPromptDismissed = true; app.settings.bookmarkHintNever = true
+
+            // links: only a site, an email or a phone number
+            val handler = Class.forName("com.github.barteksc.pdfviewer.link.DefaultLinkHandler")
+            val allowed = handler.getDeclaredMethod("allowed", Uri::class.java).apply { isAccessible = true }
+            for (ok in listOf("https://wa.me/972", "http://example.com", "mailto:a@b.c", "tel:031234567", "HTTPS://X.Y"))
+                check(allowed.invoke(null, Uri.parse(ok)) == true) { "should follow $ok" }
+            for (bad in listOf("intent://x#Intent;component=a/b;end", "file:///sdcard/a.pdf", "content://x/y", "javascript:alert(1)",
+                    "market://details?id=x", "whatsapp://send?text=x", "sms:123", "no-scheme"))
+                check(allowed.invoke(null, Uri.parse(bad)) == false) { "should not follow $bad" }
+            record("links: only http/https/mailto/tel are followed")
+
+            // another app names a private file of the reader: the screen closes, nothing is added to the list
+            val before = app.library.all().size
+            val private = File(targetContext.filesDir, "library.json").also { if (!it.exists()) it.writeText("[]") }
+            for (f in listOf(private, File("/data/data/" + targetContext.packageName + "/files/./library.json"))) {
+                val reader = openShared(Uri.fromFile(f))
+                waitFor("private file refused", 15_000) { var gone = false; onMain { gone = reader.isFinishing || reader.isDestroyed }; gone }
+                check(app.library.all().size == before) { "a private file was added to the list" }
+            }
+            record("private files of the app are not opened")
+
+            // broken files: the app stays up, each one either opens or says it can't
+            val names = (arguments("files") ?: "").split(',').filter { it.isNotBlank() }
+            check(names.isNotEmpty()) { "no files given" }
+            for (name in names) {
+                val file = File("/sdcard/Download/hostile/$name")
+                check(file.exists()) { "missing $file" }
+                val started = SystemClock.uptimeMillis()
+                val reader = openShared(Uri.fromFile(file))
+                var how = "?"
+                waitFor("$name: opened or refused", 120_000) {
+                    var done = false
+                    onMain {
+                        when {
+                            reader.isFinishing || reader.isDestroyed -> { how = "refused"; done = true }
+                            pdfView(reader).getPageCount() > 0 -> { how = "opened ${pdfView(reader).getPageCount()}p"; done = true }
+                        }
+                    }
+                    done
+                }
+                if (how.startsWith("opened")) {
+                    // draw a while, move, and close: rendering a strange page must not crash either
+                    SystemClock.sleep(4000); waitForIdleSync()
+                    onMainChecked { pdfView(reader).jumpTo(pdfView(reader).getPageCount() - 1, false) }
+                    SystemClock.sleep(4000); waitForIdleSync()
+                    onMainChecked { reader.finish() }
+                }
+                waitFor("$name: closed", 30_000) { var gone = false; onMain { gone = reader.isDestroyed }; gone }
+                record("$name: $how in ${(SystemClock.uptimeMillis() - started) / 1000}s, app still running")
+            }
+            // the list still opens with whatever was added
+            val list = startActivitySync(Intent(targetContext, LibraryActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            SystemClock.sleep(3000); waitForIdleSync()
+            onMainChecked { list.finish() }
+            record("the list opens after the broken files")
             result.putString("stream", "Passed $passed checks.\n")
             finish(Activity.RESULT_OK, result)
         } catch (error: Throwable) {

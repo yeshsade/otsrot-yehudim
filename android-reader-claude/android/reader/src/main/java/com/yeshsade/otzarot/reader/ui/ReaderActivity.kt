@@ -443,6 +443,22 @@ class ReaderActivity : AppCompatActivity() {
         Intent.ACTION_SEND -> if (Build.VERSION.SDK_INT >= 33) intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
             else intent.getParcelableExtra(Intent.EXTRA_STREAM)
         else -> intent.data
+    }?.takeUnless { ownPrivateFile(it) }
+
+    /**
+     * Another app may name a file inside this app's own private folder (the list, the working copies): that is
+     * never a PDF someone shares, and opening it could let marks be written over the app's own files (security
+     * review, 2026-11-04).
+     */
+    private fun ownPrivateFile(uri: Uri): Boolean {
+        if (uri.scheme != "file") return false
+        val path = uri.path ?: return true
+        return runCatching {
+            val file = File(path).canonicalPath
+            val own = listOfNotNull(applicationInfo.dataDir, filesDir.parent, cacheDir.parent)
+                .map { File(it).canonicalPath + File.separator }
+            own.any { file.startsWith(it) }
+        }.getOrDefault(true)
     }
 
     private fun show(target: Doc) {

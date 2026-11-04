@@ -44,16 +44,36 @@ public class DefaultLinkHandler implements LinkHandler {
         }
     }
 
+    /**
+     * Only the kinds of links a booklet has (a site, an email, a phone number). A link of any other kind in a
+     * PDF (another app's private address, a file on the device, ...) is not followed: a PDF from anyone may
+     * hold such links (security review, 2026-11-04).
+     */
+    static boolean allowed(Uri uri) {
+        String scheme = uri.getScheme();
+        if (scheme == null) return false;
+        switch (scheme.toLowerCase(java.util.Locale.ROOT)) {
+            case "http": case "https": case "mailto": case "tel": return true;
+            default: return false;
+        }
+    }
+
     private void handleUri(String uri) {
         Uri parsedUri = Uri.parse(uri);
+        if (!allowed(parsedUri)) {
+            Log.w(TAG, "Link not followed: " + parsedUri.getScheme());
+            return;
+        }
         Intent intent = new Intent(Intent.ACTION_VIEW, parsedUri);
+        // like a link in a web browser: only apps that say they accept links from the web may open it
+        intent.addCategory(Intent.CATEGORY_BROWSABLE);
         Context context = pdfView.getContext();
 
         try {
             context.startActivity(intent);
         }
         catch (Exception e) {
-            Log.w(TAG, "No activity found for URI: " + uri + "Error: " + e.getMessage());
+            Log.w(TAG, "No app opens this link: " + e.getMessage());
         }
     }
 
