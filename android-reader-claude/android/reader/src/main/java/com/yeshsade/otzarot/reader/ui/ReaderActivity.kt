@@ -428,13 +428,19 @@ class ReaderActivity : AppCompatActivity() {
             val opened = runCatching { Intake(this, library, app.settings).open(uri) }.getOrNull()
             main.post {
                 if (isFinishing || isDestroyed) return@post
-                if (opened == null) {
-                    // the notice is part of this screen: close the screen after it has been read
-                    Messages.notice(this, getString(R.string.open_failed))
-                    main.postDelayed({ if (!isDestroyed) finish() }, 3000)
-                } else show(opened)
+                if (opened == null) openFailed() else show(opened)
             }
         }
+    }
+
+    /**
+     * The file can't be shown (empty, broken, locked with a password...): say so, and close the screen after the
+     * notice has been read, instead of leaving an empty screen (security review, 2026-11-04).
+     */
+    private fun openFailed() {
+        if (isFinishing || isDestroyed) return
+        Messages.notice(this, getString(R.string.open_failed))
+        main.postDelayed({ if (!isDestroyed) finish() }, 3000)
     }
 
     @Suppress("DEPRECATION")
@@ -493,10 +499,7 @@ class ReaderActivity : AppCompatActivity() {
             val ok = runCatching { prepareSnapshot(target, Uri.parse(target.uri), file); true }.getOrDefault(false)
             main.post {
                 if (isFinishing || isDestroyed) return@post
-                if (!ok) {
-                    Messages.notice(this, getString(R.string.open_failed))
-                    return@post
-                }
+                if (!ok) { openFailed(); return@post }
                 snapshot = file
                 display(target, file)
             }
@@ -622,7 +625,7 @@ class ReaderActivity : AppCompatActivity() {
                 showPage(page)
                 app.io.execute { app.library.update(target.id) { it.copy(page = page) } }
             }
-            .onError { Messages.notice(this, getString(R.string.open_failed)) }
+            .onError { openFailed() }
             // let go of the engine only after the last capture (see onDestroy), not when the window closes
             .autoReleasingWhenDetachedFromWindow(false)
             .load()
