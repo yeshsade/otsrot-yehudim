@@ -139,9 +139,22 @@
         "duplicate_amud": "b",
         "question": "יום חמישי — עמודי מקור 22–27 בקובץ הפנים. איזה עמוד כפול: א׳, ב׳ או שניהם?",
         "response": "ב"
+      },
+      "friday": {
+        "source_pages": [
+          28,
+          29,
+          30,
+          31,
+          32,
+          33
+        ],
+        "duplicate_amud": "b",
+        "question": "יום שישי — עמודי מקור 28–33 בקובץ הפנים. איזה עמוד כפול: א׳, ב׳ או שניהם?",
+        "response": "ב"
       }
     },
-    "review_provenance": "INCOMPLETE: Tuesday, Wednesday and Thursday duplicate B are owner-confirmed. Friday and Saturday remain provisional; ask one day/run at a time."
+    "review_provenance": "INCOMPLETE: Tuesday, Wednesday, Thursday and Friday duplicate B are owner-confirmed. Saturday remains provisional; ask its day/run before building."
   },
   "tehillim": {
     "boundaries_reviewed": true,
