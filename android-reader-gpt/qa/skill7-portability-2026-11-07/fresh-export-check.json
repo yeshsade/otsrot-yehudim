@@ -1,0 +1,12 @@
+{
+  "fresh_git_export": true,
+  "checked_from_unrelated_directory": true,
+  "font_library_files_verified": 34,
+  "exact_production_fonts": 2,
+  "missing_original_fonts": [
+    "DAVIDB.TTF",
+    "Guttman Hatzvi-Bold.TTF"
+  ],
+  "full_production_ready": false,
+  "no_old_workspace_font_path_used": true
+}
