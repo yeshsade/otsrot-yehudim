@@ -1,0 +1,237 @@
+{
+  "requires_owner_confirmation": true,
+  "duplicates": [
+    [
+      {
+        "source_page": 12,
+        "day_id": "tuesday",
+        "amud": "b"
+      },
+      {
+        "source_page": 14,
+        "day_id": "tuesday",
+        "amud": "b"
+      }
+    ],
+    [
+      {
+        "source_page": 18,
+        "day_id": "wednesday",
+        "amud": "b"
+      },
+      {
+        "source_page": 20,
+        "day_id": "wednesday",
+        "amud": "b"
+      }
+    ],
+    [
+      {
+        "source_page": 24,
+        "day_id": "thursday",
+        "amud": "b"
+      },
+      {
+        "source_page": 26,
+        "day_id": "thursday",
+        "amud": "b"
+      }
+    ],
+    [
+      {
+        "source_page": 30,
+        "day_id": "friday",
+        "amud": "b"
+      },
+      {
+        "source_page": 32,
+        "day_id": "friday",
+        "amud": "b"
+      }
+    ],
+    [
+      {
+        "source_page": 35,
+        "day_id": "saturday",
+        "amud": "a"
+      },
+      {
+        "source_page": 37,
+        "day_id": "saturday",
+        "amud": "a"
+      }
+    ]
+  ],
+  "unusual_days": [
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday"
+  ],
+  "day_runs": [
+    {
+      "day_id": "sunday",
+      "source_pages": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "duplicate_amud": null
+    },
+    {
+      "day_id": "monday",
+      "source_pages": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "duplicate_amud": null
+    },
+    {
+      "day_id": "tuesday",
+      "source_pages": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "duplicate_amud": "b"
+    },
+    {
+      "day_id": "wednesday",
+      "source_pages": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "duplicate_amud": "b"
+    },
+    {
+      "day_id": "thursday",
+      "source_pages": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "duplicate_amud": "b"
+    },
+    {
+      "day_id": "friday",
+      "source_pages": [
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "duplicate_amud": "b"
+    },
+    {
+      "day_id": "saturday",
+      "source_pages": [
+        34,
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "duplicate_amud": "a"
+    }
+  ],
+  "confirmed_by_owner": true,
+  "resolved_day_runs": [
+    {
+      "day_id": "sunday",
+      "source_pages": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "duplicate_amud": null
+    },
+    {
+      "day_id": "monday",
+      "source_pages": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "duplicate_amud": null
+    },
+    {
+      "day_id": "tuesday",
+      "source_pages": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "duplicate_amud": "b"
+    },
+    {
+      "day_id": "wednesday",
+      "source_pages": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "duplicate_amud": "b"
+    },
+    {
+      "day_id": "thursday",
+      "source_pages": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "duplicate_amud": "b"
+    },
+    {
+      "day_id": "friday",
+      "source_pages": [
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "duplicate_amud": "b"
+    },
+    {
+      "day_id": "saturday",
+      "source_pages": [
+        34,
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "duplicate_amud": "a"
+    }
+  ]
+}

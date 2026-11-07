@@ -1,0 +1,96 @@
+{
+  "days": {
+    "file": "848-vayeshev-days.pdf",
+    "sha256": "ba424aa1cdab8fd435b8d76636aa4e471b3e178e3a39ecc88296de41a4cbe287",
+    "bytes": 13892278,
+    "pages": 177,
+    "widgets": 849,
+    "progress_units": 844,
+    "links": 325,
+    "prior_week": [
+      {
+        "page": 173,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 78,
+        "topic_id": "mishnah_berurah",
+        "source_input": "interior",
+        "source_input_page": 78
+      },
+      {
+        "page": 174,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 108,
+        "topic_id": "likutey_moharan",
+        "source_input": "interior",
+        "source_input_page": 108
+      },
+      {
+        "page": 175,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 116,
+        "topic_id": "likutey_halakhot",
+        "source_input": "interior",
+        "source_input_page": 116
+      },
+      {
+        "page": 176,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 161,
+        "topic_id": "gemara",
+        "source_input": "cover",
+        "source_input_page": 3
+      }
+    ]
+  },
+  "topics": {
+    "file": "848-vayeshev-topics.pdf",
+    "sha256": "5a20aa548320d4fb16e317c072e3066297190624dc2528a4965c7066e5918e31",
+    "bytes": 15381760,
+    "pages": 164,
+    "widgets": 849,
+    "progress_units": 844,
+    "links": 187,
+    "prior_week": [
+      {
+        "page": 80,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 78,
+        "topic_id": "mishnah_berurah",
+        "source_input": "interior",
+        "source_input_page": 78
+      },
+      {
+        "page": 110,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 108,
+        "topic_id": "likutey_moharan",
+        "source_input": "interior",
+        "source_input_page": 108
+      },
+      {
+        "page": 118,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 116,
+        "topic_id": "likutey_halakhot",
+        "source_input": "interior",
+        "source_input_page": 116
+      },
+      {
+        "page": 163,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 161,
+        "topic_id": "gemara",
+        "source_input": "cover",
+        "source_input_page": 3
+      }
+    ]
+  }
+}

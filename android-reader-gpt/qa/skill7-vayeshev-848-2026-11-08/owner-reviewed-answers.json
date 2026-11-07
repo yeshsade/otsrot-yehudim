@@ -17,7 +17,7 @@
     }
   },
   "gemara_review": {
-    "confirmed_by_owner": false,
+    "confirmed_by_owner": true,
     "day_runs": [
       {
         "day_id": "sunday",
@@ -152,9 +152,22 @@
         "duplicate_amud": "b",
         "question": "יום שישי — עמודי מקור 28–33 בקובץ הפנים. איזה עמוד כפול: א׳, ב׳ או שניהם?",
         "response": "ב"
+      },
+      "saturday": {
+        "source_pages": [
+          34,
+          35,
+          36,
+          37,
+          38,
+          39
+        ],
+        "duplicate_amud": "a",
+        "question": "שבת — עמודי מקור 34–39 בקובץ הפנים. איזה עמוד כפול: א׳, ב׳ או שניהם?",
+        "response": "עמוד א"
       }
     },
-    "review_provenance": "INCOMPLETE: Tuesday, Wednesday, Thursday and Friday duplicate B are owner-confirmed. Saturday remains provisional; ask its day/run before building."
+    "review_provenance": "Owner confirmed Tuesday–Friday duplicate B and Saturday duplicate A, one day and source range at a time. Sunday and Monday have normal four-page runs with no duplicates. Preserve all copies and commentary; each duplicated identity has one shared field on its confirmed day."
   },
   "tehillim": {
     "boundaries_reviewed": true,

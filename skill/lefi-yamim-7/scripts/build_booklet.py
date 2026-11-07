@@ -79,7 +79,13 @@ def build(interior, cover, answers, output, checker, edition="days"):
     cover_doc = fitz.open(cover)
     if len(cover_doc) < 4:
         raise ValueError("Four cover pages are required")
-    src = model(base, answers, source)
+    from source_staging import stage_cover_completions
+    staged_base, resolved_answers, source_origins = stage_cover_completions(
+        base, answers, source, cover_doc)
+    write_json(work / "source-origins.json", {
+        "interior_pages": base.get('total_original_pages', len(source) - len(source_origins)),
+        "appended_cover_pages": source_origins})
+    src = model(staged_base, resolved_answers, source)
     booklet = answers["booklet"]
     issue, parsha = str(booklet["issue"]), booklet["parsha"]
     date_label = booklet["date_label"]
@@ -105,8 +111,11 @@ def build(interior, cover, answers, output, checker, edition="days"):
 
     def append_source(n, day=None, previous=False):
         topic = src["owners"][n]
+        origin = source_origins.get(n, {'input': 'interior', 'page': n})
         number = append_pdf(source, n - 1, n - 1,
                             {"source_page": n, "topic_id": topic, "day_id": day,
+                             "source_input": origin['input'],
+                             "source_input_page": origin['page'],
                              "week_offset": -1 if previous else 0})
         source_occurrences[n].append(number)
         segments[topic, day, -1 if previous else 0].append(number)
