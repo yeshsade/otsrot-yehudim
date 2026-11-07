@@ -17,7 +17,8 @@ class TypographyTests(unittest.TestCase):
     def test_uploaded_faces_and_complete_hebrew_date(self):
         report = audit_profile(['כ״ח חשון – ד׳ כסלו תשפ״ז'])
         self.assertEqual(report['roles']['bold']['family'], 'David')
-        self.assertEqual(report['roles']['day_title']['family'], 'Guttman David')
+        self.assertEqual(report['roles']['day_title']['family'], 'David')
+        self.assertEqual(report['roles']['day_title']['sha256'], report['roles']['bold']['sha256'])
         self.assertEqual(load_font('heading', 30).getname(), ('Guttman Hatzvi', 'Bold'))
 
     def test_missing_font_never_selects_installed_substitute(self):
@@ -61,7 +62,9 @@ class TypographyTests(unittest.TestCase):
                 with Image.open(path) as img:
                     self.assertEqual(img.mode, 'RGBA')
                     self.assertEqual(img.getpixel((0, 0))[3], 0)
-                    self.assertEqual(img.getpixel((50, 40))[3], 128 if kind == 'return' else 84)
+                    self.assertEqual(img.getpixel((50, 40))[3], 64 if kind == 'return' else 84)
+                    if kind == 'return':
+                        self.assertEqual(img.getpixel((35, 64))[3], 119)
 
 
 if __name__ == '__main__':

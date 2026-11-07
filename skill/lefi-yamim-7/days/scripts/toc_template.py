@@ -542,6 +542,10 @@ def make_return_button_image(output_path, color=DEFAULT_ACCENT):
     draw.rounded_rectangle(box, radius=28, fill=(*fill, 238), outline=(*deep, 235), width=4)
     draw.rounded_rectangle((box[0] + 7, box[1] + 7, box[2] - 7, box[1] + 26), radius=18, fill=(*mix(accent, (255, 255, 255), 0.48), 128))
     draw.line((box[0] + 24, box[3] - 8, box[2] - 24, box[3] - 8), fill=(*mix(accent, (0, 0, 0), 0.22), 185), width=3)
+    # Owner request 2026-11-08: halve all return-control background/decor alpha.
+    # Lettering and icon are drawn afterwards and retain their legibility.
+    img.putalpha(img.getchannel("A").point(lambda value: value // 2))
+    draw = ImageDraw.Draw(img)
     fnt = get_font(ImageFont, "bold", 42)
     draw_center_box(draw, "חזרה לתוכן העניינים", (96, 30, width - 32, height - 20), fnt, dark)
     cx, cy = 62, height // 2

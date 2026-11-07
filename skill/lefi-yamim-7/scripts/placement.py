@@ -1,5 +1,5 @@
 """Measured checkbox planning and collision-free shared control placement."""
-from collections import defaultdict
+from collections import Counter, defaultdict
 import math
 
 import fitz
@@ -74,6 +74,8 @@ def measured_regions(page, topic, tehillim=None, font=None):
         return measure_shulchan(page)["regions"]
     if topic == "zohar":
         return zohar_regions(page)
+    if topic == "likutey_halakhot":
+        return likutey_halakhot_regions(page)
     landscape = page.rect.width > page.rect.height
     columns = 4 if landscape else 2
     items = list(spans(page))
@@ -125,6 +127,48 @@ def measured_regions(page, topic, tehillim=None, font=None):
             full_rect.y0, full_rect.y1 = reference.y0, reference.y1
         regions.append({"column": col, "rect": union(rects), "full_rect": full_rect})
     return regions
+
+
+def likutey_halakhot_regions(page):
+    """Separate the study columns from small marginal aids, keeping inline text.
+
+    The character-weighted body size establishes each column's horizontal
+    footprint. Include every body style and smaller text inside that footprint;
+    tiny notes outside it must not push a checkbox toward the paper edge.
+    """
+    landscape = page.rect.width > page.rect.height
+    columns = defaultdict(list)
+    for item in spans(page):
+        if item['size'] >= 5:
+            columns[column_of(item['rect'], page.rect.width, 4 if landscape else 2)].append(item)
+    result = []
+    for col, items in sorted(columns.items()):
+        sizes = Counter()
+        for item in items:
+            sizes[round(item['size'] * 4) / 4] += len(item['text'].strip())
+        body_size = max(sizes, key=sizes.get)
+        core = union([s['rect'] for s in items if s['size'] >= body_size * .85])
+        study = [s['rect'] for s in items
+                 if core.x0 - 1.5 <= (s['rect'].x0 + s['rect'].x1) / 2 <= core.x1 + 1.5]
+        result.append({'column': col, 'rect': union(study),
+                       'full_rect': union([s['rect'] for s in items]),
+                       'bounded_study_lane': True})
+    if not result:
+        raise ValueError('No Likutey Halakhot study columns')
+    if landscape:
+        reference = union([r['full_rect'] for r in result])
+        for region in result:
+            region['full_rect'].y0, region['full_rect'].y1 = reference.y0, reference.y1
+    return result
+
+
+def in_study_lane(page, rect, study):
+    """A checkbox stays 2–12 pt from study and at least 18 pt from paper edges."""
+    if rect.x0 < 18 - .02 or rect.x1 > page.rect.width - 18 + .02:
+        return False
+    gap = rect.x0 - study.x1 if rect.x0 >= study.x1 else study.x0 - rect.x1
+    return (2 - .02 <= gap <= 12 + .02
+            and rect.y0 >= study.y0 - .02 and rect.y1 <= study.y1 + .02)
 
 
 def button_rect(page, kind, scale=1):
@@ -193,6 +237,8 @@ class Canvas:
             outside_right = region["column"] in {1, 3}
         else:
             outside_right = region["column"] == 1
+        if region.get('bounded_study_lane'):
+            return self.study_checkbox(region, fraction, size, outside_right)
         start_x = r.x1 + 7 if outside_right else r.x0 - 7 - size
         # Search both closer to the text and farther into the margin. Page
         # numbers occupy the outermost lane on some source pages.
@@ -209,6 +255,28 @@ class Canvas:
                 if self.clear(rect):
                     return self.reserve(rect, checkbox=True)
         raise ValueError(f"No safe checkbox position, final page {self.page.number + 1}, column {region['column']}")
+
+    def study_checkbox(self, region, fraction, size, outside_right):
+        r = region['rect']
+        target_y = r.y0 + r.height * fraction - size
+        offsets = ((0, -1, -2, -3, -4, -6) if fraction == 1
+                   else (0, -1, 1, -2, 2, -4, 4, -6, 6, -9, 9, -12, 12))
+        for right in (outside_right, not outside_right):
+            local_offsets = offsets
+            if right != outside_right and fraction != 1:
+                # Two columns may share the same narrow gutter. Stagger their
+                # interior checkpoints by at most one source line (12 pt).
+                # The final checkpoint still ends with the actual study.
+                local_offsets = ((12, 9, 6, 4, 2, 0, -2, -4, -6, -9, -12) if outside_right
+                                 else (-12, -9, -6, -4, -2, 0, 2, 4, 6, 9, 12))
+            for gap in (7, 5, 3, 2, 9, 11, 12):
+                x = r.x1 + gap if right else r.x0 - gap - size
+                for dy in local_offsets:
+                    y = target_y + dy
+                    rect = fitz.Rect(x, y, x + size, y + size)
+                    if in_study_lane(self.page, rect, r) and self.clear(rect):
+                        return self.reserve(rect, checkbox=True)
+        raise ValueError(f"No safe bounded study lane, page {self.page.number + 1}, column {region['column']}")
 
     def lower_corner(self, right=False, size=12):
         width, height = self.page.rect.width, self.page.rect.height

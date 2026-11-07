@@ -1,10 +1,10 @@
 {
-  "id": "owner-original-fonts-2026-10-20",
+  "id": "owner-approved-fonts-2026-11-08",
   "roles": {
     "regular": "david",
     "bold": "david_bold",
     "heading": "hatzvi",
-    "day_title": "guttman_david"
+    "day_title": "david_bold"
   },
   "files": {
     "david": {
@@ -19,17 +19,17 @@
       "style": "Bold",
       "sha256": "60232ab659a84fd42931b2e799d18892788e3b7132259f4c593b92780a4b3545"
     },
-    "guttman_david": {
-      "file": "DAVIDB.TTF",
-      "family": "Guttman David",
-      "style": "Bold",
-      "sha256": "98d54cc0305f7b1520274a164aae9a17678c81d5cb1bab51dc81093a2f7d01b0"
-    },
     "hatzvi": {
       "file": "Guttman Hatzvi-Bold.TTF",
       "family": "Guttman Hatzvi",
       "style": "Bold",
-      "sha256": "ca66b104995d2fa32d27c1ba5bfe43c7c04213b8b624fd2055a2bb17d15cb01d"
+      "sha256": "079eb083fb83ebfd6ea3215b72c3c2484d1fcedba613f7ccc58b913cd445c074"
     }
+  },
+  "owner_approval": {
+    "date": "2026-11-08",
+    "day_title": "David Bold replaces unavailable Guttman David Bold",
+    "heading": "Uploaded TZVIB.TTF version approved for Guttman Hatzvi Bold",
+    "user_reply": "מקובל אבל צריך כמה תיקונים לסקיל"
   }
 }

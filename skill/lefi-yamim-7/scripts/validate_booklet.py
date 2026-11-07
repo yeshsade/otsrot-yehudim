@@ -6,7 +6,7 @@ from pathlib import Path
 import fitz
 
 from source_model import sha256
-from placement import button_rect
+from placement import button_rect, likutey_halakhot_regions, in_study_lane
 from shulchan import audit_shulchan_coverage
 
 
@@ -72,6 +72,8 @@ def validate(path, source, source_model, placements, rows, navigation, before_ha
             shulchan_coverage.append({"page": page.number + 1, "source_page": n, **coverage})
         words = [fitz.Rect(word[:4]) for word in page.get_text("words")]
         widgets = list(page.widgets() or [])
+        lh_regions = ({r['column']: r for r in likutey_halakhot_regions(page)}
+                      if row['topic_id'] == 'likutey_halakhot' and row.get('week_offset') == 0 else {})
         if row.get("week_offset") == -1 and widgets:
             raise ValueError("Previous-week completion pages must not have progress checkboxes")
         links = page.get_links()
@@ -90,6 +92,11 @@ def validate(path, source, source_model, placements, rows, navigation, before_ha
                        and item["pages"] == [page.number + 1]]
             if len(matches) != 1 or max(abs(a - b) for a, b in zip(widget.rect, matches[0]["rect"])) > .02:
                 raise ValueError("Widget differs from canonical placement list")
+            if lh_regions:
+                region = lh_regions[matches[0]['column']]
+                if (max(abs(a - b) for a, b in zip(matches[0]['learning_rect'], region['rect'])) > .03
+                        or not in_study_lane(page, widget.rect, region['rect'])):
+                    raise ValueError('Likutey Halakhot checkbox left its bounded study lane')
         for link in links:
             link_count += 1
             validate_internal_destination(doc, link)

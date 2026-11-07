@@ -15,3 +15,5 @@ The embedded schema is `otzarot.progress-map/1`, attachment name `otzarot-progre
 Shared Gemara widgets are a standard parent field with children. For scripted state changes, use `gemara_checkboxes.set_checkbox_state` so the parent value and all child appearances change together. A single PyMuPDF widget update can leave another child's appearance stale; test the intended viewer separately before claiming viewer-specific synchronization.
 
 Do not claim cross-booklet compatibility, every PDF viewer, visual approval or an unbuilt edition from a single successful run. Report actual validation and material limitations.
+
+Likutey Halakhot: remeasure the saved study footprint independently, compare recorded geometry, and require every current-week checkbox to remain in the bounded side lane (gap2–12 pt, paper margin≥18 pt). Marginal notes remain ink obstacles. Reject unresolved lanes instead of searching to the paper edge. The 2026-11-08 regression audit is planning/placement validation on existing delivered pages, not a new complete-booklet build.
