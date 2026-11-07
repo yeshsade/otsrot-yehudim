@@ -2,3 +2,7 @@
 *.TTF
 *.otf
 *.OTF
+!david.ttf
+!davidbd.ttf
+!DAVIDB.TTF
+!Guttman Hatzvi-Bold.TTF

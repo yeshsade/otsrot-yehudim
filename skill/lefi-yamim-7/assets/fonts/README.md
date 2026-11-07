@@ -1,3 +1,12 @@
-# Original UI fonts
+# גופני ההפקה המקוריים
 
-Put the four owner-supplied files listed in ../font-profile.json here, or use --fonts-dir /path/to/fonts (OTZAROT_FONTS_DIR for helpers/tests). Font files are supplied separately; this repository and skill archive store the profile, not the font binaries. Family, style, SHA-256 and character coverage are checked before building. Missing or different fonts stop the build instead of changing its typography.
+בעל המוצר אישר לשמור את קובצי התמיכה במאגר כדי שבשיחה חדשה יידרשו רק כריכה ופנים של חוברת. הגופנים נפתחים אוטומטית מהתיקייה הזאת; אין צורך בנתיב מהסביבה הישנה.
+
+מצב ב־7.11.2026:
+
+- `david.ttf` — דוד רגיל: שמור, תואם בדיוק לטביעת המקור.
+- `davidbd.ttf` — דוד מודגש: שמור, תואם בדיוק לטביעת המקור.
+- `DAVIDB.TTF` — Guttman David Bold: חסר. שונה מדוד מודגש.
+- `Guttman Hatzvi-Bold.TTF` — הקובץ המקורי חסר. `../font-library/TZVIB.TTF` הוא אותה משפחה וסגנון בגרסה שונה, ואינו מאושר כתחליף.
+
+אין לטעון שהסביבה מוכנה להפקה מלאה עד שארבעת הקבצים עברו את פרופיל האימות. הרץ `python skill/lefi-yamim-7/scripts/check_font_files.py` משורש המאגר לקבלת מצב מרוכז. קבצים נוספים מהעלאת המשתמש שמורים ב־`../font-library/`.

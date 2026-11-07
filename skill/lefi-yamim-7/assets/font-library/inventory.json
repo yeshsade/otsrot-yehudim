@@ -1,0 +1,254 @@
+{
+  "uploaded": "2026-11-07",
+  "fonts": [
+    {
+      "file": "MANTM.TTF",
+      "family": "Guttman Mantova",
+      "style": "Regular",
+      "sha256": "70025817dd2cce58ccbd08008e76a9b5856167b46ee8bf2fb590f27a45106b1c",
+      "exact_original_match": null
+    },
+    {
+      "file": "MANTB.TTF",
+      "family": "Guttman Mantova",
+      "style": "Bold",
+      "sha256": "63915002c2db35a1e84c7b1b5247c5785db321afcfce68ff77d75bb097d078c2",
+      "exact_original_match": null
+    },
+    {
+      "file": "GYADXL.TTF",
+      "family": "Guttman Yad-Light",
+      "style": "Light",
+      "sha256": "935eacc6deb84f943a5fb4342cbf9dd0f24f3855c8a80bf6db3a9e54ece9de75",
+      "exact_original_match": null
+    },
+    {
+      "file": "DROGM.TTF",
+      "family": "Guttman Drogolin",
+      "style": "Normal",
+      "sha256": "2ce2bed1db46b255470e6c65c10c3a7c1d69224fabcf20d838a62da61f705ebf",
+      "exact_original_match": null
+    },
+    {
+      "file": "TZVIB.TTF",
+      "family": "Guttman Hatzvi",
+      "style": "Bold",
+      "sha256": "079eb083fb83ebfd6ea3215b72c3c2484d1fcedba613f7ccc58b913cd445c074",
+      "exact_original_match": null
+    },
+    {
+      "file": "RASHIB.TTF",
+      "family": "Guttman Rashi",
+      "style": "Bold",
+      "sha256": "6bc89958ada26a50ca69ab940867230b73f35c11ba02ff33287e48047107d485",
+      "exact_original_match": null
+    },
+    {
+      "file": "ARAM.TTF",
+      "family": "Guttman-Aram",
+      "style": "Normal",
+      "sha256": "018f8f747f20f21c0e16912ec7d9353165296f9fa3803b51c096eb76f0ff7d5e",
+      "exact_original_match": null
+    },
+    {
+      "file": "GMYAMFIX.TTF",
+      "family": "Guttman Myamfix",
+      "style": "Regular",
+      "sha256": "2a71e2b6e7d2ff4f482992a08b5be3ba74508916c5d5ecdf7814aeef21fb1a9c",
+      "exact_original_match": null
+    },
+    {
+      "file": "DROGB.TTF",
+      "family": "Guttman Drogolin",
+      "style": "Bold",
+      "sha256": "abee8fbb260c0258747a518d0fcf9faf0659f46e352a582876dcf4a25e23cd2c",
+      "exact_original_match": null
+    },
+    {
+      "file": "FRNEW.TTF",
+      "family": "Guttman Frnew",
+      "style": "Normal",
+      "sha256": "5a7ca2bebd3fbcd1d87647258397f1d749b3b506681fe3304116cc1a9cfee944",
+      "exact_original_match": null
+    },
+    {
+      "file": "MIRB.TTF",
+      "family": "Guttman Miryam",
+      "style": "Bold",
+      "sha256": "36315a7abe702e25dbad27dfc873704ae58c2bb6c15820e8d71ac999a3952587",
+      "exact_original_match": null
+    },
+    {
+      "file": "MANTDEC.TTF",
+      "family": "Guttman Mantova-Decor",
+      "style": "Regular",
+      "sha256": "7cc4b379973b7a88be0dc9fca0778142dba5973b4c6e467664f86572276eb5ee",
+      "exact_original_match": null
+    },
+    {
+      "file": "STAM.TTF",
+      "family": "Guttman Stam",
+      "style": "Normal",
+      "sha256": "83843ced76463867f195e910bc0c7fc4a9cc3fd64e0b719eaf6ce5faf96209c0",
+      "exact_original_match": null
+    },
+    {
+      "file": "GHAIM.TTF",
+      "family": "Guttman Haim",
+      "style": "Regular",
+      "sha256": "f482b07c3780206877b897324eef9712c062d7e987f84f5128d4708cbc4800d7",
+      "exact_original_match": null
+    },
+    {
+      "file": "GYADL.TTF",
+      "family": "Guttman Yad",
+      "style": "Regular",
+      "sha256": "fef2eb6ad93814fe3bdbd698f7322d6bcb3cbb27fc543d2f1fb1be954dd20143",
+      "exact_original_match": null
+    },
+    {
+      "file": "MIRL.TTF",
+      "family": "Guttman Miryam",
+      "style": "Light",
+      "sha256": "c6bcdf0380f28d66482fbf983554e74a90a3c1c3914810082891c595365e0876",
+      "exact_original_match": null
+    },
+    {
+      "file": "DAVID.TTF",
+      "family": "David",
+      "style": "Regular",
+      "sha256": "02106cfb319ebdb7d3db30d5d8ecbd5def0225d4445932b56b00e6b509a39308",
+      "exact_original_match": "david"
+    },
+    {
+      "file": "GKAVBLD.TTF",
+      "family": "Guttman Kav",
+      "style": "Bold",
+      "sha256": "af17ee5ef76a52fb4621f034a0b1c3f2dec0c60ab9840c07b07eaea6af2377bc",
+      "exact_original_match": null
+    },
+    {
+      "file": "GKAVLIT.TTF",
+      "family": "Guttman Kav-Light",
+      "style": "Regular",
+      "sha256": "4388cbf2b4d0c257654866c283b6e0f92c61b35715d4ecdbc337004d4fba4715",
+      "exact_original_match": null
+    },
+    {
+      "file": "GFRANK.TTF",
+      "family": "Guttman Frank",
+      "style": "Regular",
+      "sha256": "8f9a4fb55fecb6d6bbcf89a9d16e02ebd8a090029a19951c94ee283f0d5ad11b",
+      "exact_original_match": null
+    },
+    {
+      "file": "GYADBR.TTF",
+      "family": "Guttman Yad-Brush",
+      "style": "Regular",
+      "sha256": "751949b5dc2b2c8becb1b2641d84842c536ee39250690e9a981a754b3b0d9cd7",
+      "exact_original_match": null
+    },
+    {
+      "file": "VILNA.TTF",
+      "family": "Guttman Vilna",
+      "style": "Regular",
+      "sha256": "24dfed031360898084708fe45ca6ccfdd86c04e714e4faac360b358bfedbe6c2",
+      "exact_original_match": null
+    },
+    {
+      "file": "GKAVMED.TTF",
+      "family": "Guttman Kav",
+      "style": "Regular",
+      "sha256": "23c4a36f10c0a2916725077088d2583bbf0859795077cdb25054785d9eff5db3",
+      "exact_original_match": null
+    },
+    {
+      "file": "FRANKB.TTF",
+      "family": "Guttman Frank",
+      "style": "Bold",
+      "sha256": "0f495aa68ad9a924205fcca1f6566b5a33d77b248f50c45d89a5dc6f66306b10",
+      "exact_original_match": null
+    },
+    {
+      "file": "TZVIM.TTF",
+      "family": "Guttman Hatzvi",
+      "style": "Regular",
+      "sha256": "f4f844530f59c557a85a7bd5df3fbbc2a4bf3539aaffb4d42a669a90fc408aa4",
+      "exact_original_match": null
+    },
+    {
+      "file": "VILNAB.TTF",
+      "family": "Guttman Vilna",
+      "style": "Bold",
+      "sha256": "9426b8fdf1d4b6fb68fbbc1f145b0c1e2bae628e5ea324c9bbb39dccab32849b",
+      "exact_original_match": null
+    },
+    {
+      "file": "LOGO1.TTF",
+      "family": "Guttman Logo1",
+      "style": "Regular",
+      "sha256": "58ae6095d0edb8c166cc2656a1062e98031aaf173ec4f773c0b491c3200218d3",
+      "exact_original_match": null
+    },
+    {
+      "file": "AHROB.TTF",
+      "family": "Guttman-Aharoni",
+      "style": "Bold",
+      "sha256": "80b932ba15b1578c6ae5e17b3ffc31882c453e5d8b347c5a1fa41b0686857f32",
+      "exact_original_match": null
+    },
+    {
+      "file": "STAM1.TTF",
+      "family": "Guttman Stam1",
+      "style": "Normal",
+      "sha256": "fececaa5bb6b58864156ddc1156f6114b4961cceb049f54c9a6439ac72d8f3bb",
+      "exact_original_match": null
+    },
+    {
+      "file": "GHAIMC.TTF",
+      "family": "Guttman Haim-Condensed",
+      "style": "Regular",
+      "sha256": "c787306c80196ed24d206afbb5c45e68866d8ed909e4423094d9a46bb21ded71",
+      "exact_original_match": null
+    },
+    {
+      "file": "DAVIDBD.TTF",
+      "family": "David",
+      "style": "Bold",
+      "sha256": "60232ab659a84fd42931b2e799d18892788e3b7132259f4c593b92780a4b3545",
+      "exact_original_match": "david_bold"
+    },
+    {
+      "file": "MIRFX.TTF",
+      "family": "Guttman-CourMir",
+      "style": "Normal",
+      "sha256": "7274635e5c122b7d5060b7da660d41a7a4338ad804d6d104db415168dcede63f",
+      "exact_original_match": null
+    },
+    {
+      "file": "GAHROM.TTF",
+      "family": "Guttman Aharoni",
+      "style": "Regular",
+      "sha256": "deb2e9decbe6296c870dde45331132b3413e0400a979fa777682532ba251abf3",
+      "exact_original_match": null
+    },
+    {
+      "file": "RASHI.TTF",
+      "family": "Guttman Rashi",
+      "style": "Normal",
+      "sha256": "2f37462e920c2587049ea8b77983590fd8f176fccc8b951be9e4958363f3cfcf",
+      "exact_original_match": null
+    }
+  ],
+  "approved_profile_unchanged": true,
+  "missing_exact_originals": [
+    "DAVIDB.TTF",
+    "Guttman Hatzvi-Bold.TTF"
+  ],
+  "same_family_candidate": {
+    "file": "TZVIB.TTF",
+    "family": "Guttman Hatzvi",
+    "style": "Bold",
+    "matches_original_sha256": false
+  }
+}

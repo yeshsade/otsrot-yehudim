@@ -6,3 +6,4 @@ work/
 output/
 *.tmp
 *.bak
+.venv-skill7/

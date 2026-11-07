@@ -1,6 +1,6 @@
 """One owner-supplied font profile for every generated UI component.
 
-Font binaries remain local; family identity and hashes are part of the skill.
+Approved font binaries use the repository assets/fonts directory by default.
 Missing fonts never select a different installed typeface.
 """
 import hashlib
