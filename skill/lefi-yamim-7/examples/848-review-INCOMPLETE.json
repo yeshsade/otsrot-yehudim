@@ -1,0 +1,152 @@
+{
+  "source_sha256": "14cebe236eb3fc87d37707b3aa13237dff8bd17040ae2d38d1e71750e0272e6e",
+  "cover_sha256": "869e39fb7d86407cb759250438825bb6f243e41b811bca70da02d2bd36509a3a",
+  "booklet": {
+    "issue": "848",
+    "parsha": "וישב",
+    "week_start": "2026-11-29",
+    "date_label": "י״ט כסלו – כ״ה כסלו תשפ״ז"
+  },
+  "previous_week": {
+    "mishnah_berurah": 78,
+    "likutey_moharan": 108,
+    "likutey_halakhot": 116,
+    "gemara": {
+      "input": "cover",
+      "page": 3
+    }
+  },
+  "gemara_review": {
+    "confirmed_by_owner": false,
+    "day_runs": [
+      {
+        "day_id": "sunday",
+        "source_pages": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "duplicate_amud": null
+      },
+      {
+        "day_id": "monday",
+        "source_pages": [
+          6,
+          7,
+          8,
+          9
+        ],
+        "duplicate_amud": null
+      },
+      {
+        "day_id": "tuesday",
+        "source_pages": [
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "duplicate_amud": "b"
+      },
+      {
+        "day_id": "wednesday",
+        "source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "duplicate_amud": "b"
+      },
+      {
+        "day_id": "thursday",
+        "source_pages": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27
+        ],
+        "duplicate_amud": "b"
+      },
+      {
+        "day_id": "friday",
+        "source_pages": [
+          28,
+          29,
+          30,
+          31,
+          32,
+          33
+        ],
+        "duplicate_amud": "b"
+      },
+      {
+        "day_id": "saturday",
+        "source_pages": [
+          34,
+          35,
+          36,
+          37,
+          38,
+          39
+        ],
+        "duplicate_amud": "a"
+      }
+    ],
+    "owner_confirmed_days": {
+      "tuesday": {
+        "source_pages": [
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "duplicate_amud": "b",
+        "question": "יום שלישי — עמודי מקור10–15 בקובץ הפנים. איזה עמוד כפול: א׳, ב׳ או שניהם?",
+        "response": "ב"
+      }
+    },
+    "review_provenance": "INCOMPLETE: only Tuesday duplicate B is owner-confirmed. Other detected duplicates are provisional and must be asked one day/run at a time."
+  },
+  "tehillim": {
+    "boundaries_reviewed": true,
+    "exclude_after_psalms": [],
+    "review_provenance": "Inspected upright source100–107 and all seven weekly tabs. Current black Psalms90–119; Sunday source100 col2, Monday101 col3, Tuesday102 col4, Wednesday103 col3 near bottom, Thursday104 col4, Friday105 col3 near bottom, Saturday106 col3. Gray previous Psalm89 on100 excluded;119 ends107 col4 above gray120 future portion. No Psalm150 or subsequent prayers in this issue."
+  },
+  "owner_answers_provenance": {
+    "mishnah_berurah": {
+      "source_page": 78,
+      "confirmed_by_owner": true,
+      "response": "כן, עמוד מקור 78",
+      "page_preview_shown": true
+    },
+    "likutey_moharan": {
+      "source_page": 108,
+      "confirmed_by_owner": true,
+      "response": "כן, עמוד מקור 108",
+      "page_preview_shown": true
+    },
+    "likutey_halakhot": {
+      "source_page": 116,
+      "confirmed_by_owner": true,
+      "response": "כן, עמוד מקור 116",
+      "page_preview_shown": true
+    },
+    "gemara": {
+      "input": "cover",
+      "source_page": 3,
+      "confirmed_by_owner": true,
+      "response": "כן, עמוד 3 בכריכה",
+      "page_preview_shown": true
+    }
+  }
+}
