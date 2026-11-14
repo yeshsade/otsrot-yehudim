@@ -13,7 +13,101 @@
     "likutey_halakhot": 160,
     "gemara": 159
   },
-  "gemara_review": null,
+  "gemara_review": {
+    "confirmed_by_owner": false,
+    "day_runs": [
+      {
+        "day_id": "sunday",
+        "source_pages": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "duplicate_amud": null
+      },
+      {
+        "day_id": "monday",
+        "source_pages": [
+          6,
+          7,
+          8,
+          9
+        ],
+        "duplicate_amud": null
+      },
+      {
+        "day_id": "tuesday",
+        "source_pages": [
+          10,
+          11,
+          12,
+          13
+        ],
+        "duplicate_amud": null
+      },
+      {
+        "day_id": "wednesday",
+        "source_pages": [
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "duplicate_amud": "a"
+      },
+      {
+        "day_id": "thursday",
+        "source_pages": [
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ],
+        "duplicate_amud": "b"
+      },
+      {
+        "day_id": "friday",
+        "source_pages": [
+          26,
+          27,
+          28,
+          29
+        ],
+        "duplicate_amud": null
+      },
+      {
+        "day_id": "saturday",
+        "source_pages": [
+          30,
+          31,
+          32,
+          33
+        ],
+        "duplicate_amud": null
+      }
+    ],
+    "owner_confirmed_days": {
+      "wednesday": {
+        "source_pages": [
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "duplicate_amud": "a",
+        "question": "יום רביעי — עמודי מקור 14–19 בקובץ הפנים. איזה עמוד כפול: א׳, ב׳ או שניהם?",
+        "response": "א"
+      }
+    },
+    "review_provenance": "INCOMPLETE: Wednesday duplicate A is owner-confirmed for sources14–19. Thursday remains provisional and requires the owner answer before building."
+  },
   "tehillim": {
     "boundaries_reviewed": false,
     "exclude_after_psalms": [],
