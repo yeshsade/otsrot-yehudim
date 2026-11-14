@@ -14,7 +14,7 @@
     "gemara": 159
   },
   "gemara_review": {
-    "confirmed_by_owner": false,
+    "confirmed_by_owner": true,
     "day_runs": [
       {
         "day_id": "sunday",
@@ -104,14 +104,39 @@
         "duplicate_amud": "a",
         "question": "יום רביעי — עמודי מקור 14–19 בקובץ הפנים. איזה עמוד כפול: א׳, ב׳ או שניהם?",
         "response": "א"
+      },
+      "thursday": {
+        "source_pages": [
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ],
+        "duplicate_amud": "b",
+        "question": "יום חמישי — עמודי מקור 20–25 בקובץ הפנים. איזה עמוד כפול: א׳, ב׳ או שניהם?",
+        "response": "ב"
       }
     },
-    "review_provenance": "INCOMPLETE: Wednesday duplicate A is owner-confirmed for sources14–19. Thursday remains provisional and requires the owner answer before building."
+    "review_provenance": "Owner confirmed Wednesday sources14–19 duplicate A and Thursday sources20–25 duplicate B, one day/range at a time. Other five days have ordinary four-page runs. Preserve every physical copy and commentary in source order."
   },
   "tehillim": {
-    "boundaries_reviewed": false,
-    "exclude_after_psalms": [],
-    "review_provenance": "Inspect the seven black weekly tabs and the last Psalm150 verse; exclude helpers/prayers and future gray reading."
+    "boundaries_reviewed": true,
+    "exclude_after_psalms": [
+      {
+        "page": 102,
+        "column": 3,
+        "end_y_pt": 57.63
+      },
+      {
+        "page": 103,
+        "column": 1,
+        "end_y_pt": 0,
+        "end_column": 2
+      }
+    ],
+    "review_provenance": "Visual review of upright sources97–106 and all seven weekly tabs. Current black Psalms120–150, then new cycle1–17. Psalm150 final verse source102 column3 first line ends57.63pt. Remaining102 columns3–4 and103 columns1–2 are post-Psalm prayers/aid material, preserved without study boxes. Friday restarts Psalm1 source103 column3; Saturday source104 column4 at333.6pt, continues105 and106 column1 above gray Psalm18. Gray prior Psalm119 on97 and future Psalm18 on106 excluded. Weekly tabs Sunday97c1, Monday98c1, Tuesday99c3, Wednesday100c3, Thursday101c3, Friday103c3, Saturday104c4."
   },
   "owner_answers_provenance": {
     "mishnah_berurah": {

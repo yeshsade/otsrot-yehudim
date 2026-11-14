@@ -187,6 +187,12 @@ def tehillim_regions(doc, pages, review):
     if [m["day"] for m in markers] != [slug for slug, _ in DAYS]:
         raise ValueError(f"Expected one black weekly tab per day in Tehillim: {markers}")
     excluded = review.get("exclude_after_psalms", [])
+    for ex in excluded:
+        # A new Psalm cycle can resume later on the very same page. Bound a
+        # reviewed prayer interval instead of discarding that later study.
+        if (ex['page'] not in pages or not 1 <= ex['column'] <= ex.get('end_column', 4) <= 4
+                or not 0 <= ex['end_y_pt'] <= doc[ex['page'] - 1].rect.height):
+            raise ValueError('Invalid reviewed post-Psalm exclusion interval')
     # The verse / post-psalm prayer boundary is semantic. Require reviewed
     # geometry if a prayer page is present; never infer it from PDF page count.
     for n in pages:
@@ -207,7 +213,7 @@ def tehillim_regions(doc, pages, review):
             pos = (n, column, r.y0)
             if any(bg.contains((r.tl + r.br) / 2) for bg in gray):
                 continue
-            if any(n == ex["page"] and (column > ex["column"] or
+            if any(n == ex["page"] and column <= ex.get('end_column', 4) and (column > ex["column"] or
                    (column == ex["column"] and r.y0 > ex["end_y_pt"])) for ex in excluded):
                 continue
             earlier = [m for m in markers if (m["page"], m["column"], m["y"]) <= pos]

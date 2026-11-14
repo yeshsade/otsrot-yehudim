@@ -1,0 +1,100 @@
+{
+  "days": {
+    "file": "849-miketz-days.pdf",
+    "pages": 175,
+    "widgets": 852,
+    "progress_units": 850,
+    "links": 323,
+    "bytes": 13626071,
+    "sha256": "3e7e558bad14e351827d7384ad87e23837a9f2f98abe4cddebca3f227feb9558",
+    "prior_week_pages": [
+      {
+        "page": 171,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 75,
+        "topic_id": "mishnah_berurah",
+        "source_input": "interior",
+        "source_input_page": 75
+      },
+      {
+        "page": 172,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 107,
+        "topic_id": "likutey_moharan",
+        "source_input": "interior",
+        "source_input_page": 107
+      },
+      {
+        "page": 173,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 159,
+        "topic_id": "gemara",
+        "source_input": "interior",
+        "source_input_page": 159
+      },
+      {
+        "page": 174,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 160,
+        "topic_id": "likutey_halakhot",
+        "source_input": "interior",
+        "source_input_page": 160
+      }
+    ],
+    "post_psalm_prayers_have_no_boxes": true,
+    "new_cycle_preserved": true
+  },
+  "topics": {
+    "file": "849-miketz-topics.pdf",
+    "pages": 163,
+    "widgets": 852,
+    "progress_units": 850,
+    "links": 186,
+    "bytes": 15113933,
+    "sha256": "4685dea93d997a33cc17e6a77e6ad687f6bdecded97bbfb986f72415af99a361",
+    "prior_week_pages": [
+      {
+        "page": 77,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 75,
+        "topic_id": "mishnah_berurah",
+        "source_input": "interior",
+        "source_input_page": 75
+      },
+      {
+        "page": 109,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 107,
+        "topic_id": "likutey_moharan",
+        "source_input": "interior",
+        "source_input_page": 107
+      },
+      {
+        "page": 161,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 159,
+        "topic_id": "gemara",
+        "source_input": "interior",
+        "source_input_page": 159
+      },
+      {
+        "page": 162,
+        "day_id": null,
+        "week_offset": -1,
+        "source_page": 160,
+        "topic_id": "likutey_halakhot",
+        "source_input": "interior",
+        "source_input_page": 160
+      }
+    ],
+    "post_psalm_prayers_have_no_boxes": true,
+    "new_cycle_preserved": true
+  }
+}
