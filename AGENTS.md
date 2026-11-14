@@ -1,21 +1,29 @@
-# Booklet preparation
+# Booklet preparation: active workflow is Skill 7
 
-For אוצרות יהודים booklet requests, use `skill/lefi-yamim-7/SKILL.md` and
-`skill/lefi-yamim-7/START-HERE.md` on `gpt/skill7-implementation`. The historical
-Skill 6 material in `main` is not the active production workflow.
+For אוצרות יהודים PDF booklet preparation, use the production branch
+`gpt/skill7-implementation` in this repository. Read its
+`skill/lefi-yamim-7/START-HERE.md`, `skill/lefi-yamim-7/SKILL.md` and
+`android-reader-gpt/docs/SKILL7-FOR-CLAUDE.md` before acting. Fetch the branch;
+when the checkout is clean, switch to it. Preserve any existing work. A cloud
+checkout starting on main does not mean the historical MOM or HEIDER workflow
+is the active production skill. Do not merge legacy snapshots to select it.
 
-The standing default is both editions (days and topics), unless the user says
-otherwise. Read the issue and parsha from the uploaded cover; do not ask the
-user to repeat information present there. Read the handoff and existing reviewed
-answers before asking questions already answered for those exact input hashes.
+A user uploading cover/interior and asking to prepare a booklet authorizes
+both editions (days and topics), unless explicitly limited. Do not ask them
+again which edition, which branch, for a previous-chat summary, or for fonts
+already committed in Skill 7. Read issue/parsha/date from the cover and reuse
+existing source-hash-bound confirmations for those exact inputs. Locate already
+uploaded files before asking the user to upload them again.
 
-Fonts and runtime assets belong in the repository. Check font availability
-before the full test suite; never substitute system fonts or claim readiness
-while required originals are missing. The font-library directory is an archive
-of uploaded candidates, not the production font profile.
+Keep pristine source PDFs, fixed button anchors and original page dimensions.
+Use the approved hash-bound repository font profile and its readiness check.
+Source completion questions include an actual page preview. For Gemara
+questions, give one day and its full one-based interior source range, then ask
+which amud is duplicated: A, B or both. Do not lead with a predicted answer.
+Photo previews for duplication questions are supplied if requested. Wait for
+and record each answer before the next unresolved day. Previous-week pages
+receive no progress boxes. Preserve every duplicate and commentary.
 
-Show an actual page preview with each required source-page question. Preserve
-the original source order, all duplicated Gemara copies and their commentaries;
-ask about ambiguous duplication before building. Deliver separate PDF links,
-with the production and validation record in GitHub. No ZIP is required for the
-reader. These rules apply to booklet preparation, not unrelated app changes.
+Run saved-PDF validation and Claude's independent checker before delivery.
+Deliver each edition as a separate PDF link and record sources, owner answers
+and QA in GitHub. Do not require a ZIP or user-managed font installation.
