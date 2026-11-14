@@ -9,7 +9,7 @@
   },
   "previous_week": {
     "mishnah_berurah": 75,
-    "likutey_moharan": "ASK_OWNER_SOURCE_PAGE_OR_EXPLICIT_NULL",
+    "likutey_moharan": 107,
     "likutey_halakhot": "ASK_OWNER_SOURCE_PAGE_OR_EXPLICIT_NULL",
     "gemara": "ASK_OWNER_SOURCE_PAGE_OR_EXPLICIT_NULL"
   },
@@ -22,6 +22,12 @@
   "owner_answers_provenance": {
     "mishnah_berurah": {
       "source_page": 75,
+      "confirmed_by_owner": true,
+      "response": "כן",
+      "page_preview_shown": true
+    },
+    "likutey_moharan": {
+      "source_page": 107,
       "confirmed_by_owner": true,
       "response": "כן",
       "page_preview_shown": true
