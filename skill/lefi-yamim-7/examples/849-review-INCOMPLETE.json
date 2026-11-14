@@ -10,7 +10,7 @@
   "previous_week": {
     "mishnah_berurah": 75,
     "likutey_moharan": 107,
-    "likutey_halakhot": "ASK_OWNER_SOURCE_PAGE_OR_EXPLICIT_NULL",
+    "likutey_halakhot": 160,
     "gemara": "ASK_OWNER_SOURCE_PAGE_OR_EXPLICIT_NULL"
   },
   "gemara_review": null,
@@ -28,6 +28,12 @@
     },
     "likutey_moharan": {
       "source_page": 107,
+      "confirmed_by_owner": true,
+      "response": "כן",
+      "page_preview_shown": true
+    },
+    "likutey_halakhot": {
+      "source_page": 160,
       "confirmed_by_owner": true,
       "response": "כן",
       "page_preview_shown": true
