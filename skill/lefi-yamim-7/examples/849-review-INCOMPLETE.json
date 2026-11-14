@@ -11,7 +11,7 @@
     "mishnah_berurah": 75,
     "likutey_moharan": 107,
     "likutey_halakhot": 160,
-    "gemara": "ASK_OWNER_SOURCE_PAGE_OR_EXPLICIT_NULL"
+    "gemara": 159
   },
   "gemara_review": null,
   "tehillim": {
@@ -34,6 +34,12 @@
     },
     "likutey_halakhot": {
       "source_page": 160,
+      "confirmed_by_owner": true,
+      "response": "כן",
+      "page_preview_shown": true
+    },
+    "gemara": {
+      "source_page": 159,
       "confirmed_by_owner": true,
       "response": "כן",
       "page_preview_shown": true
