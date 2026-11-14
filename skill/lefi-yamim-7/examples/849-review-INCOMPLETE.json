@@ -1,0 +1,30 @@
+{
+  "source_sha256": "834ae45be29ae18b61795941104a47bbba71525cd831ea320f3346d4be6487ed",
+  "cover_sha256": "b10f35bd55e07e7d613b6dc39b71193e56d50fab2553480f0452533910e86dcf",
+  "booklet": {
+    "issue": "849",
+    "parsha": "מקץ",
+    "week_start": "2026-12-06",
+    "date_label": "כ״ו כסלו – ב׳ טבת תשפ״ז"
+  },
+  "previous_week": {
+    "mishnah_berurah": 75,
+    "likutey_moharan": "ASK_OWNER_SOURCE_PAGE_OR_EXPLICIT_NULL",
+    "likutey_halakhot": "ASK_OWNER_SOURCE_PAGE_OR_EXPLICIT_NULL",
+    "gemara": "ASK_OWNER_SOURCE_PAGE_OR_EXPLICIT_NULL"
+  },
+  "gemara_review": null,
+  "tehillim": {
+    "boundaries_reviewed": false,
+    "exclude_after_psalms": [],
+    "review_provenance": "Inspect the seven black weekly tabs and the last Psalm150 verse; exclude helpers/prayers and future gray reading."
+  },
+  "owner_answers_provenance": {
+    "mishnah_berurah": {
+      "source_page": 75,
+      "confirmed_by_owner": true,
+      "response": "כן",
+      "page_preview_shown": true
+    }
+  }
+}
