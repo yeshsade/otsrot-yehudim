@@ -220,7 +220,10 @@ class LibraryActivity : AppCompatActivity() {
     /** True while the search field is open (back closes it first). */
     val searching get() = ::searchBar.isInitialized && searchBar.visibility == View.VISIBLE
 
-    private fun refresh() {
+    private fun refresh() = refresh(toTop = false)
+
+    /** [toTop]: after a new sort the list starts again from its first document (owner, 2026-11-17). */
+    private fun refresh(toTop: Boolean) {
         val order = app.settings.sortOrder
         val all = order.apply(app.library.all(), java.text.Collator.getInstance())
         val docs = if (query.isEmpty()) all else all.filter { com.yeshsade.otzarot.reader.data.NameSearch.matches(it.name, query) }
@@ -231,7 +234,11 @@ class LibraryActivity : AppCompatActivity() {
         val newDay = shownDay != null && shownDay != today
         shownDay = today
         // Only cards whose document changed are redrawn (coming back from reading usually changes one).
-        adapter.submitList(docs) { if (newDay) adapter.notifyDataSetChanged() }
+        adapter.submitList(docs) {
+            if (newDay) adapter.notifyDataSetChanged()
+            // Otherwise the list keeps following the card that was on top, wherever the new order put it.
+            if (toTop) list.scrollToPosition(0)
+        }
     }
 
     private inner class DocAdapter : androidx.recyclerview.widget.ListAdapter<Doc, DocHolder>(
@@ -313,7 +320,7 @@ class LibraryActivity : AppCompatActivity() {
             com.yeshsade.otzarot.reader.data.SortOrder.offered(settings.sortBySize).forEach { by ->
                 kinds.addView(Messages.divider(ui))
                 kinds.addView(choiceRow(SortTexts.name(this, by), by == order.by, "sort_${by.key}") {
-                    settings.sort = by.key; settings.sortReversed = false; refresh(); fill()
+                    settings.sort = by.key; settings.sortReversed = false; refresh(toTop = true); fill()
                 })
             }
             sheet.addView(kinds)
@@ -322,7 +329,7 @@ class LibraryActivity : AppCompatActivity() {
             listOf(false, true).forEach { reversed ->
                 ways.addView(Messages.divider(ui))
                 ways.addView(choiceRow(SortTexts.direction(this, order.by, reversed), order.reversed == reversed, "dir_$reversed") {
-                    settings.sortReversed = reversed; refresh(); fill()
+                    settings.sortReversed = reversed; refresh(toTop = true); fill()
                 })
             }
             sheet.addView(ways, Messages.gap(ui))

@@ -63,6 +63,7 @@ class LeanProbe : Instrumentation() {
         if (mode == "edges") { edges(); return }
         if (mode == "hostile") { hostile(); return }
         if (mode == "sharp") { sharp(); return }
+        if (mode == "sorttop") { sortTop(); return }
         val result = Bundle()
         try {
             waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
@@ -1509,7 +1510,7 @@ class LeanProbe : Instrumentation() {
         settle()
         var version = ""
         onMain { version = (reader.lastMenu!!.root.findViewWithTag<View>("drawer_version") as android.widget.TextView).text.toString() }
-        check(version.contains("0.2.21")) { "version: '$version'" }
+        check(version.contains("0.2.22")) { "version: '$version'" }
         onMainChecked { snapshotView(reader.lastMenu!!.dialog.window!!.decorView, "15-drawer.png") }
         record("The drawer shows the version at the bottom ($version)")
         onMainChecked { reader.lastMenu!!.root.findViewWithTag<View>("menu_quick_mark").performClick() }
@@ -1751,6 +1752,67 @@ class LeanProbe : Instrumentation() {
             SystemClock.sleep(3000); waitForIdleSync()
             onMainChecked { list.finish() }
             record("the list opens after the broken files")
+            result.putString("stream", "Passed $passed checks.\n")
+            finish(Activity.RESULT_OK, result)
+        } catch (error: Throwable) {
+            result.putString("stream", "FAILED after $passed checks: ${error.stackTraceToString()}")
+            finish(Activity.RESULT_CANCELED, result)
+        }
+    }
+
+    /**
+     * Owner, 2026-11-17: after choosing a new sort the list starts from its top, and does not follow the card that
+     * was on top to wherever the new order put it.
+     */
+    private fun sortTop() {
+        val result = Bundle()
+        try {
+            waitFor("app start", 60_000) { runCatching { app.settings; app.library; true }.getOrDefault(false) }
+            app.settings.whatsAppPromptDismissed = true; app.settings.bookmarkHintNever = true
+            app.settings.sort = com.yeshsade.otzarot.reader.data.SortOrder.By.RECEIVED.key; app.settings.sortReversed = false
+            // a list longer than the screen
+            val now = System.currentTimeMillis()
+            for (i in 1..30) {
+                val f = File(targetContext.filesDir, "sorttop-%02d.pdf".format(i)).apply { if (!exists()) writeBytes(byteArrayOf(0x25, 0x50, 0x44, 0x46)) }
+                app.library.upsert(com.yeshsade.otzarot.reader.data.Doc(id = "sorttop-$i", uri = Uri.fromFile(f).toString(),
+                    name = "sorttop-%02d.pdf".format(i), receivedAt = now - i * 60_000L, identity = "sorttop-$i", originIdentity = "sorttop-$i",
+                    kind = com.yeshsade.otzarot.reader.data.Doc.Kind.SOURCE, size = 4))
+            }
+            val lib = startActivitySync(Intent(targetContext, LibraryActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK).putExtra(LibraryActivity.EXTRA_STAY, true)) as LibraryActivity
+            SystemClock.sleep(2000); waitForIdleSync()
+            fun first(): Int { var at = -1; onMainChecked {
+                val list = lib.window.decorView.findViewWithTag<androidx.recyclerview.widget.RecyclerView>("doc_list")
+                check((list.adapter?.itemCount ?: 0) >= 30) { "the list has ${list.adapter?.itemCount} cards" }
+                at = (list.layoutManager as androidx.recyclerview.widget.LinearLayoutManager).findFirstVisibleItemPosition() }; return at }
+            fun sortWindow(tag: String) {
+                onMainChecked { LibraryActivity::class.java.getDeclaredMethod("chooseSort").apply { isAccessible = true }.invoke(lib) }
+                waitForIdleSync(); SystemClock.sleep(400)
+                onMainChecked { lib.lastDialog!!.window!!.decorView.findViewWithTag<View>(tag).performClick() }
+                SystemClock.sleep(800); waitForIdleSync()
+                onMainChecked { lib.lastDialog!!.dismiss() }
+                SystemClock.sleep(500); waitForIdleSync()
+            }
+            check(first() == 0) { "the list did not open at its top: ${first()}" }
+            sortWindow("dir_true")
+            check(app.settings.sortReversed) { "the other way was not chosen" }
+            check(first() == 0) { "after the other way the list is at card ${first()}, not at the top" }
+            record("Choosing the other way shows the list from its top")
+            sortWindow("sort_${com.yeshsade.otzarot.reader.data.SortOrder.By.NAME.key}")
+            check(first() == 0) { "after sorting by name the list is at card ${first()}, not at the top" }
+            record("Choosing another sort shows the list from its top")
+            // scrolled down, then coming back from elsewhere: the list stays where it was
+            onMainChecked { lib.window.decorView.findViewWithTag<androidx.recyclerview.widget.RecyclerView>("doc_list").scrollToPosition(20) }
+            SystemClock.sleep(500); waitForIdleSync()
+            val before = first()
+            check(before > 0) { "could not scroll the list" }
+            refreshList(lib)
+            SystemClock.sleep(500)
+            check(first() == before) { "a plain refresh moved the list from $before to ${first()}" }
+            record("A refresh that is not a new sort leaves the list where it was")
+            onMainChecked { lib.finish() }
+            app.settings.sort = com.yeshsade.otzarot.reader.data.SortOrder.By.RECEIVED.key; app.settings.sortReversed = false
+            for (i in 1..30) { app.library.remove("sorttop-$i"); File(targetContext.filesDir, "sorttop-%02d.pdf".format(i)).delete() }
             result.putString("stream", "Passed $passed checks.\n")
             finish(Activity.RESULT_OK, result)
         } catch (error: Throwable) {
